@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>System.ServiceProcess.Core</AssemblyName>
+    <AssemblyTitle>System.ServiceProcess</AssemblyTitle>
+    <TargetFrameworks>net8.0-windows</TargetFrameworks>
+    <RootNamespace>System.ServiceProcess</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1589</NoWarn>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>Core.System.ServiceProcess</PackageId>
+    <Version>2.0.1</Version>
+    <Description>Porting of System.ServiceProcess for .NET Standard 2.0 and .NET Core 3.0 from the Microsoft .NET Reference Source.</Description>
+    <Product>Core.System.ServiceProcess</Product>
+    <Copyright>Copyright (C) Microsoft Corporation (Modifications by Chris Benard)</Copyright>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageTags>ServiceProcess, ServiceInstaller, ServiceProcessInstaller</PackageTags>
+    <PackageProjectUrl>https://github.com/cbenard/Core.System.ServiceProcess</PackageProjectUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
+  </ItemGroup>
+  <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
+    <Compile Remove="Design\ServiceInstallerDialog.cs" />
+    <Compile Remove="Design\ServiceNameConverter.cs" />
+    <None Include="Design\ServiceInstallerDialog.cs" />
+    <None Include="Design\ServiceNameConverter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Diagnostics.EventLog" Version="8.0.0" />
+    <PackageReference Include="System.Security.Permissions" Version="8.0.0" />
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core.System.Configuration.Install\System.Configuration.Install\System.Configuration.Install.csproj" />
+  </ItemGroup>
+</Project>
