@@ -4,10 +4,13 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace VhdAttach {
-    internal partial class ServiceWaitForm : Form {
+namespace VhdAttach
+{
+    internal partial class ServiceWaitForm : Form
+    {
 
-        public ServiceWaitForm(string title, CrossAppDomainDelegate action) {
+        public ServiceWaitForm(string title, Action action)
+        {
             InitializeComponent();
             this.Font = SystemFonts.MessageBoxFont;
             this.ControlBox = false;
@@ -16,25 +19,35 @@ namespace VhdAttach {
             bw.RunWorkerAsync(action);
         }
 
-
-        private void bw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e) {
+        private void bw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
             var exceptions = new List<Exception>();
-            var action = (Delegate)e.Argument;
-            try {
-                action.DynamicInvoke();
-            } catch (TargetInvocationException ex) {
-                if (ex.InnerException != null) {
+            var action = (Action)e.Argument;
+            try
+            {
+                action();
+            }
+            catch (TargetInvocationException ex)
+            {
+                if (ex.InnerException != null)
+                {
                     throw ex.InnerException;
-                } else {
+                }
+                else
+                {
                     throw;
                 }
             }
         }
 
-        private void bw_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e) {
-            if (e.Error == null) {
+        private void bw_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error == null)
+            {
                 this.DialogResult = DialogResult.OK;
-            } else {
+            }
+            else
+            {
                 Messages.ShowServiceIOException(this, e.Error);
                 this.DialogResult = DialogResult.Cancel;
             }

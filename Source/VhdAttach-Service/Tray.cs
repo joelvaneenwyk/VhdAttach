@@ -13,7 +13,9 @@ namespace VhdAttachService {
 
         internal static void Show() {
             Tray.Notify = new NotifyIcon();
+            // TODO ContextMenu is no longer supported. Use ContextMenuStrip instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
             Tray.Notify.ContextMenu = new ContextMenu();
+            // TODO MenuItem is no longer supported. Use ToolStripMenuItem instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
             Tray.Notify.ContextMenu.MenuItems.Add(new MenuItem("Exit", Tray_Exit_OnClick));
             Tray.Notify.Icon = GetApplicationIcon();
             Tray.Notify.Text = Medo.Reflection.CallingAssembly.Title;
