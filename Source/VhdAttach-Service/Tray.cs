@@ -6,48 +6,57 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace VhdAttachService {
-    internal static class Tray {
+namespace VhdAttachService
+{
+    internal static class Tray
+    {
 
         private static NotifyIcon Notify;
 
-        internal static void Show() {
+        internal static void Show()
+        {
             Tray.Notify = new NotifyIcon();
             // TODO ContextMenu is no longer supported. Use ContextMenuStrip instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
-            Tray.Notify.ContextMenu = new ContextMenu();
+            Tray.Notify.ContextMenuStrip = new ContextMenuStrip();
             // TODO MenuItem is no longer supported. Use ToolStripMenuItem instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
-            Tray.Notify.ContextMenu.MenuItems.Add(new MenuItem("Exit", Tray_Exit_OnClick));
+            Tray.Notify.ContextMenuStrip.Items.Add(new ToolStripMenuItem("Exit", null, Tray_Exit_OnClick));
             Tray.Notify.Icon = GetApplicationIcon();
             Tray.Notify.Text = Medo.Reflection.CallingAssembly.Title;
             Tray.Notify.Visible = true;
         }
 
-        internal static void SetStatusToRunningInteractive() {
+        internal static void SetStatusToRunningInteractive()
+        {
             Tray.Notify.Icon = GetAnnotatedIcon(Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(Medo.Reflection.CallingAssembly.Name + ".Resources.Service_RunningInteractive_12.png")));
             Tray.Notify.Text = Medo.Reflection.CallingAssembly.Title + " (PID=" + Process.GetCurrentProcess().Id.ToString(CultureInfo.InvariantCulture) + ")";
         }
 
-        internal static void SetStatusToUnknown() {
+        internal static void SetStatusToUnknown()
+        {
             Tray.Notify.Icon = GetAnnotatedIcon(Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(Medo.Reflection.CallingAssembly.Name + ".Resources.Service_Unknown_12.png")));
             Tray.Notify.Text = Medo.Reflection.CallingAssembly.Title + " - Unknown state.";
         }
 
-        internal static void SetStatusToRunning() {
+        internal static void SetStatusToRunning()
+        {
             Tray.Notify.Icon = GetAnnotatedIcon(Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(Medo.Reflection.CallingAssembly.Name + ".Resources.Service_Running_12.png")));
             Tray.Notify.Text = Medo.Reflection.CallingAssembly.Title + " - Running.";
         }
 
-        internal static void SetStatusToStopped() {
+        internal static void SetStatusToStopped()
+        {
             Tray.Notify.Icon = GetAnnotatedIcon(Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(Medo.Reflection.CallingAssembly.Name + ".Resources.Service_Stopped_12.png")));
             Tray.Notify.Text = Medo.Reflection.CallingAssembly.Title + " - Stopped.";
         }
 
-        internal static void Hide() {
+        internal static void Hide()
+        {
             Tray.Notify.Visible = false;
         }
 
 
-        private static void Tray_Exit_OnClick(object sender, EventArgs e) {
+        private static void Tray_Exit_OnClick(object sender, EventArgs e)
+        {
             Application.Exit();
         }
 
@@ -55,13 +64,17 @@ namespace VhdAttachService {
 
         #region Helpers
 
-        private static Icon GetAnnotatedIcon(Image annotation) {
+        private static Icon GetAnnotatedIcon(Image annotation)
+        {
             var icon = GetApplicationIcon();
 
-            if (icon != null) {
+            if (icon != null)
+            {
                 var image = icon.ToBitmap();
-                if (icon != null) {
-                    using (var g = Graphics.FromImage(image)) {
+                if (icon != null)
+                {
+                    using (var g = Graphics.FromImage(image))
+                    {
                         g.DrawImage(annotation, (int)g.VisibleClipBounds.Width - annotation.Width - 2, (int)g.VisibleClipBounds.Height - annotation.Height - 2);
                         g.Flush();
                     }
@@ -71,11 +84,14 @@ namespace VhdAttachService {
             return null;
         }
 
-        private static Icon GetApplicationIcon() {
+        private static Icon GetApplicationIcon()
+        {
             IntPtr hLibrary = NativeMethods.LoadLibrary(Assembly.GetEntryAssembly().Location);
-            if (!hLibrary.Equals(IntPtr.Zero)) {
+            if (!hLibrary.Equals(IntPtr.Zero))
+            {
                 IntPtr hIcon = NativeMethods.LoadImage(hLibrary, "#32512", NativeMethods.IMAGE_ICON, 20, 20, 0);
-                if (!hIcon.Equals(System.IntPtr.Zero)) {
+                if (!hIcon.Equals(System.IntPtr.Zero))
+                {
                     Icon icon = Icon.FromHandle(hIcon);
                     if (icon != null) { return icon; }
                 }
@@ -83,7 +99,8 @@ namespace VhdAttachService {
             return null;
         }
 
-        private static class NativeMethods {
+        private static class NativeMethods
+        {
 
             public const UInt32 IMAGE_ICON = 1;
 

@@ -16,17 +16,10 @@
     <AssemblyOriginatorKeyFile>Properties\App.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="System.configuration" />
-    <Reference Update="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Web" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\VhdAttach-Service\VhdAttach-Service.csproj" />
-    <ProjectReference Include="..\VhdAttach\VhdAttach.csproj" />
+    <ProjectReference Include="..\VhdAttach\VhdAttach.csproj">
+      <Project>{523842B0-C6A8-4126-B9DE-0D9D814F838E}</Project>
+      <Name>VhdAttach</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing.MSTest" Version="1.1.2" />

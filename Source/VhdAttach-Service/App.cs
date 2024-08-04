@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration.Install;
 using System.Reflection;
 using System.ServiceProcess;
 using System.Windows.Forms;

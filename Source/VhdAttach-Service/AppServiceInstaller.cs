@@ -4,12 +4,15 @@ using System.Configuration.Install;
 using System.Diagnostics;
 using System.ServiceProcess;
 
-namespace VhdAttachService {
-    
-    [RunInstaller(true)]
-    public class AppServiceInstaller : Installer {
+namespace VhdAttachService
+{
 
-        public AppServiceInstaller() {
+    [RunInstaller(true)]
+    public class AppServiceInstaller : Installer
+    {
+
+        public AppServiceInstaller()
+        {
             ServiceProcessInstaller serviceProcessInstaller = new ServiceProcessInstaller();
             serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
             serviceProcessInstaller.Username = null;
@@ -25,10 +28,12 @@ namespace VhdAttachService {
         }
 
 
-        protected override void OnCommitted(IDictionary savedState) {
+        protected override void OnCommitted(IDictionary savedState)
+        {
             Debug.WriteLine("OnCommitted : Begin.");
             base.OnCommitted(savedState);
-            using (ServiceController sc = new ServiceController(AppService.Instance.ServiceName)) {
+            using (ServiceController sc = new ServiceController(AppService.Instance.ServiceName))
+            {
                 Debug.WriteLine("OnCommitted : Service starting...");
                 sc.Start();
                 Debug.WriteLine("OnCommitted : Service started.");
@@ -36,10 +41,13 @@ namespace VhdAttachService {
             Debug.WriteLine("OnCommitted : End.");
         }
 
-        protected override void OnBeforeUninstall(IDictionary savedState) {
+        protected override void OnBeforeUninstall(IDictionary savedState)
+        {
             Debug.WriteLine("OnBeforeUninstall : Begin.");
-            using (ServiceController sc = new ServiceController(AppService.Instance.ServiceName)) {
-                if (sc.Status != ServiceControllerStatus.Stopped) {
+            using (ServiceController sc = new ServiceController(AppService.Instance.ServiceName))
+            {
+                if (sc.Status != ServiceControllerStatus.Stopped)
+                {
                     Debug.WriteLine("OnBeforeUninstall : Service stopping...");
                     sc.Stop();
                     Debug.WriteLine("OnBeforeUninstall : Service stopped...");
