@@ -21,16 +21,10 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <PropertyGroup>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="..\LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
-  </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
-    <Compile Remove="Design\ServiceInstallerDialog.cs" />
-    <Compile Remove="Design\ServiceNameConverter.cs" />
-    <None Include="Design\ServiceInstallerDialog.cs" />
-    <None Include="Design\ServiceNameConverter.cs" />
+    <None Include="..\LICENSE" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Diagnostics.EventLog" Version="8.0.0" />
@@ -38,6 +32,6 @@
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Core.System.Configuration.Install\System.Configuration.Install\System.Configuration.Install.csproj" />
+    <ProjectReference Include="..\System.Configuration.Install\System.Configuration.Install.csproj" />
   </ItemGroup>
 </Project>

@@ -99,4 +99,9 @@
 <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
 
 </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core.System.ServiceProcess\System.Configuration.Install\System.Configuration.Install.csproj" />
+    <ProjectReference Include="..\Core.System.ServiceProcess\System.ServiceProcess.Core\System.ServiceProcess.Core.csproj" />
+  </ItemGroup>
 </Project>

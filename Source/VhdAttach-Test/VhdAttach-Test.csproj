@@ -8,6 +8,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <Platforms>x64</Platforms>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -15,7 +16,15 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>Properties\App.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.System.ServiceProcess\System.Configuration.Install\System.Configuration.Install.csproj" />
+    <ProjectReference Include="..\Core.System.ServiceProcess\System.ServiceProcess.Core\System.ServiceProcess.Core.csproj" />
     <ProjectReference Include="..\VhdAttach\VhdAttach.csproj">
       <Project>{523842B0-C6A8-4126-B9DE-0D9D814F838E}</Project>
       <Name>VhdAttach</Name>
