@@ -1,0 +1,11 @@
+version: "0.2"
+ignorePaths: []
+dictionaryDefinitions:
+  - name: vhd-attach
+    path: .github/config/vhd-attach.dict
+    addWords: true
+dictionaries:
+  - vhd-attach
+words: []
+ignoreWords: []
+import: []
