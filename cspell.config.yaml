@@ -1,11 +1,15 @@
 version: "0.2"
-ignorePaths: []
+ignorePaths:
+  - './Binaries/**'
+  - '.idea/**'
+  - '.git/**'
+  - '*.csproj.user'
+  - '**/.vs/**'
+  - '**/obj/**'
+  - '**/bin/**'
 dictionaryDefinitions:
   - name: vhd-attach
     path: .github/config/vhd-attach.dict
     addWords: true
 dictionaries:
   - vhd-attach
-words: []
-ignoreWords: []
-import: []
