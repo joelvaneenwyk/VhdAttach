@@ -1,10 +1,12 @@
-**/Bin
-**/bin
-**/Debug
-**/obj
-**/TestResults
-**/ApiPortabilityAnalysis.htm
-**/.vs
+.idea/
+
+Bin/
+bin/
+Debug/
+obj/
+TestResults/
+ApiPortabilityAnalysis.htm
+.vs/
 
 Binaries/**
 Releases/**
@@ -33,3 +35,4 @@ Temporary/**
 *.zip
 
 *.upgrade.json
+*.csproj.DotSettings
