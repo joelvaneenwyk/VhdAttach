@@ -1,15 +1,17 @@
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using VirtualHardDiskImage;
 
-namespace VhdAttach {
-    internal partial class CreateFixedDiskForm : Form {
+namespace VhdAttach
+{
+    internal partial class CreateFixedDiskForm : Form
+    {
 
-        public CreateFixedDiskForm(string fileName, long sizeInBytes, bool isVhdX) {
+        public CreateFixedDiskForm(string fileName, long sizeInBytes, bool isVhdX)
+        {
             InitializeComponent();
             this.Font = SystemFonts.MessageBoxFont;
 
@@ -24,32 +26,42 @@ namespace VhdAttach {
         private readonly bool IsVhdX;
 
 
-        private void Form_Load(object sender, System.EventArgs e) {
+        private void Form_Load(object sender, System.EventArgs e)
+        {
             bgw.RunWorkerAsync();
         }
 
-        private void Form_FormClosing(object sender, FormClosingEventArgs e) {
-            if (e.CloseReason == CloseReason.UserClosing) {
+        private void Form_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
                 btnCancel.PerformClick();
                 e.Cancel = true;
                 Medo.Windows.Forms.TaskbarProgress.SetState(Medo.Windows.Forms.TaskbarProgressState.Error);
             }
         }
 
-        private void Form_FormClosed(object sender, FormClosedEventArgs e) {
+        private void Form_FormClosed(object sender, FormClosedEventArgs e)
+        {
             Medo.Windows.Forms.TaskbarProgress.SetState(Medo.Windows.Forms.TaskbarProgressState.NoProgress);
         }
 
 
-        private void bgw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e) {
-            if (this.IsVhdX) {
+        private void bgw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            if (this.IsVhdX)
+            {
                 bgw.ReportProgress(-1);
-                if (CreateVhdX() == false) {
+                if (CreateVhdX() == false)
+                {
                     e.Cancel = true;
                     return;
                 }
-            } else {
-                if (CreateVhd() == false) {
+            }
+            else
+            {
+                if (CreateVhd() == false)
+                {
                     e.Cancel = true;
                     return;
                 }
@@ -58,35 +70,46 @@ namespace VhdAttach {
             bgw.ReportProgress(100);
         }
 
-        private void bgw_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e) {
-            if (e.ProgressPercentage >= 0) {
+        private void bgw_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        {
+            if (e.ProgressPercentage >= 0)
+            {
                 Medo.Windows.Forms.TaskbarProgress.SetState(Medo.Windows.Forms.TaskbarProgressState.Normal);
                 Medo.Windows.Forms.TaskbarProgress.SetPercentage(e.ProgressPercentage);
                 prg.Style = ProgressBarStyle.Continuous;
                 prg.Value = e.ProgressPercentage;
-            } else {
+            }
+            else
+            {
                 Medo.Windows.Forms.TaskbarProgress.SetState(Medo.Windows.Forms.TaskbarProgressState.Indeterminate);
                 prg.Style = ProgressBarStyle.Marquee;
             }
         }
 
-        private void bgw_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e) {
-            if (e.Cancelled) {
+        private void bgw_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
                 this.DialogResult = DialogResult.Cancel;
-            } else {
+            }
+            else
+            {
                 this.DialogResult = DialogResult.OK;
             }
         }
 
 
-        private void btnCancel_Click(object sender, System.EventArgs e) {
+        private void btnCancel_Click(object sender, System.EventArgs e)
+        {
             bgw.CancelAsync();
             btnCancel.Enabled = false;
         }
 
 
-        private bool CreateVhd() {
-            using (var stream = new FileStream(this.FileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 1, FileOptions.WriteThrough)) {
+        private bool CreateVhd()
+        {
+            using (var stream = new FileStream(this.FileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 1, FileOptions.WriteThrough))
+            {
                 ReFS.RemoveIntegrityStream(stream.SafeFileHandle);
 
                 var footer = new HardDiskFooter();
@@ -102,8 +125,10 @@ namespace VhdAttach {
                 var lastReport = DateTime.UtcNow;
                 byte[] buffer = new byte[Settings.WriteBufferSize];
                 ulong remaining = footer.CurrentSize;
-                while (remaining > 0) {
-                    if (bgw.CancellationPending) {
+                while (remaining > 0)
+                {
+                    if (bgw.CancellationPending)
+                    {
                         stream.Dispose();
                         File.Delete(this.FileName);
                         return false;
@@ -112,7 +137,8 @@ namespace VhdAttach {
                     if ((ulong)count > remaining) { count = remaining; }
                     stream.Write(buffer, 0, (int)count);
                     remaining -= count;
-                    if (lastReport.AddSeconds(1) < DateTime.UtcNow) {
+                    if (lastReport.AddSeconds(1) < DateTime.UtcNow)
+                    {
                         bgw.ReportProgress(100 - (int)(remaining * 100 / footer.CurrentSize));
                         lastReport = DateTime.UtcNow;
                     }
@@ -123,14 +149,18 @@ namespace VhdAttach {
             return true;
         }
 
-        private bool CreateVhdX() {
-            using (var vhdx = new Medo.IO.VirtualDisk(this.FileName)) {
+        private bool CreateVhdX()
+        {
+            using (var vhdx = new Medo.IO.VirtualDisk(this.FileName))
+            {
                 vhdx.CreateAsync(this.SizeInBytes, Medo.IO.VirtualDiskCreateOptions.FullPhysicalAllocation, 0, 0, Medo.IO.VirtualDiskType.Vhdx);
                 var progress = vhdx.GetCreateProgress();
-                while (progress.IsDone == false) {
+                while (progress.IsDone == false)
+                {
                     //bgw.ReportProgress(progress.ProgressPercentage);
                     bgw.ReportProgress(-1);
-                    if (bgw.CancellationPending) {
+                    if (bgw.CancellationPending)
+                    {
                         //TODO
                         return false;
                     }

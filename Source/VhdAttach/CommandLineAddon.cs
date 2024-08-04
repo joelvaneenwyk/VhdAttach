@@ -12,10 +12,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using System.IO;
 using VhdAttachCommon;
 
 namespace VhdAttach
@@ -33,7 +32,8 @@ namespace VhdAttach
 
             // Init and parameter checks
 
-            if (args.Length != 2) {
+            if (args.Length != 2)
+            {
                 string err = "Changing drive letter failed. Wrong number of arguments.\n";
                 err += "Usage: VhdAttach -ChangeLetter VHDFilename Driveletter:";
                 showError(err);
@@ -42,7 +42,8 @@ namespace VhdAttach
 
             string fileName = args[0];
 
-            if (!File.Exists(fileName)) {
+            if (!File.Exists(fileName))
+            {
                 string err = "Changing drive letter failed. File not found: " + fileName + "\n";
                 err += "Usage: VhdAttach -ChangeLetter VHDFilename Driveletter:";
                 showError(err);
@@ -51,7 +52,8 @@ namespace VhdAttach
 
             string driveLetterRaw = args[1];
 
-            if (driveLetterRaw.Length > 3 || (driveLetterRaw.Length == 3 && driveLetterRaw.Substring(1,2) != ":\\") || (driveLetterRaw.Length == 2 && driveLetterRaw.Substring(1,1) != ":")) {
+            if (driveLetterRaw.Length > 3 || (driveLetterRaw.Length == 3 && driveLetterRaw.Substring(1, 2) != ":\\") || (driveLetterRaw.Length == 2 && driveLetterRaw.Substring(1, 1) != ":"))
+            {
                 string err = "Changing drive letter failed. Drive Letter parameter seems to be invalid.\n";
                 err += "Usage: VhdAttach -ChangeLetter VHDFilename Driveletter:";
                 showError(err);
@@ -62,7 +64,8 @@ namespace VhdAttach
             string driveLetter1 = args[1].Substring(0, 1);
             string driveLetter2 = driveLetter1 + ":";
 
-            if (allowedLetters.IndexOf(driveLetter1) == -1) {
+            if (allowedLetters.IndexOf(driveLetter1) == -1)
+            {
                 string err = "Changing drive letter failed. Drive Letter parameter seems to be invalid.\n";
                 err += "Usage: VhdAttach -ChangeLetter VHDFilename Driveletter:";
                 showError(err);
@@ -76,13 +79,17 @@ namespace VhdAttach
             // The actual drive letter operation begins here
 
             string attachedDevice = null;
-            
-            try {
-                using (var document = new Medo.IO.VirtualDisk(fileName)) {
+
+            try
+            {
+                using (var document = new Medo.IO.VirtualDisk(fileName))
+                {
                     document.Open(Medo.IO.VirtualDiskAccessMask.GetInfo);
                     attachedDevice = document.GetAttachedPath();
                 }
-            } catch {
+            }
+            catch
+            {
                 string err = "Changing Drive letter failed. Could not open device.\n";
                 err += "Possible reasons include:\n";
                 err += "The specified file might not be attached or maybe isn't an VHD file.";
@@ -90,13 +97,16 @@ namespace VhdAttach
                 return 1;
             }
 
-            if (attachedDevice != null) {
+            if (attachedDevice != null)
+            {
                 var volumes = new List<Volume>(Volume.GetVolumesOnPhysicalDrive(attachedDevice));
                 var availableVolumes = new List<Volume>();
-                if (volumes != null && volumes.Count > 0) {
+                if (volumes != null && volumes.Count > 0)
+                {
                     string oldLetter2 = volumes[0].DriveLetter2;
                     PipeResponse res = PipeClient.ChangeDriveLetter(volumes[0].VolumeName, driveLetter2);
-                    if (res.IsError == true) {
+                    if (res.IsError == true)
+                    {
                         PipeClient.ChangeDriveLetter(volumes[0].VolumeName, oldLetter2);
                         string err = "Changing drive letter failed. Drive letter possibly in use.";
                         showError(err);
