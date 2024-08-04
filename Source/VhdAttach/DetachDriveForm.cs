@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using Medo.Windows.Forms;
+using MessageBox = Medo.MessageBox;
 
 namespace VhdAttach
 {
@@ -17,9 +19,9 @@ namespace VhdAttach
         public DetachDriveForm(IList<FileInfo> file)
         {
             InitializeComponent();
-            this.Font = SystemFonts.MessageBoxFont;
+            Font = SystemFonts.MessageBoxFont;
 
-            this._files = file;
+            _files = file;
         }
 
         private void Form_Load(object sender, EventArgs e)
@@ -29,43 +31,43 @@ namespace VhdAttach
 
         private void Form_Shown(object sender, EventArgs e)
         {
-            Medo.Windows.Forms.TaskbarProgress.SetState(Medo.Windows.Forms.TaskbarProgressState.Indeterminate);
+            TaskbarProgress.SetState(TaskbarProgressState.Indeterminate);
         }
 
         private void Form_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Medo.Windows.Forms.TaskbarProgress.SetState(Medo.Windows.Forms.TaskbarProgressState.NoProgress);
+            TaskbarProgress.SetState(TaskbarProgressState.NoProgress);
         }
 
 
         private void bw_DoWork(object sender, DoWorkEventArgs e)
         {
-            this._exceptions = new List<Exception>();
+            _exceptions = new List<Exception>();
             FileSystemInfo iDirectory = null;
             try
             {
-                for (var i = 0; i < this._files.Count; ++i)
+                for (var i = 0; i < _files.Count; ++i)
                 {
-                    iDirectory = new DirectoryInfo(this._files[i].FullName);
+                    iDirectory = new DirectoryInfo(_files[i].FullName);
                     bw.ReportProgress(-1, iDirectory.Name);
 
                     Utility.FixServiceErrorsIfNeeded();
                     var res = PipeClient.DetachDrive(iDirectory.FullName);
                     if (res.IsError)
                     {
-                        this._exceptions.Add(new InvalidOperationException(iDirectory.Name, new Exception(res.Message)));
+                        _exceptions.Add(new InvalidOperationException(iDirectory.Name, new Exception(res.Message)));
                     }
                 }
             }
             catch (TimeoutException)
             {
-                this._exceptions.Add(new InvalidOperationException(iDirectory.Name, new Exception("Cannot access VHD Attach service.")));
+                _exceptions.Add(new InvalidOperationException(iDirectory.Name, new Exception("Cannot access VHD Attach service.")));
             }
             catch (Exception ex)
             {
-                this._exceptions.Add(new InvalidOperationException(iDirectory.Name, ex));
+                _exceptions.Add(new InvalidOperationException(iDirectory.Name, ex));
             }
-            if (this._exceptions.Count > 0) { throw new InvalidOperationException(); }
+            if (_exceptions.Count > 0) { throw new InvalidOperationException(); }
         }
 
         private static int IndexOfAny(string text, int startingIndex, params string[] fragment)
@@ -87,30 +89,30 @@ namespace VhdAttach
         {
             if (e.UserState != null)
             {
-                this.StatusLabel.Text = "Detaching drive" + Environment.NewLine + e.UserState.ToString();
+                StatusLabel.Text = "Detaching drive" + Environment.NewLine + e.UserState;
             }
         }
 
         private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (this.IsDisposed) { return; }
+            if (IsDisposed) { return; }
 
-            this.progress.Value = 100;
-            Medo.Windows.Forms.TaskbarProgress.SetPercentage(100);
+            progress.Value = 100;
+            TaskbarProgress.SetPercentage(100);
             if (e.Error == null)
             {
-                Medo.Windows.Forms.TaskbarProgress.SetState(Medo.Windows.Forms.TaskbarProgressState.Normal);
+                TaskbarProgress.SetState(TaskbarProgressState.Normal);
             }
             else
             {
-                Medo.Windows.Forms.TaskbarProgress.SetState(Medo.Windows.Forms.TaskbarProgressState.Error);
-                System.Environment.ExitCode = 1;
-                foreach (var iException in this._exceptions)
+                TaskbarProgress.SetState(TaskbarProgressState.Error);
+                Environment.ExitCode = 1;
+                foreach (var iException in _exceptions)
                 {
-                    Medo.MessageBox.ShowError(this, string.Format("Drive \"{0}\" cannot be detached.\n\n{1}", iException.Message, iException.InnerException.Message));
+                    MessageBox.ShowError(this, string.Format("Drive \"{0}\" cannot be detached.\n\n{1}", iException.Message, iException.InnerException.Message));
                 }
             }
-            this.Close();
+            Close();
         }
 
     }

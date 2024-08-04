@@ -7,6 +7,9 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
 using System.Windows.Forms;
+using Medo.Application;
+using Medo.Windows.Forms;
+using MessageBox = Medo.MessageBox;
 
 namespace VhdAttach
 {
@@ -20,13 +23,13 @@ namespace VhdAttach
             mutexSecurity.AddAccessRule(new MutexAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl, AccessControlType.Allow));
             using (var setupMutex = new Mutex(false, @"Global\JosipMedved_VhdAttach", out bool createdNew))
             {
-                System.Windows.Forms.Application.EnableVisualStyles();
-                System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
 
-                Medo.Application.UnhandledCatch.ThreadException += new EventHandler<ThreadExceptionEventArgs>(UnhandledCatch_ThreadException);
-                Medo.Application.UnhandledCatch.Attach();
+                UnhandledCatch.ThreadException += UnhandledCatch_ThreadException;
+                UnhandledCatch.Attach();
 
-                if (!((Environment.OSVersion.Version.Build < 7000) || (App.IsRunningOnMono)))
+                if (!((Environment.OSVersion.Version.Build < 7000) || (IsRunningOnMono)))
                 {
                     var appId = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
                     if (appId.Length > 127) { appId = @"JosipMedved_VhdAttach\" + appId.Substring(appId.Length - 127 - 20); }
@@ -34,49 +37,49 @@ namespace VhdAttach
                 }
                 else
                 {
-                    Medo.MessageBox.ShowError(null, "This program requires Windows 7 or later.");
-                    System.Environment.Exit(1);
+                    MessageBox.ShowError(null, "This program requires Windows 7 or later.");
+                    Environment.Exit(1);
                 }
 
-                Medo.Windows.Forms.TaskbarProgress.DoNotThrowNotImplementedException = true;
+                TaskbarProgress.DoNotThrowNotImplementedException = true;
 
 
-                bool doAttach = Medo.Application.Args.Current.ContainsKey("Attach");
-                bool doDetach = Medo.Application.Args.Current.ContainsKey("Detach") && (!doAttach);
-                bool doDetachDrive = Medo.Application.Args.Current.ContainsKey("DetachDrive") && (!doAttach) && (!doDetach);
-                bool doChangeLetter = Medo.Application.Args.Current.ContainsKey("ChangeLetter") && (!doAttach) && (!doDetach) && (!doDetachDrive);
+                bool doAttach = Args.Current.ContainsKey("Attach");
+                bool doDetach = Args.Current.ContainsKey("Detach") && (!doAttach);
+                bool doDetachDrive = Args.Current.ContainsKey("DetachDrive") && (!doAttach) && (!doDetach);
+                bool doChangeLetter = Args.Current.ContainsKey("ChangeLetter") && (!doAttach) && (!doDetach) && (!doDetachDrive);
 
                 bool doAnything = doAttach || doDetach || doDetachDrive || doChangeLetter;
 
                 if (doAnything)
                 {
 
-                    string[] argfiles = Medo.Application.Args.Current.GetValues("");
+                    string[] argfiles = Args.Current.GetValues("");
 
                     if (doChangeLetter)
                     {
                         CommandLineAddon cla = new CommandLineAddon();
                         int res = cla.ChangeDriveLetter(argfiles);
-                        System.Environment.Exit(res);
+                        Environment.Exit(res);
                         return;
                     }
 
                     var files = new List<FileInfo>();
                     foreach (var iFile in argfiles)
                     {
-                        files.Add(new FileInfo(iFile.TrimEnd(new char[] { '\"' })));
+                        files.Add(new FileInfo(iFile.TrimEnd(new[] { '\"' })));
                     }
 
                     if (files.Count == 0)
                     {
-                        System.Environment.Exit(1);
+                        Environment.Exit(1);
                         return;
                     }
 
                     Form appForm = null;
                     if (doAttach)
                     {
-                        appForm = new AttachForm(files, Medo.Application.Args.Current.ContainsKey("readonly"), false);
+                        appForm = new AttachForm(files, Args.Current.ContainsKey("readonly"), false);
                     }
                     else if (doDetach)
                     {
@@ -89,13 +92,13 @@ namespace VhdAttach
 
                     if (appForm != null)
                     {
-                        Medo.Windows.Forms.TaskbarProgress.DefaultOwner = appForm;
+                        TaskbarProgress.DefaultOwner = appForm;
                         Application.Run(appForm);
-                        System.Environment.Exit(System.Environment.ExitCode);
+                        Environment.Exit(Environment.ExitCode);
                     }
                     else
                     {
-                        System.Environment.Exit(1);
+                        Environment.Exit(1);
                     }
 
                 }

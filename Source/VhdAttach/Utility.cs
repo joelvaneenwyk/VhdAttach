@@ -15,7 +15,7 @@ namespace VhdAttach
             startInfo.CreateNoWindow = Process.GetCurrentProcess().StartInfo.CreateNoWindow;
             startInfo.FileName = exe;
             startInfo.Arguments = arguments;
-            startInfo.WorkingDirectory = System.Environment.CurrentDirectory;
+            startInfo.WorkingDirectory = Environment.CurrentDirectory;
             return startInfo;
         }
 
@@ -30,7 +30,7 @@ namespace VhdAttach
                     {
                         try
                         {
-                            Utility.ForceStartService();
+                            ForceStartService();
                         }
                         catch (InvalidOperationException) { }
                     }
@@ -39,7 +39,7 @@ namespace VhdAttach
                 {
                     try
                     {
-                        Utility.ForceInstallService();
+                        ForceInstallService();
                     }
                     catch (InvalidOperationException) { }
                 }

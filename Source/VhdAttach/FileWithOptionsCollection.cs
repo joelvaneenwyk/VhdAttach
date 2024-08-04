@@ -20,7 +20,7 @@ namespace VhdAttach
                     break;
                 }
             }
-            return this.Remove(selectedItem);
+            return Remove(selectedItem);
         }
 
     }

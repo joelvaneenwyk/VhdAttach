@@ -1,9 +1,12 @@
-﻿namespace VhdAttach {
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace VhdAttach {
     partial class AttachForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -81,9 +84,9 @@
 
         #endregion
 
-        private System.Windows.Forms.ProgressBar progress;
-        private System.Windows.Forms.Label StatusLabel;
-        private System.ComponentModel.BackgroundWorker bw;
+        private ProgressBar progress;
+        private Label StatusLabel;
+        private BackgroundWorker bw;
 
     }
 }

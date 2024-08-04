@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Medo.Diagnostics;
+using Medo.IO;
 using VhdAttachCommon;
 
 namespace VhdAttachService
@@ -53,7 +55,7 @@ namespace VhdAttachService
         {
             try
             {
-                ThreadPool.QueueUserWorkItem(new WaitCallback(RunAttachAutomatics));
+                ThreadPool.QueueUserWorkItem(RunAttachAutomatics);
 
                 try
                 {
@@ -114,12 +116,12 @@ namespace VhdAttachService
                 try
                 {
                     Thread.Sleep(1000); //a bit of breather
-                    var access = Medo.IO.VirtualDiskAccessMask.All;
-                    var options = Medo.IO.VirtualDiskAttachOptions.PermanentLifetime;
-                    if (fwo.ReadOnly) { options |= Medo.IO.VirtualDiskAttachOptions.ReadOnly; }
-                    if (fwo.NoDriveLetter) { options |= Medo.IO.VirtualDiskAttachOptions.NoDriveLetter; }
+                    var access = VirtualDiskAccessMask.All;
+                    var options = VirtualDiskAttachOptions.PermanentLifetime;
+                    if (fwo.ReadOnly) { options |= VirtualDiskAttachOptions.ReadOnly; }
+                    if (fwo.NoDriveLetter) { options |= VirtualDiskAttachOptions.NoDriveLetter; }
                     var fileName = fwo.FileName;
-                    using (var disk = new Medo.IO.VirtualDisk(fileName))
+                    using (var disk = new VirtualDisk(fileName))
                     {
                         disk.Open(access);
                         disk.Attach(options);
@@ -129,7 +131,7 @@ namespace VhdAttachService
                 {
                     if (failedList != null) { failedList.Add(fwo); }
                     Trace.TraceError("E: Cannot attach file \"" + fwo.FileName + "\". " + ex.Message);
-                    Medo.Diagnostics.ErrorReport.SaveToTemp(ex, fwo.FileName);
+                    ErrorReport.SaveToTemp(ex, fwo.FileName);
                 }
             }
         }

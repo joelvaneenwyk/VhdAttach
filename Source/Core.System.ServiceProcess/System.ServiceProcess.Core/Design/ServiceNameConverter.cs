@@ -4,13 +4,11 @@
 // </copyright>                                                                
 //------------------------------------------------------------------------------
 
+using System.ComponentModel;
+using System.Globalization;
+
 namespace System.ServiceProcess.Design
 {
-    using System;
-    using System.ComponentModel;
-    using System.Globalization;
-    using System.ServiceProcess;
-
     internal class ServiceNameConverter : TypeConverter
     {
         private StandardValuesCollection values;

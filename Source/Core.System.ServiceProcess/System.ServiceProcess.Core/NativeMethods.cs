@@ -4,12 +4,11 @@
 // </copyright>                                                                
 //------------------------------------------------------------------------------
 
+using System.Runtime.InteropServices;
+using System.Text;
+
 namespace System.ServiceProcess
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using System.Text;
-
     internal static class NativeMethods
     {
         public const int MAX_COMPUTERNAME_LENGTH = 31;
@@ -116,7 +115,7 @@ namespace System.ServiceProcess
         public const int SERVICE_CONFIG_FAILURE_ACTIONS = 0x00000002;
         public const int SERVICE_CONFIG_DELAYED_AUTO_START_INFO = 0x00000003;
 
-        [System.Runtime.InteropServices.ComVisible(false)]
+        [ComVisible(false)]
         public enum StructFormat
         {
             Ansi = 1,
@@ -325,32 +324,32 @@ namespace System.ServiceProcess
         {
             public short length = 0;
             public short maximumLength = 0;
-            public IntPtr pwstr = (IntPtr)0;
+            public IntPtr pwstr = 0;
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public class LSA_OBJECT_ATTRIBUTES
         {
             public int length = 0;
-            public IntPtr rootDirectory = (IntPtr)0;
-            public IntPtr pointerLsaString = (IntPtr)0;
+            public IntPtr rootDirectory = 0;
+            public IntPtr pointerLsaString = 0;
             public int attributes = 0;
-            public IntPtr pointerSecurityDescriptor = (IntPtr)0;
-            public IntPtr pointerSecurityQualityOfService = (IntPtr)0;
+            public IntPtr pointerSecurityDescriptor = 0;
+            public IntPtr pointerSecurityQualityOfService = 0;
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct SERVICE_DESCRIPTION
         {
             public IntPtr description;
-        };
+        }
 
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct SERVICE_DELAYED_AUTOSTART_INFO
         {
             public bool fDelayedAutostart;
-        };
+        }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct SC_ACTION
@@ -372,52 +371,52 @@ namespace System.ServiceProcess
 
         public delegate int ServiceControlCallbackEx(int control, int eventType, IntPtr eventData, IntPtr eventContext);
 
-        [DllImport(ExternDll.Advapi32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
         public extern static IntPtr OpenService(IntPtr databaseHandle, string serviceName, int access);
 
-        [DllImport(ExternDll.Advapi32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
         public extern static IntPtr RegisterServiceCtrlHandler(string serviceName, Delegate callback);
 
-        [DllImport(ExternDll.Advapi32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
         public extern static IntPtr RegisterServiceCtrlHandlerEx(string serviceName, Delegate callback, IntPtr userData);
 
-        [DllImport(ExternDll.Advapi32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
         public extern static bool StartServiceCtrlDispatcher(IntPtr entry);
 
-        [DllImport(ExternDll.Advapi32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
         public extern static IntPtr CreateService(IntPtr databaseHandle, string serviceName, string displayName, int access, int serviceType,
             int startType, int errorControl, string binaryPath, string loadOrderGroup, IntPtr pTagId, string dependencies,
             string servicesStartName, string password);
 
-        [DllImport(ExternDll.Advapi32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
         public extern static bool DeleteService(IntPtr serviceHandle);
 
-        [DllImport(ExternDll.Advapi32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = false)]
-        public static extern int LsaOpenPolicy(NativeMethods.LSA_UNICODE_STRING systemName, IntPtr pointerObjectAttributes,
+        [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = false)]
+        public static extern int LsaOpenPolicy(LSA_UNICODE_STRING systemName, IntPtr pointerObjectAttributes,
                                                             int desiredAccess, out IntPtr pointerPolicyHandle);
 
-        [DllImport(ExternDll.Advapi32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = false)]
-        public static extern int LsaAddAccountRights(IntPtr policyHandle, byte[] accountSid, NativeMethods.LSA_UNICODE_STRING userRights,
+        [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = false)]
+        public static extern int LsaAddAccountRights(IntPtr policyHandle, byte[] accountSid, LSA_UNICODE_STRING userRights,
                                                             int countOfRights);
 
-        [DllImport(ExternDll.Advapi32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = false)]
-        public static extern int LsaRemoveAccountRights(IntPtr policyHandle, byte[] accountSid, bool allRights, NativeMethods.LSA_UNICODE_STRING userRights, int countOfRights);
+        [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = false)]
+        public static extern int LsaRemoveAccountRights(IntPtr policyHandle, byte[] accountSid, bool allRights, LSA_UNICODE_STRING userRights, int countOfRights);
 
-        [DllImport(ExternDll.Advapi32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = false)]
+        [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = false)]
         public static extern int LsaEnumerateAccountRights(IntPtr policyHandle, byte[] accountSid, out IntPtr pLsaUnicodeStringUserRights, out int RightsCount);
 
-        [DllImport(ExternDll.Advapi32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool LookupAccountName(string systemName, string accountName,
             byte[] sid, int[] sidLen, char[] refDomainName, int[] domNameLen,
             [In, Out] int[] sidNameUse);
 
-        [DllImport(ExternDll.Kernel32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        [DllImport(ExternDll.Kernel32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool GetComputerName(StringBuilder lpBuffer, ref int nSize);
 
-        [DllImport(ExternDll.Advapi32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool ChangeServiceConfig2(IntPtr serviceHandle, uint infoLevel, ref SERVICE_DESCRIPTION serviceDesc);
 
-        [DllImport(ExternDll.Advapi32, CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool ChangeServiceConfig2(IntPtr serviceHandle, uint infoLevel, ref SERVICE_DELAYED_AUTOSTART_INFO serviceDesc);
 
 

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using VhdAttachCommon;
+using MessageBox = Medo.MessageBox;
 
 namespace VhdAttach
 {
@@ -16,7 +17,7 @@ namespace VhdAttach
 
             Helper.UpdateToolstripImages(imagesAutoAttach, toolVhdOrder);
 
-            this.Font = SystemFonts.MessageBoxFont;
+            Font = SystemFonts.MessageBoxFont;
         }
 
         private void SettingsForm_Load(object sender, EventArgs e)
@@ -51,7 +52,7 @@ namespace VhdAttach
         {
             try
             {
-                this.Cursor = Cursors.WaitCursor;
+                Cursor = Cursors.WaitCursor;
 
                 var vhds = new List<string>();
                 foreach (ListViewVhdItem item in listAutoAttach.Items)
@@ -61,7 +62,7 @@ namespace VhdAttach
                 var resVhd = PipeClient.WriteContextMenuVhdSettings(checkVhdOpen.Checked, checkVhdAttach.Checked, checkVhdAttachReadOnly.Checked, checkVhdDetach.Checked, checkVhdDetachDrive.Checked);
                 if (resVhd.IsError)
                 {
-                    Medo.MessageBox.ShowError(this, resVhd.Message);
+                    MessageBox.ShowError(this, resVhd.Message);
                 }
 
                 var isWindows8 = ((Environment.OSVersion.Version.Major * 1000000 + Environment.OSVersion.Version.Minor) >= 6000002); //show if equal to or higher than Windows 8
@@ -70,13 +71,13 @@ namespace VhdAttach
                     var resIso = PipeClient.WriteContextMenuIsoSettings(checkIsoOpen.Checked, checkIsoAttachReadOnly.Checked, checkIsoDetach.Checked);
                     if (resIso.IsError)
                     {
-                        Medo.MessageBox.ShowError(this, resIso.Message);
+                        MessageBox.ShowError(this, resIso.Message);
                     }
                 }
                 var resAA = PipeClient.WriteAutoAttachSettings(vhds.ToArray());
                 if (resAA.IsError)
                 {
-                    Medo.MessageBox.ShowError(this, resAA.Message);
+                    MessageBox.ShowError(this, resAA.Message);
                 }
             }
             catch (IOException ex)
@@ -85,7 +86,7 @@ namespace VhdAttach
             }
             finally
             {
-                this.Cursor = Cursors.Default;
+                Cursor = Cursors.Default;
             }
         }
 
@@ -261,9 +262,9 @@ namespace VhdAttach
             var res = PipeClient.RegisterExtensionVhd();
             if (res.IsError)
             {
-                Medo.MessageBox.ShowError(this, res.Message);
+                MessageBox.ShowError(this, res.Message);
             }
-            this.DialogResult = DialogResult.OK;
+            DialogResult = DialogResult.OK;
         }
 
     }

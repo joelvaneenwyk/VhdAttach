@@ -4,6 +4,8 @@
 //2008-06-06: Added Copyright.
 
 
+using System;
+using System.Globalization;
 using System.Reflection;
 
 namespace Medo.Reflection
@@ -15,7 +17,7 @@ namespace Medo.Reflection
     public static class CallingAssembly
     {
 
-        private readonly static Assembly Assembly = System.Reflection.Assembly.GetCallingAssembly();
+        private readonly static Assembly Assembly = Assembly.GetCallingAssembly();
         private readonly static AssemblyName AssemblyName = Assembly.GetName();
 
         /// <summary>
@@ -37,7 +39,7 @@ namespace Medo.Reflection
         /// <summary>
         /// Gets entry assembly's version.
         /// </summary>
-        public static System.Version Version
+        public static Version Version
         {
             get { return AssemblyName.Version; }
         }
@@ -49,8 +51,8 @@ namespace Medo.Reflection
         {
             get
             {
-                System.Version version = AssemblyName.Version;
-                return version.Major.ToString("0", System.Globalization.CultureInfo.InvariantCulture) + "." + version.Minor.ToString("00", System.Globalization.CultureInfo.InvariantCulture);
+                Version version = AssemblyName.Version;
+                return version.Major.ToString("0", CultureInfo.InvariantCulture) + "." + version.Minor.ToString("00", CultureInfo.InvariantCulture);
             }
         }
 
@@ -61,8 +63,8 @@ namespace Medo.Reflection
         {
             get
             {
-                System.Version version = AssemblyName.Version;
-                return version.Major.ToString("0", System.Globalization.CultureInfo.CurrentCulture) + "." + version.Minor.ToString("00", System.Globalization.CultureInfo.CurrentCulture) + "." + version.Build.ToString("000", System.Globalization.CultureInfo.CurrentCulture) + "." + version.Revision.ToString("0000", System.Globalization.CultureInfo.CurrentCulture);
+                Version version = AssemblyName.Version;
+                return version.Major.ToString("0", CultureInfo.CurrentCulture) + "." + version.Minor.ToString("00", CultureInfo.CurrentCulture) + "." + version.Build.ToString("000", CultureInfo.CurrentCulture) + "." + version.Revision.ToString("0000", CultureInfo.CurrentCulture);
             }
         }
 
@@ -73,10 +75,10 @@ namespace Medo.Reflection
         {
             get
             {
-                object[] companyAttributes = Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyCompanyAttribute), true);
+                object[] companyAttributes = Assembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), true);
                 if ((companyAttributes != null) && (companyAttributes.Length >= 1))
                 {
-                    return ((System.Reflection.AssemblyCompanyAttribute)companyAttributes[companyAttributes.Length - 1]).Company;
+                    return ((AssemblyCompanyAttribute)companyAttributes[companyAttributes.Length - 1]).Company;
                 }
                 return null;
             }
@@ -89,15 +91,13 @@ namespace Medo.Reflection
         {
             get
             {
-                object[] titleAttributes = Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyTitleAttribute), true);
+                object[] titleAttributes = Assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), true);
                 if ((titleAttributes != null) && (titleAttributes.Length >= 1))
                 {
-                    return ((System.Reflection.AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
+                    return ((AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
                 }
-                else
-                {
-                    return Name;
-                }
+
+                return Name;
             }
         }
 
@@ -108,15 +108,13 @@ namespace Medo.Reflection
         {
             get
             {
-                object[] productAttributes = Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyProductAttribute), true);
+                object[] productAttributes = Assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), true);
                 if ((productAttributes != null) && (productAttributes.Length >= 1))
                 {
-                    return ((System.Reflection.AssemblyProductAttribute)productAttributes[productAttributes.Length - 1]).Product;
+                    return ((AssemblyProductAttribute)productAttributes[productAttributes.Length - 1]).Product;
                 }
-                else
-                {
-                    return Title;
-                }
+
+                return Title;
             }
         }
 
@@ -127,15 +125,13 @@ namespace Medo.Reflection
         {
             get
             {
-                object[] descriptionAttributes = Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyDescriptionAttribute), true);
+                object[] descriptionAttributes = Assembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute), true);
                 if ((descriptionAttributes != null) && (descriptionAttributes.Length >= 1))
                 {
-                    return ((System.Reflection.AssemblyDescriptionAttribute)descriptionAttributes[descriptionAttributes.Length - 1]).Description;
+                    return ((AssemblyDescriptionAttribute)descriptionAttributes[descriptionAttributes.Length - 1]).Description;
                 }
-                else
-                {
-                    return string.Empty;
-                }
+
+                return string.Empty;
             }
         }
 
@@ -146,15 +142,13 @@ namespace Medo.Reflection
         {
             get
             {
-                object[] copyrightAttributes = Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyCopyrightAttribute), true);
+                object[] copyrightAttributes = Assembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), true);
                 if ((copyrightAttributes != null) && (copyrightAttributes.Length >= 1))
                 {
-                    return ((System.Reflection.AssemblyCopyrightAttribute)copyrightAttributes[copyrightAttributes.Length - 1]).Copyright;
+                    return ((AssemblyCopyrightAttribute)copyrightAttributes[copyrightAttributes.Length - 1]).Copyright;
                 }
-                else
-                {
-                    return string.Empty;
-                }
+
+                return string.Empty;
             }
         }
 

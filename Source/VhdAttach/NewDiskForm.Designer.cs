@@ -1,9 +1,12 @@
-﻿namespace VhdAttach {
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace VhdAttach {
     partial class NewDiskForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -254,20 +257,20 @@
 
         #endregion
 
-        private System.Windows.Forms.Label lblSize;
-        private System.Windows.Forms.Button btnOK;
-        private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.CheckBox chbThousandSize;
-        private System.Windows.Forms.GroupBox grpType;
-        private System.Windows.Forms.RadioButton radTypeFixed;
-        private System.Windows.Forms.RadioButton radTypeDynamic;
-        private System.Windows.Forms.Label lblSizeInBytes;
-        private System.Windows.Forms.TextBox txtSizeInBytes;
-        private System.Windows.Forms.ErrorProvider erpError;
-        private System.Windows.Forms.ComboBox cmbSizeUnit;
-        private System.Windows.Forms.TextBox txtSize;
-        private System.Windows.Forms.GroupBox grpFormat;
-        private System.Windows.Forms.RadioButton radFormatVhdX;
-        private System.Windows.Forms.RadioButton radFormatVhd;
+        private Label lblSize;
+        private Button btnOK;
+        private Button btnCancel;
+        private CheckBox chbThousandSize;
+        private GroupBox grpType;
+        private RadioButton radTypeFixed;
+        private RadioButton radTypeDynamic;
+        private Label lblSizeInBytes;
+        private TextBox txtSizeInBytes;
+        private ErrorProvider erpError;
+        private ComboBox cmbSizeUnit;
+        private TextBox txtSize;
+        private GroupBox grpFormat;
+        private RadioButton radFormatVhdX;
+        private RadioButton radFormatVhd;
     }
 }

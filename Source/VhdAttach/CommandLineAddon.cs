@@ -1,21 +1,23 @@
 /*
  * Command line Addon - Exposes additional functionality to the command line
  * Author: Ralf Ostertag, (C) 2014 Ralf Ostertag
- *  
+ *
  * ChangeLetter
- * Usage: VhdAttach -ChangeLetter VHDFilename DriveLetter 
+ * Usage: VhdAttach -ChangeLetter VHDFilename DriveLetter
  * Drive letter can be: L, L:, L:\, l, l:, l:\
- * 
+ *
  * 2014-04-27 First version (adds ChangeDriveLetter)
- * 
-*/
+ *
+ */
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Medo.IO;
 using VhdAttachCommon;
+using Timer = System.Timers.Timer;
 
 namespace VhdAttach
 {
@@ -82,9 +84,9 @@ namespace VhdAttach
 
             try
             {
-                using (var document = new Medo.IO.VirtualDisk(fileName))
+                using (var document = new VirtualDisk(fileName))
                 {
-                    document.Open(Medo.IO.VirtualDiskAccessMask.GetInfo);
+                    document.Open(VirtualDiskAccessMask.GetInfo);
                     attachedDevice = document.GetAttachedPath();
                 }
             }
@@ -105,7 +107,7 @@ namespace VhdAttach
                 {
                     string oldLetter2 = volumes[0].DriveLetter2;
                     PipeResponse res = PipeClient.ChangeDriveLetter(volumes[0].VolumeName, driveLetter2);
-                    if (res.IsError == true)
+                    if (res.IsError)
                     {
                         PipeClient.ChangeDriveLetter(volumes[0].VolumeName, oldLetter2);
                         string err = "Changing drive letter failed. Drive letter possibly in use.";
@@ -133,7 +135,7 @@ namespace VhdAttach
         private void showError(string errorText)
         {
             string caption = "VhdAttach Error";
-            var timer = new System.Timers.Timer(5000) { AutoReset = false };
+            var timer = new Timer(5000) { AutoReset = false };
             timer.Elapsed += delegate
             {
                 IntPtr hWnd = FindWindowByCaption(IntPtr.Zero, caption);

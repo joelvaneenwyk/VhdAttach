@@ -4,18 +4,17 @@
 // </copyright>                                                                
 //------------------------------------------------------------------------------
 
+using System.Collections;
+using System.ComponentModel;
+using System.Configuration.Install;
+using System.Diagnostics;
+using System.Globalization;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
+
 namespace System.ServiceProcess
 {
-    using System;
-    using System.Collections;
-    using System.ComponentModel;
-    using System.Configuration.Install;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.Runtime.InteropServices;
-    using System.Text;
-    using System.Threading;
-
     /// <summary>Installs a class that extends <see cref="T:System.ServiceProcess.ServiceBase" /> to implement a service. This class is called by the install utility when installing a service application.</summary>
     public class ServiceInstaller : ComponentInstaller
     {
@@ -28,13 +27,13 @@ namespace System.ServiceProcess
         private string description = "";
         private string[] servicesDependedOn = new string[0];
         private ServiceStartMode startType = ServiceStartMode.Manual;
-        private bool delayedStartMode = false;
-        private static bool environmentChecked = false;
-        private static bool isWin9x = false;
+        private bool delayedStartMode;
+        private static bool environmentChecked;
+        private static bool isWin9x;
 
 
         /// <summary>Initializes a new instance of the <see cref="T:System.ServiceProcess.ServiceInstaller" /> class.</summary>
-        public ServiceInstaller() : base()
+        public ServiceInstaller()
         {
 
             // Create an EventLogInstaller and add it to our Installers collection to take
@@ -144,7 +143,7 @@ namespace System.ServiceProcess
             {
                 return false;
             }
-            foreach (char c in serviceName.ToCharArray())
+            foreach (char c in serviceName)
             {
                 if (c == '\\' || c == '/')
                 {
@@ -215,14 +214,12 @@ namespace System.ServiceProcess
 
                 return;
             }
-            else
-            {
-                isWin9x = Environment.OSVersion.Platform != PlatformID.Win32NT;
-                environmentChecked = true;
 
-                if (isWin9x)
-                    throw new PlatformNotSupportedException(Res.GetString(Res.CantInstallOnWin9x));
-            }
+            isWin9x = Environment.OSVersion.Platform != PlatformID.Win32NT;
+            environmentChecked = true;
+
+            if (isWin9x)
+                throw new PlatformNotSupportedException(Res.GetString(Res.CantInstallOnWin9x));
         }
 
 

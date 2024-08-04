@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Configuration.Install;
 using System.Diagnostics;
 using System.ServiceProcess;
+using Medo.Reflection;
 
 namespace VhdAttachService
 {
@@ -17,14 +18,14 @@ namespace VhdAttachService
             serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
             serviceProcessInstaller.Username = null;
             serviceProcessInstaller.Password = null;
-            this.Installers.Add(serviceProcessInstaller);
+            Installers.Add(serviceProcessInstaller);
 
             ServiceInstaller serviceInstaller = new ServiceInstaller();
             serviceInstaller.ServiceName = AppService.Instance.ServiceName;
-            serviceInstaller.DisplayName = Medo.Reflection.CallingAssembly.Product;
-            serviceInstaller.Description = Medo.Reflection.CallingAssembly.Description;
+            serviceInstaller.DisplayName = CallingAssembly.Product;
+            serviceInstaller.Description = CallingAssembly.Description;
             serviceInstaller.StartType = ServiceStartMode.Automatic;
-            this.Installers.Add(serviceInstaller);
+            Installers.Add(serviceInstaller);
         }
 
 

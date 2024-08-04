@@ -18,14 +18,13 @@ namespace VhdAttach
             {
                 return GetLettersFromPhysicalDrive(driveNumber);
             }
-            else if (device.StartsWith(@"\\.\CDROM", StringComparison.InvariantCulture) && int.TryParse(device.Substring(9), NumberStyles.Integer, CultureInfo.InvariantCulture, out driveNumber))
+
+            if (device.StartsWith(@"\\.\CDROM", StringComparison.InvariantCulture) && int.TryParse(device.Substring(9), NumberStyles.Integer, CultureInfo.InvariantCulture, out driveNumber))
             {
                 return GetLettersFromCdRom(driveNumber);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
 
@@ -98,7 +97,7 @@ namespace VhdAttach
                 if (NativeMethods.QueryDosDeviceW(dosDevice, sb, (uint)sb.Capacity) > 0)
                 {
                     var dosPath = sb.ToString();
-                    Debug.WriteLine(sb.ToString() + " is at " + dosDevice);
+                    Debug.WriteLine(sb + " is at " + dosDevice);
                     if (dosPath.StartsWith(@"\Device\CdRom", StringComparison.OrdinalIgnoreCase))
                     {
                         int cdromNumber = 0;
@@ -106,7 +105,7 @@ namespace VhdAttach
                         {
                             if (cdromNumber == driveNumber)
                             {
-                                return new string[] { dosDevice + @"\" };
+                                return new[] { dosDevice + @"\" };
                             }
                         }
                     }
@@ -121,8 +120,8 @@ namespace VhdAttach
 
             [DllImportAttribute("kernel32.dll", EntryPoint = "QueryDosDeviceW")]
             public static extern UInt32 QueryDosDeviceW(
-                [InAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] string lpDeviceName,
-                [OutAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpTargetPath,
+                [InAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] string lpDeviceName,
+                [OutAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpTargetPath,
                 UInt32 ucchMax);
 
         }

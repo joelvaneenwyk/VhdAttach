@@ -4,15 +4,13 @@
 // </copyright>                                                                
 //------------------------------------------------------------------------------
 
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
+using System.Windows.Forms;
+
 namespace System.ServiceProcess.Design
 {
-
-    using System;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Drawing;
-    using System.Windows.Forms;
-
     /// <summary>Specifies the return value of a <see cref="T:System.ServiceProcess.Design.ServiceInstallerDialog" /> form.</summary>
     public enum ServiceInstallerDialogResult
     {
@@ -28,21 +26,21 @@ namespace System.ServiceProcess.Design
     public class ServiceInstallerDialog : Form
     {
 
-        private System.Windows.Forms.Button okButton;
+        private Button okButton;
 
-        private System.Windows.Forms.TextBox passwordEdit;
+        private TextBox passwordEdit;
 
-        private System.Windows.Forms.Button cancelButton;
+        private Button cancelButton;
 
-        private System.Windows.Forms.TextBox confirmPassword;
+        private TextBox confirmPassword;
 
-        private System.Windows.Forms.TextBox usernameEdit;
+        private TextBox usernameEdit;
 
-        private System.Windows.Forms.Label label1;
+        private Label label1;
 
-        private System.Windows.Forms.Label label2;
+        private Label label2;
 
-        private System.Windows.Forms.Label label3;
+        private Label label3;
         private TableLayoutPanel okCancelTableLayoutPanel;
         private TableLayoutPanel overarchingTableLayoutPanel;
 
@@ -51,7 +49,7 @@ namespace System.ServiceProcess.Design
         /// <summary>Initializes a new instance of the service account form.</summary>
         public ServiceInstallerDialog()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         /// <summary>Gets or sets the password for the service account form.</summary>
@@ -95,136 +93,136 @@ namespace System.ServiceProcess.Design
         /// <summary>Begins running a standard application message loop and displays the service account form.</summary>
         public static void Main()
         {
-            System.Windows.Forms.Application.Run(new ServiceInstallerDialog());
+            Application.Run(new ServiceInstallerDialog());
         }
 
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServiceInstallerDialog));
-            this.okButton = new System.Windows.Forms.Button();
-            this.passwordEdit = new System.Windows.Forms.TextBox();
-            this.cancelButton = new System.Windows.Forms.Button();
-            this.confirmPassword = new System.Windows.Forms.TextBox();
-            this.usernameEdit = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.okCancelTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.overarchingTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.okCancelTableLayoutPanel.SuspendLayout();
-            this.overarchingTableLayoutPanel.SuspendLayout();
-            this.SuspendLayout();
-            // 
+            ComponentResourceManager resources = new ComponentResourceManager(typeof(ServiceInstallerDialog));
+            okButton = new Button();
+            passwordEdit = new TextBox();
+            cancelButton = new Button();
+            confirmPassword = new TextBox();
+            usernameEdit = new TextBox();
+            label1 = new Label();
+            label2 = new Label();
+            label3 = new Label();
+            okCancelTableLayoutPanel = new TableLayoutPanel();
+            overarchingTableLayoutPanel = new TableLayoutPanel();
+            okCancelTableLayoutPanel.SuspendLayout();
+            overarchingTableLayoutPanel.SuspendLayout();
+            SuspendLayout();
+            //
             // okButton
-            // 
-            resources.ApplyResources(this.okButton, "okButton");
-            this.okButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
-            this.okButton.MinimumSize = new System.Drawing.Size(75, 23);
-            this.okButton.Name = "okButton";
-            this.okButton.Padding = new System.Windows.Forms.Padding(10, 0, 10, 0);
-            this.okButton.Click += new System.EventHandler(this.okButton_Click);
-            // 
+            //
+            resources.ApplyResources(okButton, "okButton");
+            okButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            okButton.DialogResult = DialogResult.OK;
+            okButton.Margin = new Padding(0, 0, 3, 0);
+            okButton.MinimumSize = new Size(75, 23);
+            okButton.Name = "okButton";
+            okButton.Padding = new Padding(10, 0, 10, 0);
+            okButton.Click += okButton_Click;
+            //
             // passwordEdit
-            // 
-            resources.ApplyResources(this.passwordEdit, "passwordEdit");
-            this.passwordEdit.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
-            this.passwordEdit.Name = "passwordEdit";
-            // 
+            //
+            resources.ApplyResources(passwordEdit, "passwordEdit");
+            passwordEdit.Margin = new Padding(3, 3, 0, 3);
+            passwordEdit.Name = "passwordEdit";
+            //
             // cancelButton
-            // 
-            resources.ApplyResources(this.cancelButton, "cancelButton");
-            this.cancelButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
-            this.cancelButton.MinimumSize = new System.Drawing.Size(75, 23);
-            this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Padding = new System.Windows.Forms.Padding(10, 0, 10, 0);
-            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
-            // 
+            //
+            resources.ApplyResources(cancelButton, "cancelButton");
+            cancelButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            cancelButton.DialogResult = DialogResult.Cancel;
+            cancelButton.Margin = new Padding(3, 0, 0, 0);
+            cancelButton.MinimumSize = new Size(75, 23);
+            cancelButton.Name = "cancelButton";
+            cancelButton.Padding = new Padding(10, 0, 10, 0);
+            cancelButton.Click += cancelButton_Click;
+            //
             // confirmPassword
-            // 
-            resources.ApplyResources(this.confirmPassword, "confirmPassword");
-            this.confirmPassword.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
-            this.confirmPassword.Name = "confirmPassword";
-            // 
+            //
+            resources.ApplyResources(confirmPassword, "confirmPassword");
+            confirmPassword.Margin = new Padding(3, 3, 0, 3);
+            confirmPassword.Name = "confirmPassword";
+            //
             // usernameEdit
-            // 
-            resources.ApplyResources(this.usernameEdit, "usernameEdit");
-            this.usernameEdit.Margin = new System.Windows.Forms.Padding(3, 0, 0, 3);
-            this.usernameEdit.Name = "usernameEdit";
-            // 
+            //
+            resources.ApplyResources(usernameEdit, "usernameEdit");
+            usernameEdit.Margin = new Padding(3, 0, 0, 3);
+            usernameEdit.Name = "usernameEdit";
+            //
             // label1
-            // 
-            resources.ApplyResources(this.label1, "label1");
-            this.label1.Margin = new System.Windows.Forms.Padding(0, 0, 3, 3);
-            this.label1.Name = "label1";
-            // 
+            //
+            resources.ApplyResources(label1, "label1");
+            label1.Margin = new Padding(0, 0, 3, 3);
+            label1.Name = "label1";
+            //
             // label2
-            // 
-            resources.ApplyResources(this.label2, "label2");
-            this.label2.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
-            this.label2.Name = "label2";
-            // 
+            //
+            resources.ApplyResources(label2, "label2");
+            label2.Margin = new Padding(0, 3, 3, 3);
+            label2.Name = "label2";
+            //
             // label3
-            // 
-            resources.ApplyResources(this.label3, "label3");
-            this.label3.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
-            this.label3.Name = "label3";
-            // 
+            //
+            resources.ApplyResources(label3, "label3");
+            label3.Margin = new Padding(0, 3, 3, 3);
+            label3.Name = "label3";
+            //
             // okCancelTableLayoutPanel
-            // 
-            resources.ApplyResources(this.okCancelTableLayoutPanel, "okCancelTableLayoutPanel");
-            this.okCancelTableLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.overarchingTableLayoutPanel.SetColumnSpan(this.okCancelTableLayoutPanel, 2);
-            this.okCancelTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.okCancelTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.okCancelTableLayoutPanel.Controls.Add(this.okButton, 0, 0);
-            this.okCancelTableLayoutPanel.Controls.Add(this.cancelButton, 1, 0);
-            this.okCancelTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0, 6, 0, 0);
-            this.okCancelTableLayoutPanel.Name = "okCancelTableLayoutPanel";
-            this.okCancelTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            // 
+            //
+            resources.ApplyResources(okCancelTableLayoutPanel, "okCancelTableLayoutPanel");
+            okCancelTableLayoutPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            overarchingTableLayoutPanel.SetColumnSpan(okCancelTableLayoutPanel, 2);
+            okCancelTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            okCancelTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            okCancelTableLayoutPanel.Controls.Add(okButton, 0, 0);
+            okCancelTableLayoutPanel.Controls.Add(cancelButton, 1, 0);
+            okCancelTableLayoutPanel.Margin = new Padding(0, 6, 0, 0);
+            okCancelTableLayoutPanel.Name = "okCancelTableLayoutPanel";
+            okCancelTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            //
             // overarchingTableLayoutPanel
-            // 
-            resources.ApplyResources(this.overarchingTableLayoutPanel, "overarchingTableLayoutPanel");
-            this.overarchingTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.overarchingTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.overarchingTableLayoutPanel.Controls.Add(this.label1, 0, 0);
-            this.overarchingTableLayoutPanel.Controls.Add(this.okCancelTableLayoutPanel, 0, 3);
-            this.overarchingTableLayoutPanel.Controls.Add(this.label2, 0, 1);
-            this.overarchingTableLayoutPanel.Controls.Add(this.confirmPassword, 1, 2);
-            this.overarchingTableLayoutPanel.Controls.Add(this.label3, 0, 2);
-            this.overarchingTableLayoutPanel.Controls.Add(this.passwordEdit, 1, 1);
-            this.overarchingTableLayoutPanel.Controls.Add(this.usernameEdit, 1, 0);
-            this.overarchingTableLayoutPanel.Name = "overarchingTableLayoutPanel";
-            this.overarchingTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.overarchingTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.overarchingTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.overarchingTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            // 
+            //
+            resources.ApplyResources(overarchingTableLayoutPanel, "overarchingTableLayoutPanel");
+            overarchingTableLayoutPanel.ColumnStyles.Add(new ColumnStyle());
+            overarchingTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            overarchingTableLayoutPanel.Controls.Add(label1, 0, 0);
+            overarchingTableLayoutPanel.Controls.Add(okCancelTableLayoutPanel, 0, 3);
+            overarchingTableLayoutPanel.Controls.Add(label2, 0, 1);
+            overarchingTableLayoutPanel.Controls.Add(confirmPassword, 1, 2);
+            overarchingTableLayoutPanel.Controls.Add(label3, 0, 2);
+            overarchingTableLayoutPanel.Controls.Add(passwordEdit, 1, 1);
+            overarchingTableLayoutPanel.Controls.Add(usernameEdit, 1, 0);
+            overarchingTableLayoutPanel.Name = "overarchingTableLayoutPanel";
+            overarchingTableLayoutPanel.RowStyles.Add(new RowStyle());
+            overarchingTableLayoutPanel.RowStyles.Add(new RowStyle());
+            overarchingTableLayoutPanel.RowStyles.Add(new RowStyle());
+            overarchingTableLayoutPanel.RowStyles.Add(new RowStyle());
+            //
             // ServiceInstallerDialog
-            // 
-            this.AcceptButton = this.okButton;
+            //
+            AcceptButton = okButton;
             resources.ApplyResources(this, "$this");
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoScaleDimensions = new SizeF(6, 13);
-            this.CancelButton = this.cancelButton;
-            this.Controls.Add(this.overarchingTableLayoutPanel);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.HelpButton = true;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "ServiceInstallerDialog";
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
-            this.HelpButtonClicked += new System.ComponentModel.CancelEventHandler(this.ServiceInstallerDialog_HelpButtonClicked);
-            this.okCancelTableLayoutPanel.ResumeLayout(false);
-            this.okCancelTableLayoutPanel.PerformLayout();
-            this.overarchingTableLayoutPanel.ResumeLayout(false);
-            this.overarchingTableLayoutPanel.PerformLayout();
-            this.ResumeLayout(false);
+            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(6, 13);
+            CancelButton = cancelButton;
+            Controls.Add(overarchingTableLayoutPanel);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            HelpButton = true;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "ServiceInstallerDialog";
+            ShowIcon = false;
+            ShowInTaskbar = false;
+            HelpButtonClicked += ServiceInstallerDialog_HelpButtonClicked;
+            okCancelTableLayoutPanel.ResumeLayout(false);
+            okCancelTableLayoutPanel.PerformLayout();
+            overarchingTableLayoutPanel.ResumeLayout(false);
+            overarchingTableLayoutPanel.PerformLayout();
+            ResumeLayout(false);
 
         }
 
@@ -241,7 +239,7 @@ namespace System.ServiceProcess.Design
                 DialogResult = DialogResult.OK;
             else
             {
-                MessageBoxOptions options = (MessageBoxOptions)0;
+                MessageBoxOptions options = 0;
                 Control current = this;
                 while (current.RightToLeft == RightToLeft.Inherit)
                     current = current.Parent;

@@ -86,7 +86,7 @@ namespace System.Configuration.Install
         /// <param name="commandLine">The command line to use when creating a new <see cref="T:System.Configuration.Install.InstallContext" /> object for the assembly's installation. Can be a null value.</param>
         public AssemblyInstaller(string fileName, string[] commandLine)
         {
-            Path = System.IO.Path.GetFullPath(fileName);
+            Path = IO.Path.GetFullPath(fileName);
             CommandLine = commandLine;
             UseNewContext = true;
         }
@@ -120,7 +120,7 @@ namespace System.Configuration.Install
 
         private InstallContext CreateAssemblyContext()
         {
-            var installContext = new InstallContext(System.IO.Path.ChangeExtension(Path, ".InstallLog"), CommandLine);
+            var installContext = new InstallContext(IO.Path.ChangeExtension(Path, ".InstallLog"), CommandLine);
             if (Context != null)
             {
                 installContext.Parameters["logtoconsole"] = Context.Parameters["logtoconsole"];
@@ -170,12 +170,12 @@ namespace System.Configuration.Install
         private string GetInstallStatePath(string assemblyPath)
         {
             var text = Context.Parameters["InstallStateDir"];
-            assemblyPath = System.IO.Path.ChangeExtension(assemblyPath, ".InstallState");
+            assemblyPath = IO.Path.ChangeExtension(assemblyPath, ".InstallState");
             if (string.IsNullOrEmpty(text))
             {
                 return assemblyPath;
             }
-            return System.IO.Path.Combine(text, System.IO.Path.GetFileName(assemblyPath));
+            return IO.Path.Combine(text, IO.Path.GetFileName(assemblyPath));
         }
 
         /// <summary>Completes the installation transaction.</summary>

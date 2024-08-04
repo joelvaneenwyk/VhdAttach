@@ -13,9 +13,9 @@ namespace VhdAttach
         public ChangeDriveLetterForm(Volume volume)
         {
             InitializeComponent();
-            this.Font = SystemFonts.MessageBoxFont;
+            Font = SystemFonts.MessageBoxFont;
 
-            this.Volume = volume;
+            Volume = volume;
 
             string currDrive = volume.DriveLetter2;
             if (currDrive == null)
@@ -30,7 +30,7 @@ namespace VhdAttach
             var drives = new List<string>();
             for (char letter = 'A'; letter <= 'Z'; letter++)
             {
-                drives.Add(letter.ToString() + ":");
+                drives.Add(letter + ":");
             }
 
             foreach (var drive in DriveInfo.GetDrives())
@@ -54,11 +54,11 @@ namespace VhdAttach
 
         private void cmbDriveLetter_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (this.Volume.DriveLetter2 != null)
+            if (Volume.DriveLetter2 != null)
             {
                 btnOK.Text = string.IsNullOrEmpty(cmbDriveLetter.Text) ? "Remove" : "Change";
             }
-            btnOK.Enabled = !(cmbDriveLetter.Text.Equals(this.Volume.DriveLetter2, StringComparison.InvariantCultureIgnoreCase));
+            btnOK.Enabled = !(cmbDriveLetter.Text.Equals(Volume.DriveLetter2, StringComparison.InvariantCultureIgnoreCase));
         }
 
 
@@ -66,9 +66,9 @@ namespace VhdAttach
         {
             var driveLetter = string.IsNullOrEmpty(cmbDriveLetter.Text) ? "" : cmbDriveLetter.Text + "\\";
             using (var frm = new ServiceWaitForm("Changing drive letter",
-                delegate ()
+                delegate
                 {
-                    var res = PipeClient.ChangeDriveLetter(this.Volume.VolumeName, driveLetter);
+                    var res = PipeClient.ChangeDriveLetter(Volume.VolumeName, driveLetter);
                     if (res.IsError)
                     {
                         throw new InvalidOperationException(res.Message);

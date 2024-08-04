@@ -1,9 +1,12 @@
-﻿namespace VhdAttach {
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace VhdAttach {
     partial class CreateFixedDiskForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -84,8 +87,8 @@
 
         #endregion
 
-        private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.ProgressBar prg;
-        private System.ComponentModel.BackgroundWorker bgw;
+        private Button btnCancel;
+        private ProgressBar prg;
+        private BackgroundWorker bgw;
     }
 }

@@ -84,16 +84,27 @@
   <ItemGroup>
     <Content Include="Properties\App.ico" />
   </ItemGroup>
-  <PropertyGroup />
-
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DebugType>embedded</DebugType>
+    <WarningLevel>9999</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DebugType>embedded</DebugType>
+    <WarningLevel>9999</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Management" Version="8.0.0" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
-
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Core.System.ServiceProcess\System.Configuration.Install\System.Configuration.Install.csproj" />
-    <ProjectReference Include="..\Core.System.ServiceProcess\System.ServiceProcess.Core\System.ServiceProcess.Core.csproj" />
   </ItemGroup>
 </Project>

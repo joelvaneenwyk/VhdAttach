@@ -4,14 +4,14 @@ using VhdAttachCommon;
 namespace VhdAttachTest
 {
 
-    [TestClass()]
+    [TestClass]
     public class FileWithOptionsTest
     {
 
-        public TestContext TestContext { get; set; }
+        public TestContext? TestContext { get; set; }
 
 
-        [TestMethod()]
+        [TestMethod]
         public void Test_FileWithOptions_Read_01()
         {
             var x = new FileWithOptions(@"/readonly/E:\Virtual Disks\Install.vhd");
@@ -20,7 +20,7 @@ namespace VhdAttachTest
             Assert.AreEqual(false, x.NoDriveLetter);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void Test_FileWithOptions_Read_02()
         {
             var x = new FileWithOptions(@"E:\Virtual Disks\Floppy.vhd");
@@ -30,7 +30,7 @@ namespace VhdAttachTest
         }
 
 
-        [TestMethod()]
+        [TestMethod]
         public void Test_FileWithOptions_Write_01()
         {
             var x = new FileWithOptions("Test.vhd");
@@ -41,7 +41,7 @@ namespace VhdAttachTest
             Assert.AreEqual("/readonly/Test.vhd", x.ToString());
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void Test_FileWithOptions_Write_02()
         {
             var x = new FileWithOptions("Test.vhd");
@@ -53,7 +53,7 @@ namespace VhdAttachTest
             Assert.AreEqual("/readonly,nodriveletter/Test.vhd", x.ToString());
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void Test_FileWithOptions_Write_03()
         {
             var x = new FileWithOptions("/readonly/Test.vhd");

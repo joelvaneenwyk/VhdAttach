@@ -66,7 +66,7 @@ namespace VhdAttachService
             public const byte PARTITION_IFS = 0x07;
 
 
-            public enum PARTITION_STYLE : int
+            public enum PARTITION_STYLE
             {
                 PARTITION_STYLE_MBR = 0,
                 PARTITION_STYLE_GPT = 1,

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using MessageBox = Medo.MessageBox;
 
 namespace VhdAttach
 {
@@ -10,7 +11,7 @@ namespace VhdAttach
 
         public static void ShowServiceIOException(IWin32Window owner, Exception ex)
         {
-            Medo.MessageBox.ShowError(owner, string.Format(ServiceIOException + "\n\n{0}", ex.Message));
+            MessageBox.ShowError(owner, string.Format(ServiceIOException + "\n\n{0}", ex.Message));
         }
 
 

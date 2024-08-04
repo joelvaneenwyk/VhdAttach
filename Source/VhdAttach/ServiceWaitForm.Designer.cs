@@ -1,9 +1,12 @@
-﻿namespace VhdAttach {
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace VhdAttach {
     partial class ServiceWaitForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -63,7 +66,7 @@
 
         #endregion
 
-        private System.Windows.Forms.ProgressBar progressBar1;
-        private System.ComponentModel.BackgroundWorker bw;
+        private ProgressBar progressBar1;
+        private BackgroundWorker bw;
     }
 }

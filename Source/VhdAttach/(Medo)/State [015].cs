@@ -19,13 +19,18 @@
 //2010-10-31: Added option to skip registry writes (NoRegistryWrites).
 
 
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Security;
+using System.Text;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace Medo.Windows.Forms
 {
@@ -48,27 +53,27 @@ namespace Medo.Windows.Forms
             {
                 if (_subkeyPath == null)
                 {
-                    System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
+                    Assembly assembly = Assembly.GetEntryAssembly();
 
                     string company = null;
-                    object[] companyAttributes = assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyCompanyAttribute), true);
+                    object[] companyAttributes = assembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), true);
                     if ((companyAttributes != null) && (companyAttributes.Length >= 1))
                     {
-                        company = ((System.Reflection.AssemblyCompanyAttribute)companyAttributes[companyAttributes.Length - 1]).Company;
+                        company = ((AssemblyCompanyAttribute)companyAttributes[companyAttributes.Length - 1]).Company;
                     }
 
                     string product = null;
-                    object[] productAttributes = assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyProductAttribute), true);
+                    object[] productAttributes = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), true);
                     if ((productAttributes != null) && (productAttributes.Length >= 1))
                     {
-                        product = ((System.Reflection.AssemblyProductAttribute)productAttributes[productAttributes.Length - 1]).Product;
+                        product = ((AssemblyProductAttribute)productAttributes[productAttributes.Length - 1]).Product;
                     }
                     else
                     {
-                        object[] titleAttributes = assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyTitleAttribute), true);
+                        object[] titleAttributes = assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), true);
                         if ((titleAttributes != null) && (titleAttributes.Length >= 1))
                         {
-                            product = ((System.Reflection.AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
+                            product = ((AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
                         }
                         else
                         {
@@ -123,14 +128,14 @@ namespace Medo.Windows.Forms
         {
             if (form == null) { throw new ArgumentNullException("form", "Form is null."); }
 
-            if (formSetup.ContainsKey(form)) { throw new System.ArgumentException("Form setup already done.", "form"); }
+            if (formSetup.ContainsKey(form)) { throw new ArgumentException("Form setup already done.", "form"); }
 
             Load(form);
             if (controls != null) { Load(controls); }
 
             formSetup.Add(form, controls);
-            form.Load += new EventHandler(form_Load);
-            form.FormClosed += new FormClosedEventHandler(form_FormClosed);
+            form.Load += form_Load;
+            form.FormClosed += form_FormClosed;
         }
 
         private static Dictionary<Form, Control[]> formSetup = new Dictionary<Form, Control[]>();
@@ -162,7 +167,7 @@ namespace Medo.Windows.Forms
         /// </summary>
         /// <param name="controls">Controls to load.</param>
         /// <exception cref="System.NotSupportedException">This control's parents cannot be resolved using Name property.</exception>
-        public static void Load(params System.Windows.Forms.Control[] controls)
+        public static void Load(params Control[] controls)
         {
             if (controls == null) { return; }
             for (int i = 0; i < controls.Length; ++i)
@@ -192,7 +197,6 @@ namespace Medo.Windows.Forms
                 if (splitContainer != null)
                 {
                     Load(splitContainer);
-                    continue;
                 }
             }
         }
@@ -203,7 +207,7 @@ namespace Medo.Windows.Forms
         /// </summary>
         /// <param name="controls">Controls to save.</param>
         /// <exception cref="System.NotSupportedException">This control's parents cannot be resolved using Name property.</exception>
-        public static void Save(params System.Windows.Forms.Control[] controls)
+        public static void Save(params Control[] controls)
         {
             if (controls == null) { return; }
             for (int i = 0; i < controls.Length; ++i)
@@ -233,7 +237,6 @@ namespace Medo.Windows.Forms
                 if (splitContainer != null)
                 {
                     Save(splitContainer);
-                    continue;
                 }
             }
         }
@@ -249,14 +252,14 @@ namespace Medo.Windows.Forms
         /// <param name="form">Form.</param>
         /// <exception cref="System.ArgumentNullException">Form is null.</exception>
         /// <exception cref="System.NotSupportedException">This control's parents cannot be resolved using Name property.</exception>
-        public static void Save(System.Windows.Forms.Form form)
+        public static void Save(Form form)
         {
             if (form == null) { throw new ArgumentNullException("form", "Form is null."); }
 
             string baseValueName = Helper.GetControlPath(form);
 
-            Helper.Write(baseValueName + ".WindowState", System.Convert.ToInt32(form.WindowState, System.Globalization.CultureInfo.InvariantCulture));
-            if (form.WindowState == System.Windows.Forms.FormWindowState.Normal)
+            Helper.Write(baseValueName + ".WindowState", Convert.ToInt32(form.WindowState, CultureInfo.InvariantCulture));
+            if (form.WindowState == FormWindowState.Normal)
             {
                 Helper.Write(baseValueName + ".Left", form.Bounds.Left);
                 Helper.Write(baseValueName + ".Top", form.Bounds.Top);
@@ -279,15 +282,15 @@ namespace Medo.Windows.Forms
         /// <param name="form">Form.</param>
         /// <exception cref="System.ArgumentNullException">Form is null.</exception>
         /// <exception cref="System.NotSupportedException">This control's parents cannot be resolved using Name property.</exception>
-        public static void Load(System.Windows.Forms.Form form)
+        public static void Load(Form form)
         {
             if (form == null) { throw new ArgumentNullException("form", "Form is null."); }
 
             string baseValueName = Helper.GetControlPath(form);
 
-            int currWindowState = System.Convert.ToInt32(form.WindowState, System.Globalization.CultureInfo.InvariantCulture);
+            int currWindowState = Convert.ToInt32(form.WindowState, CultureInfo.InvariantCulture);
             int currLeft, currTop, currWidth, currHeight;
-            if (form.WindowState == System.Windows.Forms.FormWindowState.Normal)
+            if (form.WindowState == FormWindowState.Normal)
             {
                 currLeft = form.Bounds.Left;
                 currTop = form.Bounds.Top;
@@ -314,12 +317,12 @@ namespace Medo.Windows.Forms
                 newHeight = currHeight;
             }
 
-            System.Windows.Forms.Screen screen = System.Windows.Forms.Screen.FromRectangle(new System.Drawing.Rectangle(newLeft, newTop, newWidth, newHeight));
+            Screen screen = Screen.FromRectangle(new Rectangle(newLeft, newTop, newWidth, newHeight));
 
             switch (form.StartPosition)
             {
 
-                case System.Windows.Forms.FormStartPosition.CenterParent:
+                case FormStartPosition.CenterParent:
                     {
                         if (form.Parent != null)
                         {
@@ -339,7 +342,7 @@ namespace Medo.Windows.Forms
                     }
                     break;
 
-                case System.Windows.Forms.FormStartPosition.CenterScreen:
+                case FormStartPosition.CenterScreen:
                     {
                         newLeft = screen.WorkingArea.Left + (screen.WorkingArea.Width - newWidth) / 2;
                         newTop = screen.WorkingArea.Top + (screen.WorkingArea.Height - newHeight) / 2;
@@ -360,9 +363,9 @@ namespace Medo.Windows.Forms
             form.Location = new Point(newLeft, newTop);
             form.Size = new Size(newWidth, newHeight);
 
-            if (newWindowState == System.Convert.ToInt32(System.Windows.Forms.FormWindowState.Maximized, System.Globalization.CultureInfo.InvariantCulture))
+            if (newWindowState == Convert.ToInt32(FormWindowState.Maximized, CultureInfo.InvariantCulture))
             {
-                form.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+                form.WindowState = FormWindowState.Maximized;
             } //no need for any code - it is already either in normal state or minimized (will be restored to normal).
         }
 
@@ -376,7 +379,7 @@ namespace Medo.Windows.Forms
         /// <param name="control">PropertyGrid.</param>
         /// <exception cref="System.ArgumentNullException">Control is null.</exception>
         /// <exception cref="System.NotSupportedException">This control's parents cannot be resolved using Name property.</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "PropertyGrid is passed because of reflection upon its member.")]
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "PropertyGrid is passed because of reflection upon its member.")]
         public static void Load(PropertyGrid control)
         {
             if (control == null) { throw new ArgumentNullException("control", "Control is null."); }
@@ -385,16 +388,16 @@ namespace Medo.Windows.Forms
 
             try
             {
-                control.PropertySort = (System.Windows.Forms.PropertySort)(Helper.Read(baseValueName + ".PropertySort", System.Convert.ToInt32(control.PropertySort, System.Globalization.CultureInfo.InvariantCulture)));
+                control.PropertySort = (PropertySort)(Helper.Read(baseValueName + ".PropertySort", Convert.ToInt32(control.PropertySort, CultureInfo.InvariantCulture)));
             }
-            catch (System.ComponentModel.InvalidEnumArgumentException) { }
+            catch (InvalidEnumArgumentException) { }
 
-            System.Reflection.FieldInfo fieldGridView = control.GetType().GetField("gridView", System.Reflection.BindingFlags.GetField | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            FieldInfo fieldGridView = control.GetType().GetField("gridView", BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance);
             object gridViewObject = fieldGridView.GetValue(control);
             if (gridViewObject != null)
             {
                 int currentlabelWidth = 0;
-                System.Reflection.PropertyInfo propertyInternalLabelWidth = gridViewObject.GetType().GetProperty("InternalLabelWidth", System.Reflection.BindingFlags.InvokeMethod | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                PropertyInfo propertyInternalLabelWidth = gridViewObject.GetType().GetProperty("InternalLabelWidth", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
                 if (propertyInternalLabelWidth != null)
                 {
                     object val = propertyInternalLabelWidth.GetValue(gridViewObject, null);
@@ -406,11 +409,11 @@ namespace Medo.Windows.Forms
                 int labelWidth = Helper.Read(baseValueName + ".LabelWidth", currentlabelWidth);
                 if ((labelWidth > 0) && (labelWidth < control.Width))
                 {
-                    System.Reflection.BindingFlags methodMoveSplitterToFlags = System.Reflection.BindingFlags.InvokeMethod | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
-                    System.Reflection.MethodInfo methodMoveSplitterTo = gridViewObject.GetType().GetMethod("MoveSplitterTo", methodMoveSplitterToFlags);
+                    BindingFlags methodMoveSplitterToFlags = BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance;
+                    MethodInfo methodMoveSplitterTo = gridViewObject.GetType().GetMethod("MoveSplitterTo", methodMoveSplitterToFlags);
                     if (methodMoveSplitterTo != null)
                     {
-                        methodMoveSplitterTo.Invoke(gridViewObject, methodMoveSplitterToFlags, null, new object[] { labelWidth }, System.Globalization.CultureInfo.CurrentCulture);
+                        methodMoveSplitterTo.Invoke(gridViewObject, methodMoveSplitterToFlags, null, new object[] { labelWidth }, CultureInfo.CurrentCulture);
                     }
                 }
             }
@@ -422,20 +425,20 @@ namespace Medo.Windows.Forms
         /// <param name="control">PropertyGrid.</param>
         /// <exception cref="System.ArgumentNullException">Control is null.</exception>
         /// <exception cref="System.NotSupportedException">This control's parents cannot be resolved using Name property.</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "PropertyGrid is passed because of reflection upon its member.")]
-        public static void Save(System.Windows.Forms.PropertyGrid control)
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "PropertyGrid is passed because of reflection upon its member.")]
+        public static void Save(PropertyGrid control)
         {
             if (control == null) { throw new ArgumentNullException("control", "Control is null."); }
 
             string baseValueName = Helper.GetControlPath(control);
 
-            Helper.Write(baseValueName + ".PropertySort", System.Convert.ToInt32(control.PropertySort, System.Globalization.CultureInfo.InvariantCulture));
+            Helper.Write(baseValueName + ".PropertySort", Convert.ToInt32(control.PropertySort, CultureInfo.InvariantCulture));
 
-            System.Reflection.FieldInfo fieldGridView = control.GetType().GetField("gridView", System.Reflection.BindingFlags.GetField | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            FieldInfo fieldGridView = control.GetType().GetField("gridView", BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance);
             object gridViewObject = fieldGridView.GetValue(control);
             if (gridViewObject != null)
             {
-                System.Reflection.PropertyInfo propertyInternalLabelWidth = gridViewObject.GetType().GetProperty("InternalLabelWidth", System.Reflection.BindingFlags.InvokeMethod | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                PropertyInfo propertyInternalLabelWidth = gridViewObject.GetType().GetProperty("InternalLabelWidth", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
                 if (propertyInternalLabelWidth != null)
                 {
                     object val = propertyInternalLabelWidth.GetValue(gridViewObject, null);
@@ -456,7 +459,7 @@ namespace Medo.Windows.Forms
         /// </summary>
         /// <param name="control">ListView.</param>
         /// <exception cref="System.ArgumentNullException">Control is null.</exception>
-        public static void Load(System.Windows.Forms.ListView control)
+        public static void Load(ListView control)
         {
             if (control == null) { throw new ArgumentNullException("control", "Control is null."); }
 
@@ -464,7 +467,7 @@ namespace Medo.Windows.Forms
 
             for (int i = 0; i < control.Columns.Count; i++)
             {
-                int width = Helper.Read(baseValueName + ".ColumnHeaderWidth[" + i.ToString(System.Globalization.CultureInfo.InvariantCulture) + "]", control.Columns[i].Width);
+                int width = Helper.Read(baseValueName + ".ColumnHeaderWidth[" + i.ToString(CultureInfo.InvariantCulture) + "]", control.Columns[i].Width);
                 if (width > control.ClientRectangle.Width) { width = control.ClientRectangle.Width; }
                 control.Columns[i].Width = width;
             }
@@ -475,7 +478,7 @@ namespace Medo.Windows.Forms
         /// </summary>
         /// <param name="control">ListView.</param>
         /// <exception cref="System.ArgumentNullException">Control is null.</exception>
-        public static void Save(System.Windows.Forms.ListView control)
+        public static void Save(ListView control)
         {
             if (control == null) { throw new ArgumentNullException("control", "Control is null."); }
 
@@ -483,7 +486,7 @@ namespace Medo.Windows.Forms
 
             for (int i = 0; i < control.Columns.Count; i++)
             {
-                Helper.Write(baseValueName + ".ColumnHeaderWidth[" + i.ToString(System.Globalization.CultureInfo.InvariantCulture) + "]", control.Columns[i].Width);
+                Helper.Write(baseValueName + ".ColumnHeaderWidth[" + i.ToString(CultureInfo.InvariantCulture) + "]", control.Columns[i].Width);
             }
         }
 
@@ -504,9 +507,9 @@ namespace Medo.Windows.Forms
 
             try
             {
-                control.Orientation = (System.Windows.Forms.Orientation)(Helper.Read(baseValueName + ".Orientation", System.Convert.ToInt32(control.Orientation, System.Globalization.CultureInfo.InvariantCulture)));
+                control.Orientation = (Orientation)(Helper.Read(baseValueName + ".Orientation", Convert.ToInt32(control.Orientation, CultureInfo.InvariantCulture)));
             }
-            catch (System.ComponentModel.InvalidEnumArgumentException) { }
+            catch (InvalidEnumArgumentException) { }
             try
             {
                 int distance = Helper.Read(baseValueName + ".SplitterDistance", control.SplitterDistance);
@@ -514,9 +517,9 @@ namespace Medo.Windows.Forms
                 {
                     control.SplitterDistance = distance;
                 }
-                catch (System.ArgumentOutOfRangeException) { }
+                catch (ArgumentOutOfRangeException) { }
             }
-            catch (System.ComponentModel.InvalidEnumArgumentException) { }
+            catch (InvalidEnumArgumentException) { }
         }
 
         /// <summary>
@@ -524,13 +527,13 @@ namespace Medo.Windows.Forms
         /// </summary>
         /// <param name="control">SplitContainer.</param>
         /// <exception cref="System.ArgumentNullException">Control is null.</exception>
-        public static void Save(System.Windows.Forms.SplitContainer control)
+        public static void Save(SplitContainer control)
         {
             if (control == null) { throw new ArgumentNullException("control", "Control is null."); }
 
             string baseValueName = Helper.GetControlPath(control);
 
-            Helper.Write(baseValueName + ".Orientation", System.Convert.ToInt32(control.Orientation, System.Globalization.CultureInfo.InvariantCulture));
+            Helper.Write(baseValueName + ".Orientation", Convert.ToInt32(control.Orientation, CultureInfo.InvariantCulture));
             Helper.Write(baseValueName + ".SplitterDistance", control.SplitterDistance);
         }
 
@@ -542,12 +545,12 @@ namespace Medo.Windows.Forms
 
             internal static void Write(string valueName, int value)
             {
-                if (State.NoRegistryWrites == false)
+                if (NoRegistryWrites == false)
                 {
                     try
                     {
-                        if (State.SubkeyPath.Length == 0) { return; }
-                        using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(State.SubkeyPath))
+                        if (SubkeyPath.Length == 0) { return; }
+                        using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(SubkeyPath))
                         {
                             if (rk != null)
                             {
@@ -566,14 +569,14 @@ namespace Medo.Windows.Forms
             {
                 try
                 {
-                    using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(State.SubkeyPath, false))
+                    using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(SubkeyPath, false))
                     {
                         if (rk != null)
                         {
                             object value = rk.GetValue(valueName, null);
                             if (value == null) { return defaultValue; }
                             var valueKind = RegistryValueKind.DWord;
-                            if (!State.Helper.IsRunningOnMono) { valueKind = rk.GetValueKind(valueName); }
+                            if (!IsRunningOnMono) { valueKind = rk.GetValueKind(valueName); }
                             if ((value != null) && (valueKind == RegistryValueKind.DWord))
                             {
                                 return (int)value;
@@ -586,14 +589,14 @@ namespace Medo.Windows.Forms
             }
 
 
-            internal static string GetControlPath(System.Windows.Forms.Control control)
+            internal static string GetControlPath(Control control)
             {
-                System.Text.StringBuilder sbPath = new System.Text.StringBuilder();
+                StringBuilder sbPath = new StringBuilder();
 
-                System.Windows.Forms.Control currControl = control;
+                Control currControl = control;
                 while (true)
                 {
-                    System.Windows.Forms.Control parentControl = currControl.Parent;
+                    Control parentControl = currControl.Parent;
 
                     if (parentControl == null)
                     {
@@ -601,17 +604,15 @@ namespace Medo.Windows.Forms
                         sbPath.Insert(0, currControl.GetType().FullName);
                         break;
                     }
+
+                    if (string.IsNullOrEmpty(currControl.Name))
+                    {
+                        //throw new System.NotSupportedException("This control's parents cannot be resolved using Name property.");
+                    }
                     else
                     {
-                        if (string.IsNullOrEmpty(currControl.Name))
-                        {
-                            //throw new System.NotSupportedException("This control's parents cannot be resolved using Name property.");
-                        }
-                        else
-                        {
-                            if (sbPath.Length > 0) { sbPath.Insert(0, "."); }
-                            sbPath.Insert(0, currControl.Name);
-                        }
+                        if (sbPath.Length > 0) { sbPath.Insert(0, "."); }
+                        sbPath.Insert(0, currControl.Name);
                     }
 
                     currControl = parentControl;

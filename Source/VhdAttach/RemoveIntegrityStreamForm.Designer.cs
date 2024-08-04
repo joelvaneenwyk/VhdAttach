@@ -1,9 +1,12 @@
+using System.ComponentModel;
+using System.Windows.Forms;
+
 namespace VhdAttach {
     partial class RemoveIntegrityStreamForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -66,7 +69,7 @@ namespace VhdAttach {
 
         #endregion
 
-        private System.Windows.Forms.ProgressBar progress;
-        private System.ComponentModel.BackgroundWorker bwAction;
+        private ProgressBar progress;
+        private BackgroundWorker bwAction;
     }
 }

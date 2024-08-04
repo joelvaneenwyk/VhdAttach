@@ -1,9 +1,12 @@
-﻿namespace VhdAttach {
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace VhdAttach {
     partial class ChangeDriveLetterForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -101,9 +104,9 @@
 
         #endregion
 
-        private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.Button btnOK;
-        private System.Windows.Forms.Label lblDriveLetter;
-        private System.Windows.Forms.ComboBox cmbDriveLetter;
+        private Button btnCancel;
+        private Button btnOK;
+        private Label lblDriveLetter;
+        private ComboBox cmbDriveLetter;
     }
 }

@@ -17,19 +17,19 @@ namespace VhdAttachCommon
                  */
                 var iEndPipe = fileNameWithOptions.IndexOf("/", 1);
                 var additionalSettings = fileNameWithOptions.Substring(1, iEndPipe - 1);
-                this.FileName = fileNameWithOptions.Substring(iEndPipe + 1);
-                foreach (var setting in additionalSettings.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                FileName = fileNameWithOptions.Substring(iEndPipe + 1);
+                foreach (var setting in additionalSettings.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     switch (additionalSettings.ToUpperInvariant())
                     {
-                        case "READONLY": this.ReadOnly = true; break;
-                        case "NODRIVELETTER": this.NoDriveLetter = true; break;
+                        case "READONLY": ReadOnly = true; break;
+                        case "NODRIVELETTER": NoDriveLetter = true; break;
                     }
                 }
             }
             else
             {
-                this.FileName = fileNameWithOptions;
+                FileName = fileNameWithOptions;
             }
         }
 
@@ -40,8 +40,8 @@ namespace VhdAttachCommon
         public override string ToString()
         {
             var options = new List<string>();
-            if (this.ReadOnly) { options.Add("readonly"); }
-            if (this.NoDriveLetter) { options.Add("nodriveletter"); }
+            if (ReadOnly) { options.Add("readonly"); }
+            if (NoDriveLetter) { options.Add("nodriveletter"); }
 
             var sb = new StringBuilder();
             if (options.Count >= 1)
@@ -54,7 +54,7 @@ namespace VhdAttachCommon
                 }
                 sb.Append("/");
             }
-            sb.Append(this.FileName);
+            sb.Append(FileName);
             return sb.ToString();
         }
 

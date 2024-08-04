@@ -1,9 +1,12 @@
+using System.ComponentModel;
+using System.Windows.Forms;
+
 namespace VhdAttach {
     partial class SettingsForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -369,28 +372,28 @@ namespace VhdAttach {
 
         #endregion
 
-        private System.Windows.Forms.Button buttonCancel;
-        private System.Windows.Forms.Button buttonOk;
-        private System.Windows.Forms.ErrorProvider erp;
-        private System.Windows.Forms.GroupBox groupContextMenu;
-        private System.Windows.Forms.CheckBox checkVhdDetachDrive;
-        private System.Windows.Forms.CheckBox checkVhdDetach;
-        private System.Windows.Forms.CheckBox checkVhdAttach;
-        private System.Windows.Forms.GroupBox groupAutoAttach;
-        private System.Windows.Forms.Button buttonVhdRemove;
-        private System.Windows.Forms.Button buttonVhdAdd;
-        private System.Windows.Forms.ListView listAutoAttach;
-        private System.Windows.Forms.ColumnHeader columnFileName;
-        private System.Windows.Forms.ToolStrip toolVhdOrder;
-        private System.Windows.Forms.ToolStripButton buttonMoveVhdUp;
-        private System.Windows.Forms.ToolStripButton buttonMoveVhdDown;
-        private System.Windows.Forms.ImageList imagesAutoAttach;
-        private System.Windows.Forms.CheckBox checkVhdAttachReadOnly;
-        private System.Windows.Forms.Button btnRegisterExtensionVhd;
-        private System.Windows.Forms.ToolStripButton buttonVhdReadOnly;
-        private System.Windows.Forms.CheckBox checkIsoDetach;
-        private System.Windows.Forms.CheckBox checkIsoAttachReadOnly;
-        private System.Windows.Forms.CheckBox checkVhdOpen;
-        private System.Windows.Forms.CheckBox checkIsoOpen;
+        private Button buttonCancel;
+        private Button buttonOk;
+        private ErrorProvider erp;
+        private GroupBox groupContextMenu;
+        private CheckBox checkVhdDetachDrive;
+        private CheckBox checkVhdDetach;
+        private CheckBox checkVhdAttach;
+        private GroupBox groupAutoAttach;
+        private Button buttonVhdRemove;
+        private Button buttonVhdAdd;
+        private ListView listAutoAttach;
+        private ColumnHeader columnFileName;
+        private ToolStrip toolVhdOrder;
+        private ToolStripButton buttonMoveVhdUp;
+        private ToolStripButton buttonMoveVhdDown;
+        private ImageList imagesAutoAttach;
+        private CheckBox checkVhdAttachReadOnly;
+        private Button btnRegisterExtensionVhd;
+        private ToolStripButton buttonVhdReadOnly;
+        private CheckBox checkIsoDetach;
+        private CheckBox checkIsoAttachReadOnly;
+        private CheckBox checkVhdOpen;
+        private CheckBox checkIsoOpen;
     }
 }

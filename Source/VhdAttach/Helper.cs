@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using VhdAttach.Properties;
 
 namespace VhdAttach
 {
@@ -91,7 +92,7 @@ namespace VhdAttach
             GetToolstripSizeAndSet(toolstrip, out size, out set);
             toolstrip.ImageScalingSize = new Size(size, size);
 
-            var resources = VhdAttach.Properties.Resources.ResourceManager;
+            var resources = Resources.ResourceManager;
             foreach (ToolStripItem item in toolstrip.Items)
             {
                 if (string.IsNullOrEmpty(item.Name)) { continue; }
@@ -112,7 +113,7 @@ namespace VhdAttach
 
         private static void UpdateToolstripImage(ToolStripItem item, string name, int size, string set)
         {
-            var resources = VhdAttach.Properties.Resources.ResourceManager;
+            var resources = Resources.ResourceManager;
             var resourceName = name + set;
             var bitmap = resources.GetObject(resourceName) as Bitmap;
             if (bitmap != null)

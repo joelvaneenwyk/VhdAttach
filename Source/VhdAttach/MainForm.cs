@@ -1,5 +1,3 @@
-using Medo.Extensions;
-using Medo.Localization.Croatia;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,8 +11,18 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using Medo.Application;
+using Medo.Configuration;
+using Medo.Diagnostics;
+using Medo.Extensions;
+using Medo.IO;
+using Medo.Localization.Croatia;
+using Medo.Reflection;
+using Medo.Services;
+using Medo.Windows.Forms;
 using VhdAttachCommon;
 using VirtualHardDiskImage;
+using MessageBox = Medo.MessageBox;
 
 namespace VhdAttach
 {
@@ -23,7 +31,7 @@ namespace VhdAttach
     {
 
         private string VhdFileName;
-        private Medo.Configuration.RecentFiles Recent;
+        private RecentFiles Recent;
         private static readonly NumberDeclination CylinderSuffix = new NumberDeclination("cylinder", "cylinders", "cylinders");
         private static readonly NumberDeclination HeadSuffix = new NumberDeclination("head", "heads", "heads");
         private static readonly NumberDeclination SectorSuffix = new NumberDeclination("sector", "sectors", "sectors");
@@ -35,14 +43,14 @@ namespace VhdAttach
         public MainForm()
         {
             InitializeComponent();
-            this.Font = SystemFonts.MessageBoxFont;
-            Medo.Windows.Forms.TaskbarProgress.DefaultOwner = this;
-            Medo.Windows.Forms.TaskbarProgress.DoNotThrowNotImplementedException = true;
+            Font = SystemFonts.MessageBoxFont;
+            TaskbarProgress.DefaultOwner = this;
+            TaskbarProgress.DoNotThrowNotImplementedException = true;
 
             mnu.Renderer = new Helper.ToolStripBorderlessProfessionalRenderer();
             Helper.UpdateToolstripImages(null, mnu);
 
-            using (var g = this.CreateGraphics())
+            using (var g = CreateGraphics())
             {
                 var scale = (Settings.ScaleFactor > 1) ? Settings.ScaleFactor : Math.Max(g.DpiX, g.DpiY) / 96.0;
                 var newScale = ((int)Math.Floor(scale * 100) / 50 * 50) / 100.0;
@@ -55,15 +63,15 @@ namespace VhdAttach
                 }
             }
 
-            this.Recent = new Medo.Configuration.RecentFiles();
+            Recent = new RecentFiles();
         }
 
 
-        private bool SuppressMenuKey = false;
+        private bool SuppressMenuKey;
 
         protected override bool ProcessDialogKey(Keys keyData)
         {
-            if (((keyData & Keys.Alt) == Keys.Alt) && (keyData != (Keys.Alt | Keys.Menu))) { this.SuppressMenuKey = true; }
+            if (((keyData & Keys.Alt) == Keys.Alt) && (keyData != (Keys.Alt | Keys.Menu))) { SuppressMenuKey = true; }
 
             switch (keyData)
             {
@@ -136,7 +144,7 @@ namespace VhdAttach
         {
             if (e.KeyData == Keys.Menu)
             {
-                if (this.SuppressMenuKey) { this.SuppressMenuKey = false; return; }
+                if (SuppressMenuKey) { SuppressMenuKey = false; return; }
                 ToggleMenu();
                 e.Handled = true;
                 e.SuppressKeyPress = true;
@@ -151,7 +159,7 @@ namespace VhdAttach
         {
             if (e.KeyData == Keys.Menu)
             {
-                if (this.SuppressMenuKey) { this.SuppressMenuKey = false; return; }
+                if (SuppressMenuKey) { SuppressMenuKey = false; return; }
                 ToggleMenu();
                 e.Handled = true;
                 e.SuppressKeyPress = true;
@@ -165,7 +173,7 @@ namespace VhdAttach
 
         private void Form_Load(object sender, EventArgs e)
         {
-            Medo.Windows.Forms.State.Load(this, list);
+            State.Load(this, list);
             OpenFromCommandLineArgs();
             UpdateRecent();
 
@@ -176,8 +184,8 @@ namespace VhdAttach
 
         private void Form_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Medo.Windows.Forms.State.Save(this, list);
-            this.Recent.Save();
+            State.Save(this, list);
+            Recent.Save();
             bwCheckForUpgrade.CancelAsync();
         }
 
@@ -185,7 +193,7 @@ namespace VhdAttach
         {
             using (var listGraphics = list.CreateGraphics())
             {
-                var x = listGraphics.MeasureString("XxWwAaZz »ËQqXxWw", list.Font).ToSize();
+                var x = listGraphics.MeasureString("XxWwAaZz √à√®QqXxWw", list.Font).ToSize();
                 list.Columns[0].Width = x.Width;
             }
             list.Columns[1].Width = list.ClientSize.Width - list.Columns[0].Width - SystemInformation.VerticalScrollBarWidth;
@@ -216,27 +224,27 @@ namespace VhdAttach
 
             try
             {
-                this.Cursor = Cursors.WaitCursor;
+                Cursor = Cursors.WaitCursor;
                 mnuRefresh.Enabled = true;
 
-                using (var document = new Medo.IO.VirtualDisk(vhdFileName))
+                using (var document = new VirtualDisk(vhdFileName))
                 {
                     var items = new List<ListViewItem>();
                     var fileInfo = new FileInfo(document.FileName);
-                    items.Add(new ListViewItem(new string[] { "File path", fileInfo.Directory.FullName }) { Group = GroupFileSystem });
-                    items.Add(new ListViewItem(new string[] { "File name", fileInfo.Name }) { Group = GroupFileSystem });
+                    items.Add(new ListViewItem(new[] { "File path", fileInfo.Directory.FullName }) { Group = GroupFileSystem });
+                    items.Add(new ListViewItem(new[] { "File name", fileInfo.Name }) { Group = GroupFileSystem });
 
                     try
                     {
                         var fi = new FileInfo(document.FileName);
-                        items.Add(new ListViewItem(new string[] { "File size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(fi.Length, "B", "0"), fi.Length) }) { Group = GroupFileSystem });
+                        items.Add(new ListViewItem(new[] { "File size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(fi.Length, "B", "0"), fi.Length) }) { Group = GroupFileSystem });
                     }
                     catch { }
 
                     try
                     {
                         var di = new DriveInfo(new FileInfo(document.FileName).Directory.Root.FullName);
-                        items.Add(new ListViewItem(new string[] { "Free space on " + di.Name, string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(di.AvailableFreeSpace, "B", "0"), di.AvailableFreeSpace) }) { Group = GroupFileSystem });
+                        items.Add(new ListViewItem(new[] { "Free space on " + di.Name, string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(di.AvailableFreeSpace, "B", "0"), di.AvailableFreeSpace) }) { Group = GroupFileSystem });
                     }
                     catch { }
 
@@ -248,7 +256,7 @@ namespace VhdAttach
 
                     try
                     {
-                        document.Open(Medo.IO.VirtualDiskAccessMask.GetInfo | Medo.IO.VirtualDiskAccessMask.Detach); //Workaround: The VirtualDiskAccessMask parameter must include the VIRTUAL_DISK_ACCESS_DETACH (0x00040000) flag.
+                        document.Open(VirtualDiskAccessMask.GetInfo | VirtualDiskAccessMask.Detach); //Workaround: The VirtualDiskAccessMask parameter must include the VIRTUAL_DISK_ACCESS_DETACH (0x00040000) flag.
 
                         string attachedDevice = null;
                         string[] attachedPaths = null;
@@ -260,13 +268,13 @@ namespace VhdAttach
                         catch { }
                         if (attachedDevice != null)
                         {
-                            items.Add(new ListViewItem(new string[] { "Attached device", attachedDevice }) { Group = GroupFileSystem });
+                            items.Add(new ListViewItem(new[] { "Attached device", attachedDevice }) { Group = GroupFileSystem });
                         }
                         if (attachedPaths != null)
                         {
                             for (int i = 0; i < attachedPaths.Length; i++)
                             {
-                                items.Add(new ListViewItem(new string[] { ((i == 0) ? "Attached path" : ""), attachedPaths[i] }) { Group = GroupFileSystem });
+                                items.Add(new ListViewItem(new[] { ((i == 0) ? "Attached path" : ""), attachedPaths[i] }) { Group = GroupFileSystem });
                             }
                         }
 
@@ -277,22 +285,22 @@ namespace VhdAttach
                             int blockSize;
                             int sectorSize;
                             document.GetSize(out virtualSize, out physicalSize, out blockSize, out sectorSize);
-                            items.Add(new ListViewItem(new string[] { "Virtual size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(virtualSize, "B", "0"), virtualSize) }) { Group = GroupDetails });
+                            items.Add(new ListViewItem(new[] { "Virtual size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(virtualSize, "B", "0"), virtualSize) }) { Group = GroupDetails });
                             if (fileInfo.Length != physicalSize)
                             {
-                                items.Add(new ListViewItem(new string[] { "Physical size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(physicalSize, "B", "0"), physicalSize) }) { Group = GroupDetails });
+                                items.Add(new ListViewItem(new[] { "Physical size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(physicalSize, "B", "0"), physicalSize) }) { Group = GroupDetails });
                             }
                             if (blockSize != 0)
                             {
-                                items.Add(new ListViewItem(new string[] { "Block size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(((long)blockSize), "B", "0"), blockSize) }) { Group = GroupDetails });
+                                items.Add(new ListViewItem(new[] { "Block size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(blockSize, "B", "0"), blockSize) }) { Group = GroupDetails });
                             }
-                            items.Add(new ListViewItem(new string[] { "Sector size", string.Format(CultureInfo.CurrentCulture, "{0} ({1} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(((long)sectorSize), "B", "0"), sectorSize) }) { Group = GroupDetails });
+                            items.Add(new ListViewItem(new[] { "Sector size", string.Format(CultureInfo.CurrentCulture, "{0} ({1} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(sectorSize, "B", "0"), sectorSize) }) { Group = GroupDetails });
                         }
                         catch { }
 
                         try
                         {
-                            items.Add(new ListViewItem(new string[] { "Identifier", document.GetIdentifier().ToString() }) { Group = GroupDetails });
+                            items.Add(new ListViewItem(new[] { "Identifier", document.GetIdentifier().ToString() }) { Group = GroupDetails });
                         }
                         catch { }
 
@@ -310,19 +318,19 @@ namespace VhdAttach
                             }
                             string vendorText = string.Format(CultureInfo.InvariantCulture, "Unknown ({0})", vendorId);
                             if (vendorId.Equals(new Guid("EC984AEC-A0F9-47e9-901F-71415A66345B"))) { vendorText = "Microsoft"; }
-                            items.Add(new ListViewItem(new string[] { "Device ID", deviceText }) { Group = GroupDetails });
-                            items.Add(new ListViewItem(new string[] { "Vendor ID", vendorText }) { Group = GroupDetails });
+                            items.Add(new ListViewItem(new[] { "Device ID", deviceText }) { Group = GroupDetails });
+                            items.Add(new ListViewItem(new[] { "Vendor ID", vendorText }) { Group = GroupDetails });
                         }
                         catch { }
 
                         try
                         {
-                            items.Add(new ListViewItem(new string[] { "Provider subtype", string.Format(CultureInfo.CurrentCulture, "{0} (0x{0:x8})", document.GetProviderSubtype()) }) { Group = GroupDetails });
+                            items.Add(new ListViewItem(new[] { "Provider subtype", string.Format(CultureInfo.CurrentCulture, "{0} (0x{0:x8})", document.GetProviderSubtype()) }) { Group = GroupDetails });
                         }
                         catch { }
 
 
-                        if (document.DiskType == Medo.IO.VirtualDiskType.Vhd)
+                        if (document.DiskType == VirtualDiskType.Vhd)
                         {
                             try
                             {
@@ -341,10 +349,10 @@ namespace VhdAttach
 
                                 if (footer.Cookie != "conectix")
                                 {
-                                    items.Add(new ListViewItem(new string[] { "Cookie", footer.Cookie }) { Group = GroupInternals });
+                                    items.Add(new ListViewItem(new[] { "Cookie", footer.Cookie }) { Group = GroupInternals });
                                 }
 
-                                items.Add(new ListViewItem(new string[] { "Creation time stamp", string.Format(CultureInfo.CurrentCulture, "{0}", footer.TimeStamp.ToLocalTime()) }) { Group = GroupInternals });
+                                items.Add(new ListViewItem(new[] { "Creation time stamp", string.Format(CultureInfo.CurrentCulture, "{0}", footer.TimeStamp.ToLocalTime()) }) { Group = GroupInternals });
 
                                 var creatorApplicationText = string.Format(CultureInfo.InvariantCulture, "Unknown (0x{0:x4})", (int)footer.CreatorApplication);
                                 switch (footer.CreatorApplication)
@@ -356,7 +364,7 @@ namespace VhdAttach
                                     case VhdCreatorApplication.MicrosoftWindows: creatorApplicationText = "Microsoft Windows"; break;
                                     case VhdCreatorApplication.OracleVirtualBox: creatorApplicationText = "Oracle VirtualBox"; break;
                                 }
-                                items.Add(new ListViewItem(new string[] { "Creator application", string.Format(CultureInfo.InvariantCulture, "{0} {1}.{2}", creatorApplicationText, footer.CreatorVersion.Major, footer.CreatorVersion.Minor) }) { Group = GroupInternals });
+                                items.Add(new ListViewItem(new[] { "Creator application", string.Format(CultureInfo.InvariantCulture, "{0} {1}.{2}", creatorApplicationText, footer.CreatorVersion.Major, footer.CreatorVersion.Minor) }) { Group = GroupInternals });
 
                                 var creatorHostOsText = string.Format(CultureInfo.InvariantCulture, "Unknown (0x{0:x4})", (int)footer.CreatorHostOs);
                                 switch (footer.CreatorHostOs)
@@ -364,9 +372,9 @@ namespace VhdAttach
                                     case VhdCreatorHostOs.Windows: creatorHostOsText = "Windows"; break;
                                     case VhdCreatorHostOs.Macintosh: creatorHostOsText = "Macintosh"; break;
                                 }
-                                items.Add(new ListViewItem(new string[] { "Creator host OS", creatorHostOsText }) { Group = GroupInternals });
+                                items.Add(new ListViewItem(new[] { "Creator host OS", creatorHostOsText }) { Group = GroupInternals });
 
-                                items.Add(new ListViewItem(new string[] { "Disk geometry", string.Format(CultureInfo.CurrentCulture, "{0}, {1}, {2}", CylinderSuffix.GetText(footer.DiskGeometryCylinders), HeadSuffix.GetText(footer.DiskGeometryHeads), SectorSuffix.GetText(footer.DiskGeometrySectors)) }) { Group = GroupInternals });
+                                items.Add(new ListViewItem(new[] { "Disk geometry", string.Format(CultureInfo.CurrentCulture, "{0}, {1}, {2}", CylinderSuffix.GetText(footer.DiskGeometryCylinders), HeadSuffix.GetText(footer.DiskGeometryHeads), SectorSuffix.GetText(footer.DiskGeometrySectors)) }) { Group = GroupInternals });
 
                                 var diskTypeText = string.Format(CultureInfo.CurrentCulture, "Unknown ({0}: 0x{0:x4})", (int)footer.DiskType);
                                 switch ((int)footer.DiskType)
@@ -379,7 +387,7 @@ namespace VhdAttach
                                     case 5: diskTypeText = "Reserved (deprecated: 0x0005)"; break;
                                     case 6: diskTypeText = "Reserved (deprecated: 0x0006)"; break;
                                 }
-                                items.Add(new ListViewItem(new string[] { "Disk type", diskTypeText }) { Group = GroupInternals });
+                                items.Add(new ListViewItem(new[] { "Disk type", diskTypeText }) { Group = GroupInternals });
 
                                 if ((footer.DiskType == VhdDiskType.DynamicHardDisk) || (footer.DiskType == VhdDiskType.DifferencingHardDisk))
                                 {
@@ -388,17 +396,17 @@ namespace VhdAttach
 
                                     if (header.Cookie != "cxsparse")
                                     {
-                                        items.Add(new ListViewItem(new string[] { "Cookie", header.Cookie }) { Group = GroupInternalsDynamic });
+                                        items.Add(new ListViewItem(new[] { "Cookie", header.Cookie }) { Group = GroupInternalsDynamic });
                                     }
 
                                     if (header.DataOffset != ulong.MaxValue)
                                     {
-                                        items.Add(new ListViewItem(new string[] { "Data offset", header.DataOffset.ToString("#,##0") }) { Group = GroupInternalsDynamic });
+                                        items.Add(new ListViewItem(new[] { "Data offset", header.DataOffset.ToString("#,##0") }) { Group = GroupInternalsDynamic });
                                     }
 
-                                    items.Add(new ListViewItem(new string[] { "Max table entries", header.MaxTableEntries.ToString("#,##0") }) { Group = GroupInternalsDynamic });
+                                    items.Add(new ListViewItem(new[] { "Max table entries", header.MaxTableEntries.ToString("#,##0") }) { Group = GroupInternalsDynamic });
 
-                                    items.Add(new ListViewItem(new string[] { "Block size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(header.BlockSize, "B", "0"), header.BlockSize) }) { Group = GroupInternalsDynamic });
+                                    items.Add(new ListViewItem(new[] { "Block size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(header.BlockSize, "B", "0"), header.BlockSize) }) { Group = GroupInternalsDynamic });
 
                                 }
 
@@ -416,7 +424,7 @@ namespace VhdAttach
                     }
                     catch (InvalidDataException ex)
                     {
-                        Medo.MessageBox.ShowError(this, "Cannot open virtual disk drive.\n\n" + ex.Message);
+                        MessageBox.ShowError(this, "Cannot open virtual disk drive.\n\n" + ex.Message);
                     }
 
 
@@ -436,36 +444,36 @@ namespace VhdAttach
             }
             finally
             {
-                this.Cursor = Cursors.Default;
+                Cursor = Cursors.Default;
             }
 
 
-            this.Text = GetFileTitle(vhdFileName) + " - " + Medo.Reflection.EntryAssembly.Title;
+            Text = GetFileTitle(vhdFileName) + " - " + EntryAssembly.Title;
         }
 
         private void UpdateRecent()
         {
             mnuOpen.DropDownItems.Clear();
             var paths = new List<string>();
-            foreach (var iRecentFile in this.Recent.Items)
+            foreach (var iRecentFile in Recent.Items)
             {
                 var item2 = new ToolStripMenuItem(iRecentFile.Title);
                 item2.Tag = iRecentFile;
-                item2.Click += new EventHandler(recentItem_Click);
+                item2.Click += recentItem_Click;
                 mnuOpen.DropDownItems.Add(item2);
                 paths.Add(iRecentFile.FileName.ToUpperInvariant());
             }
             foreach (var fwo in ServiceSettings.AutoAttachVhdList)
             {
-                Medo.Configuration.RecentFile iRecentFile;
-                iRecentFile = Medo.Configuration.RecentFile.GetRecentFile(fwo.FileName);
+                RecentFile iRecentFile;
+                iRecentFile = RecentFile.GetRecentFile(fwo.FileName);
                 if (iRecentFile != null)
                 {
                     if (paths.Contains(iRecentFile.FileName.ToUpperInvariant()) == false)
                     {
                         var item2 = new ToolStripMenuItem(iRecentFile.Title);
                         item2.Tag = iRecentFile;
-                        item2.Click += new EventHandler(recentItem_Click);
+                        item2.Click += recentItem_Click;
                         mnuOpen.DropDownItems.Add(item2);
                     }
                 }
@@ -475,8 +483,8 @@ namespace VhdAttach
         void recentItem_Click(object sender, EventArgs e)
         {
             var item = (ToolStripMenuItem)sender;
-            var recentItem = (Medo.Configuration.RecentFile)item.Tag;
-            this.OpenFile(recentItem.FileName, removeRecent: true);
+            var recentItem = (RecentFile)item.Tag;
+            OpenFile(recentItem.FileName, removeRecent: true);
         }
 
 
@@ -492,9 +500,9 @@ namespace VhdAttach
                     var fileName = frm.FileName;
                     try
                     {
-                        var newDocument = new Medo.IO.VirtualDisk(fileName);
+                        var newDocument = new VirtualDisk(fileName);
                         UpdateData(newDocument.FileName);
-                        this.VhdFileName = newDocument.FileName;
+                        VhdFileName = newDocument.FileName;
                         Recent.Push(fileName);
                         UpdateRecent();
                         using (var form = new AttachForm(new FileInfo(fileName), false, true))
@@ -506,7 +514,7 @@ namespace VhdAttach
                     catch (Exception ex)
                     {
                         var exFile = new FileInfo(fileName);
-                        Medo.MessageBox.ShowError(this, string.Format("Cannot open \"{0}\".\n\n{1}", exFile.Name, ex.Message));
+                        MessageBox.ShowError(this, string.Format("Cannot open \"{0}\".\n\n{1}", exFile.Name, ex.Message));
                     }
                 }
             }
@@ -532,7 +540,7 @@ namespace VhdAttach
                 dialog.ShowReadOnly = false;
                 if (dialog.ShowDialog(this) == DialogResult.OK)
                 {
-                    this.OpenFile(dialog.FileName);
+                    OpenFile(dialog.FileName);
                 }
             }
         }
@@ -545,7 +553,7 @@ namespace VhdAttach
                 if (!file.Exists) { throw new IOException("File not found."); }
 
                 var isIntegrityStream = ReFS.HasIntegrityStream(file);
-                if (isIntegrityStream && Medo.MessageBox.ShowWarning(this, string.Format("Integrity stream is enabled for \"{0}\".\n\nVirtual disk does not support ReFS integrity streams.\n\nDo you wish to remove integrity stream?", file.Name), MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (isIntegrityStream && MessageBox.ShowWarning(this, string.Format("Integrity stream is enabled for \"{0}\".\n\nVirtual disk does not support ReFS integrity streams.\n\nDo you wish to remove integrity stream?", file.Name), MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     using (var frm = new RemoveIntegrityStreamForm(file))
                     {
@@ -554,18 +562,18 @@ namespace VhdAttach
                 }
 
 
-                var newDocument = new Medo.IO.VirtualDisk(fileName);
-                this.VhdFileName = newDocument.FileName;
+                var newDocument = new VirtualDisk(fileName);
+                VhdFileName = newDocument.FileName;
                 Recent.Push(fileName);
                 UpdateRecent();
                 UpdateData(newDocument.FileName);
-                this.VhdFileName = newDocument.FileName;
+                VhdFileName = newDocument.FileName;
             }
             catch (Exception ex)
             {
                 if (removeRecent)
                 {
-                    if (Medo.MessageBox.ShowError(this, string.Format("Cannot open \"{0}\".\n\n{1}\n\nDo you wish to remove it from list?", file.Name, ex.Message), MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    if (MessageBox.ShowError(this, string.Format("Cannot open \"{0}\".\n\n{1}\n\nDo you wish to remove it from list?", file.Name, ex.Message), MessageBoxButtons.YesNo) == DialogResult.Yes)
                     {
                         Recent.Remove(fileName);
                         UpdateRecent();
@@ -573,7 +581,7 @@ namespace VhdAttach
                 }
                 else
                 {
-                    Medo.MessageBox.ShowError(this, string.Format("Cannot open \"{0}\".\n\n{1}", file.Name, ex.Message));
+                    MessageBox.ShowError(this, string.Format("Cannot open \"{0}\".\n\n{1}", file.Name, ex.Message));
                 }
             }
         }
@@ -581,29 +589,29 @@ namespace VhdAttach
 
         private void mnuRefresh_Click(object sender, EventArgs e)
         {
-            UpdateData(this.VhdFileName);
+            UpdateData(VhdFileName);
             CheckErrors();
         }
 
         private void mnuAttach_ButtonClick(object sender, EventArgs e)
         {
-            if (this.VhdFileName == null) { return; }
+            if (VhdFileName == null) { return; }
 
             if (Settings.UseService)
             {
-                using (var form = new AttachForm(new FileInfo(this.VhdFileName), false, false))
+                using (var form = new AttachForm(new FileInfo(VhdFileName), false, false))
                 {
                     form.StartPosition = FormStartPosition.CenterParent;
                     form.ShowDialog(this);
                 }
-                UpdateData(this.VhdFileName);
+                UpdateData(VhdFileName);
             }
             else
             {
                 mnu.Enabled = false;
                 var exe = Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName, "VhdAttachExecutor.exe");
-                var startInfo = Utility.GetProcessStartInfo(exe, @"/Attach """ + this.VhdFileName + @"""");
-                this.Cursor = Cursors.WaitCursor;
+                var startInfo = Utility.GetProcessStartInfo(exe, @"/Attach """ + VhdFileName + @"""");
+                Cursor = Cursors.WaitCursor;
                 bwExecutor.RunWorkerAsync(startInfo);
             }
             AllowSetForegroundWindowToExplorer();
@@ -611,23 +619,23 @@ namespace VhdAttach
 
         private void mnuAttachReadOnly_Click(object sender, EventArgs e)
         {
-            if (this.VhdFileName == null) { return; }
+            if (VhdFileName == null) { return; }
 
             if (Settings.UseService)
             {
-                using (var form = new AttachForm(new FileInfo(this.VhdFileName), true, false))
+                using (var form = new AttachForm(new FileInfo(VhdFileName), true, false))
                 {
                     form.StartPosition = FormStartPosition.CenterParent;
                     form.ShowDialog(this);
                 }
-                UpdateData(this.VhdFileName);
+                UpdateData(VhdFileName);
             }
             else
             {
                 mnu.Enabled = false;
                 var exe = Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName, "VhdAttachExecutor.exe");
-                var startInfo = Utility.GetProcessStartInfo(exe, @"/Attach """ + this.VhdFileName + @""" /ReadOnly");
-                this.Cursor = Cursors.WaitCursor;
+                var startInfo = Utility.GetProcessStartInfo(exe, @"/Attach """ + VhdFileName + @""" /ReadOnly");
+                Cursor = Cursors.WaitCursor;
                 bwExecutor.RunWorkerAsync(startInfo);
             }
             AllowSetForegroundWindowToExplorer();
@@ -635,17 +643,17 @@ namespace VhdAttach
 
         private void mnuDetach_Click(object sender, EventArgs e)
         {
-            if (this.VhdFileName == null) { return; }
+            if (VhdFileName == null) { return; }
 
             if (Settings.UseService)
             {
 
-                using (var form = new DetachForm(new FileInfo[] { new FileInfo(this.VhdFileName) }))
+                using (var form = new DetachForm(new[] { new FileInfo(VhdFileName) }))
                 {
                     form.StartPosition = FormStartPosition.CenterParent;
                     form.ShowDialog(this);
                 }
-                UpdateData(this.VhdFileName);
+                UpdateData(VhdFileName);
 
             }
             else
@@ -654,9 +662,9 @@ namespace VhdAttach
                 mnu.Enabled = false;
 
                 var exe = Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName, "VhdAttachExecutor.exe");
-                var startInfo = Utility.GetProcessStartInfo(exe, @"/Detach """ + this.VhdFileName + @"""");
+                var startInfo = Utility.GetProcessStartInfo(exe, @"/Detach """ + VhdFileName + @"""");
 
-                this.Cursor = Cursors.WaitCursor;
+                Cursor = Cursors.WaitCursor;
                 bwExecutor.RunWorkerAsync(startInfo);
 
             }
@@ -669,7 +677,7 @@ namespace VhdAttach
             bool isAutoMountReadonly = false;
             foreach (var fwo in ServiceSettings.AutoAttachVhdList)
             {
-                if (string.Compare(this.VhdFileName, fwo.FileName, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Compare(VhdFileName, fwo.FileName, StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     isAutoMountNormal = !fwo.ReadOnly;
                     isAutoMountReadonly = fwo.ReadOnly;
@@ -681,7 +689,7 @@ namespace VhdAttach
             mnuAutomountReadonly.Enabled = !isAutoMountReadonly;
             mnuAutomountDisable.Enabled = isAutoMountNormal | isAutoMountReadonly;
 
-            if (this.VhdFileName == null)
+            if (VhdFileName == null)
             {
                 mnuAutomount.Tag = null;
                 mnuAutomount.Text = "Auto-mount";
@@ -709,7 +717,7 @@ namespace VhdAttach
 
         private void mnuAutomount_ButtonClick(object sender, EventArgs e)
         {
-            var senderObject = ((ToolStripDropDownItem)sender).Tag as object;
+            var senderObject = ((ToolStripDropDownItem)sender).Tag;
             if (senderObject != null)
             {
                 var isMounted = (bool)senderObject;
@@ -727,8 +735,8 @@ namespace VhdAttach
         private void mnuAutomountNormal_Click(object sender, EventArgs e)
         {
             var list = new FileWithOptionsCollection(ServiceSettings.AutoAttachVhdList);
-            list.Remove(this.VhdFileName);
-            list.Add(new FileWithOptions(this.VhdFileName));
+            list.Remove(VhdFileName);
+            list.Add(new FileWithOptions(VhdFileName));
             SaveAutomountSettings(list);
             mnuAutomount_DropDownOpening(null, null);
         }
@@ -736,8 +744,8 @@ namespace VhdAttach
         private void mnuAutomountReadonly_Click(object sender, EventArgs e)
         {
             var list = new FileWithOptionsCollection(ServiceSettings.AutoAttachVhdList);
-            list.Remove(this.VhdFileName);
-            list.Add(new FileWithOptions(this.VhdFileName) { ReadOnly = true });
+            list.Remove(VhdFileName);
+            list.Add(new FileWithOptions(VhdFileName) { ReadOnly = true });
             SaveAutomountSettings(list);
             mnuAutomount_DropDownOpening(null, null);
         }
@@ -745,7 +753,7 @@ namespace VhdAttach
         private void mnuAutomountDisable_Click(object sender, EventArgs e)
         {
             var list = new FileWithOptionsCollection(ServiceSettings.AutoAttachVhdList);
-            list.Remove(this.VhdFileName);
+            list.Remove(VhdFileName);
             SaveAutomountSettings(list);
             mnuAutomount_DropDownOpening(null, null);
         }
@@ -754,7 +762,7 @@ namespace VhdAttach
         {
             try
             {
-                this.Cursor = Cursors.WaitCursor;
+                Cursor = Cursors.WaitCursor;
 
                 var vhds = new List<string>();
                 foreach (FileWithOptions file in files)
@@ -764,7 +772,7 @@ namespace VhdAttach
                 var resAA = PipeClient.WriteAutoAttachSettings(vhds.ToArray());
                 if (resAA.IsError)
                 {
-                    Medo.MessageBox.ShowError(this, resAA.Message);
+                    MessageBox.ShowError(this, resAA.Message);
                 }
             }
             catch (IOException ex)
@@ -773,7 +781,7 @@ namespace VhdAttach
             }
             finally
             {
-                this.Cursor = Cursors.Default;
+                Cursor = Cursors.Default;
             }
         }
 
@@ -785,9 +793,9 @@ namespace VhdAttach
             string attachedDevice = null;
             try
             {
-                using (var document = new Medo.IO.VirtualDisk(this.VhdFileName))
+                using (var document = new VirtualDisk(VhdFileName))
                 {
-                    document.Open(Medo.IO.VirtualDiskAccessMask.GetInfo);
+                    document.Open(VirtualDiskAccessMask.GetInfo);
                     attachedDevice = document.GetAttachedPath();
                 }
             }
@@ -889,7 +897,7 @@ namespace VhdAttach
             {
                 if (frm.ShowDialog(this) == DialogResult.OK)
                 {
-                    UpdateData(this.VhdFileName);
+                    UpdateData(VhdFileName);
                 }
             }
         }
@@ -902,7 +910,7 @@ namespace VhdAttach
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     staErrorStolenExtension.Visible = !ServiceSettings.ContextMenuVhd;
-                    UpdateData(this.VhdFileName);
+                    UpdateData(VhdFileName);
                 }
             }
         }
@@ -915,7 +923,7 @@ namespace VhdAttach
 
         private void mnuAppUpgrade_Click(object sender, EventArgs e)
         {
-            Medo.Services.Upgrade.ShowDialog(this, new Uri("https://medo64.com/upgrade/"));
+            Upgrade.ShowDialog(this, new Uri("https://medo64.com/upgrade/"));
         }
 
         private void mnuAppAbout_Click(object sender, EventArgs e)
@@ -925,12 +933,12 @@ namespace VhdAttach
 
         private void mnuHelpReportABug_Click(object sender, EventArgs e)
         {
-            Medo.Diagnostics.ErrorReport.ShowDialog(this, null, new Uri("https://medo64.com/feedback/"));
+            ErrorReport.ShowDialog(this, null, new Uri("https://medo64.com/feedback/"));
         }
 
         private void mnuHelpAbout_Click(object sender, EventArgs e)
         {
-            Medo.Windows.Forms.AboutBox.ShowDialog(this, new Uri("https://www.medo64.com/vhdattach/"));
+            AboutBox.ShowDialog(this, new Uri("https://www.medo64.com/vhdattach/"));
         }
 
         #endregion
@@ -997,16 +1005,16 @@ namespace VhdAttach
 
         private void OpenFromCommandLineArgs()
         { //goes through all files until it can open one and redirects all other files to new instances with /OpenOrExit argument. That argument ensures that each new instance will close in case of error.
-            var filesToOpen = Medo.Application.Args.Current.GetValues(null);
+            var filesToOpen = Args.Current.GetValues(null);
             FileInfo iFile;
             for (int i = 0; i < filesToOpen.Length; ++i)
             {
                 iFile = new FileInfo(filesToOpen[i]);
                 try
                 {
-                    var newDocument = new Medo.IO.VirtualDisk(iFile.FullName);
+                    var newDocument = new VirtualDisk(iFile.FullName);
                     UpdateData(newDocument.FileName);
-                    this.VhdFileName = newDocument.FileName;
+                    VhdFileName = newDocument.FileName;
                     Recent.Push(iFile.FullName);
 
                     //send all other files to second instances
@@ -1021,10 +1029,10 @@ namespace VhdAttach
                 }
                 catch (Exception ex)
                 {
-                    Medo.MessageBox.ShowError(this, string.Format("Cannot open \"{0}\".\n\n{1}", iFile.Name, ex.Message));
-                    if (Medo.Application.Args.Current.ContainsKey("OpenOrExit"))
+                    MessageBox.ShowError(this, string.Format("Cannot open \"{0}\".\n\n{1}", iFile.Name, ex.Message));
+                    if (Args.Current.ContainsKey("OpenOrExit"))
                     {
-                        System.Environment.Exit(2);
+                        Environment.Exit(2);
                     }
                 }
             }
@@ -1050,7 +1058,7 @@ namespace VhdAttach
             try
             {
                 var startInfo = (ProcessStartInfo)e.Argument;
-                startInfo.Arguments += string.Format(CultureInfo.InvariantCulture, " /ParentWindow=\"{0},{1},{2},{3}\"", this.Left, this.Top, this.Width, this.Height);
+                startInfo.Arguments += string.Format(CultureInfo.InvariantCulture, " /ParentWindow=\"{0},{1},{2},{3}\"", Left, Top, Width, Height);
                 using (var process = new Process())
                 {
                     process.StartInfo = startInfo;
@@ -1069,11 +1077,11 @@ namespace VhdAttach
         {
             if (e.Error != null)
             {
-                Medo.MessageBox.ShowError(this, string.Format("Error during execution of external process.\n\n{0}", e.Error.Message));
+                MessageBox.ShowError(this, string.Format("Error during execution of external process.\n\n{0}", e.Error.Message));
             }
             mnu.Enabled = true;
-            UpdateData(this.VhdFileName);
-            this.Cursor = Cursors.Default;
+            UpdateData(VhdFileName);
+            Cursor = Cursors.Default;
         }
 
 
@@ -1104,7 +1112,7 @@ namespace VhdAttach
 #if DEBUG
             var sw = Stopwatch.StartNew();
 #endif
-            if (this.VhdFileName == null)
+            if (VhdFileName == null)
             {
                 mnuRefresh.Enabled = false;
                 mnuAttach.Enabled = false;
@@ -1118,10 +1126,10 @@ namespace VhdAttach
             {
                 mnuRefresh.Enabled = true;
 
-                if (!File.Exists(this.VhdFileName)) { return; }
-                using (var document = new Medo.IO.VirtualDisk(this.VhdFileName))
+                if (!File.Exists(VhdFileName)) { return; }
+                using (var document = new VirtualDisk(VhdFileName))
                 {
-                    document.Open(Medo.IO.VirtualDiskAccessMask.GetInfo | Medo.IO.VirtualDiskAccessMask.Detach); //Workaround: The VirtualDiskAccessMask parameter must include the VIRTUAL_DISK_ACCESS_DETACH (0x00040000) flag.
+                    document.Open(VirtualDiskAccessMask.GetInfo | VirtualDiskAccessMask.Detach); //Workaround: The VirtualDiskAccessMask parameter must include the VIRTUAL_DISK_ACCESS_DETACH (0x00040000) flag.
                     string attachedDevice = null;
                     try
                     {
@@ -1177,16 +1185,16 @@ namespace VhdAttach
                 {
                     try
                     {
-                        var newDocument = new Medo.IO.VirtualDisk(files[0]);
+                        var newDocument = new VirtualDisk(files[0]);
                         UpdateData(newDocument.FileName);
-                        this.VhdFileName = newDocument.FileName;
+                        VhdFileName = newDocument.FileName;
                         Recent.Push(files[0]);
                         UpdateRecent();
                     }
                     catch (Exception ex)
                     {
                         var exFile = new FileInfo(files[0]);
-                        Medo.MessageBox.ShowError(this, string.Format("Cannot open \"{0}\".\n\n{1}", exFile.Name, ex.Message));
+                        MessageBox.ShowError(this, string.Format("Cannot open \"{0}\".\n\n{1}", exFile.Name, ex.Message));
                     }
                 }
             }
@@ -1205,7 +1213,7 @@ namespace VhdAttach
             }
             catch (InvalidOperationException ex)
             {
-                Medo.MessageBox.ShowWarning(this, string.Format("Cannot install service.\n\n{0}", ex.Message));
+                MessageBox.ShowWarning(this, string.Format("Cannot install service.\n\n{0}", ex.Message));
             }
             CheckErrors();
         }
@@ -1218,7 +1226,7 @@ namespace VhdAttach
             }
             catch (InvalidOperationException ex)
             {
-                Medo.MessageBox.ShowWarning(this, string.Format("Cannot install service.\n\n{0}", ex.Message));
+                MessageBox.ShowWarning(this, string.Format("Cannot install service.\n\n{0}", ex.Message));
             }
             CheckErrors();
         }
@@ -1276,7 +1284,7 @@ namespace VhdAttach
                 if (bwCheckForUpgrade.CancellationPending) { return; }
             }
 
-            var file = Medo.Services.Upgrade.GetUpgradeFile(new Uri("https://medo64.com/upgrade/"));
+            var file = Upgrade.GetUpgradeFile(new Uri("https://medo64.com/upgrade/"));
             if (file != null)
             {
                 if (bwCheckForUpgrade.CancellationPending) { return; }

@@ -1,4 +1,6 @@
+using System;
 using System.Globalization;
+
 namespace VhdAttach
 {
 
@@ -27,17 +29,15 @@ namespace VhdAttach
                 {
                     return size;
                 }
-                else
-                {
-                    return 0;
-                }
+
+                return 0;
             }
             set { Medo.Configuration.Settings.Write("LastSize", value.ToString(CultureInfo.InvariantCulture)); }
         }
 
         public static string LastSizeUnit
         {
-            get { return (Medo.Configuration.Settings.Read("LastSizeUnit", "GB").Equals("MB", System.StringComparison.OrdinalIgnoreCase)) ? "MB" : "GB"; }
+            get { return (Medo.Configuration.Settings.Read("LastSizeUnit", "GB").Equals("MB", StringComparison.OrdinalIgnoreCase)) ? "MB" : "GB"; }
             set { Medo.Configuration.Settings.Write("LastSizeUnit", value); }
         }
 

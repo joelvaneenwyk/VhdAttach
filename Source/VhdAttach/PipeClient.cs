@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
+using Medo.IO;
+using Medo.Net;
 
 namespace VhdAttach
 {
@@ -72,11 +74,11 @@ namespace VhdAttach
             return Send("RegisterExtensionVhd", data);
         }
 
-        private static Medo.IO.NamedPipe Pipe = new Medo.IO.NamedPipe("JosipMedved-VhdAttach-Commands");
+        private static NamedPipe Pipe = new NamedPipe("JosipMedved-VhdAttach-Commands");
 
         private static PipeResponse Send(string operation, Dictionary<string, string> data, int timeout = 5000)
         {
-            var packetOut = new Medo.Net.TinyPacket("VhdAttach", operation, data);
+            var packetOut = new TinyPacket("VhdAttach", operation, data);
             try
             {
                 Pipe.Open();
@@ -92,7 +94,7 @@ namespace VhdAttach
                 if (Pipe.HasBytesToRead)
                 {
                     var buffer = Pipe.ReadAvailable();
-                    var packetIn = Medo.Net.TinyPacket.Parse(buffer);
+                    var packetIn = TinyPacket.Parse(buffer);
                     return new PipeResponse(bool.Parse(packetIn["IsError"]), packetIn["Message"]);
                 }
                 else

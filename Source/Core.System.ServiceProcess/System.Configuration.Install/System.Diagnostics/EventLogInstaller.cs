@@ -1,7 +1,5 @@
-using Microsoft.Win32;
 using System.ComponentModel;
 using System.Configuration.Install;
-using System.Runtime.InteropServices;
 
 namespace System.Diagnostics
 {

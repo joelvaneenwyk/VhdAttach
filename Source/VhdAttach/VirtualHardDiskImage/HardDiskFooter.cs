@@ -15,25 +15,25 @@ namespace VirtualHardDiskImage
         /// </summary>
         public HardDiskFooter()
         {
-            this.Bytes = new Byte[512];
-            this.BeginUpdate();
-            this.Cookie = "conectix";
-            this.Features = VhdFeature.NoFeaturesEnabled;
-            this.FileFormatVersion = new Version(1, 0);
-            this.DataOffset = 0xFFFFFFFFFFFFFFFF;
-            this.TimeStamp = DateTime.UtcNow;
-            this.CreatorApplication = VhdCreatorApplication.None;
-            this.CreatorVersion = new Version(0, 0);
-            this.CreatorHostOs = VhdCreatorHostOs.Windows;
-            this.OriginalSize = 0;
-            this.CurrentSize = 0;
-            this.DiskGeometryCylinders = 0;
-            this.DiskGeometryHeads = 0;
-            this.DiskGeometrySectors = 0;
-            this.DiskType = VhdDiskType.None;
-            this.UniqueId = Guid.NewGuid();
-            this.SavedState = false;
-            this.EndUpdate();
+            Bytes = new Byte[512];
+            BeginUpdate();
+            Cookie = "conectix";
+            Features = VhdFeature.NoFeaturesEnabled;
+            FileFormatVersion = new Version(1, 0);
+            DataOffset = 0xFFFFFFFFFFFFFFFF;
+            TimeStamp = DateTime.UtcNow;
+            CreatorApplication = VhdCreatorApplication.None;
+            CreatorVersion = new Version(0, 0);
+            CreatorHostOs = VhdCreatorHostOs.Windows;
+            OriginalSize = 0;
+            CurrentSize = 0;
+            DiskGeometryCylinders = 0;
+            DiskGeometryHeads = 0;
+            DiskGeometrySectors = 0;
+            DiskType = VhdDiskType.None;
+            UniqueId = Guid.NewGuid();
+            SavedState = false;
+            EndUpdate();
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace VirtualHardDiskImage
             if (bytes == null) { throw new ArgumentNullException("bytes", "Argument bytes cannot be null."); }
             if (bytes.Length != 512) { throw new FormatException("Footer must be 512 bytes long."); }
 
-            this.Bytes = bytes;
+            Bytes = bytes;
         }
 
 
@@ -57,15 +57,15 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                return ASCIIEncoding.ASCII.GetString(this.Bytes, 0, 8);
+                return ASCIIEncoding.ASCII.GetString(Bytes, 0, 8);
             }
             set
             {
                 if (value == null) { throw new ArgumentNullException("value", "Value cannot be null."); }
                 var buffer = ASCIIEncoding.ASCII.GetBytes(value);
                 if (buffer.Length != 8) { throw new ArgumentException("Cookie must be 8 ASCII characters long.", "value"); }
-                Buffer.BlockCopy(buffer, 0, this.Bytes, 0, 8);
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Buffer.BlockCopy(buffer, 0, Bytes, 0, 8);
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -80,13 +80,13 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                return (VhdFeature)GetInt32(this.Bytes, 8);
+                return (VhdFeature)GetInt32(Bytes, 8);
             }
             set
             {
                 var buffer = GetBytes((int)value);
-                Buffer.BlockCopy(buffer, 0, this.Bytes, 8, 4);
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Buffer.BlockCopy(buffer, 0, Bytes, 8, 4);
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -105,9 +105,9 @@ namespace VirtualHardDiskImage
             {
                 var major = GetBytes((UInt16)value.Major);
                 var minor = GetBytes((UInt16)value.Minor);
-                Buffer.BlockCopy(major, 0, this.Bytes, 12, 2);
-                Buffer.BlockCopy(minor, 0, this.Bytes, 14, 2);
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Buffer.BlockCopy(major, 0, Bytes, 12, 2);
+                Buffer.BlockCopy(minor, 0, Bytes, 14, 2);
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -118,13 +118,13 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                return GetUInt64(this.Bytes, 16);
+                return GetUInt64(Bytes, 16);
             }
             set
             {
                 var buffer = GetBytes(value);
-                Buffer.BlockCopy(buffer, 0, this.Bytes, 16, 8);
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Buffer.BlockCopy(buffer, 0, Bytes, 16, 8);
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -135,7 +135,7 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(GetUInt32(this.Bytes, 24));
+                return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(GetUInt32(Bytes, 24));
             }
             set
             {
@@ -143,8 +143,8 @@ namespace VirtualHardDiskImage
                 if (value < origin) { value = origin; }
                 var diff = (uint)(value - origin).TotalSeconds;
                 var buffer = GetBytes(diff);
-                Buffer.BlockCopy(buffer, 0, this.Bytes, 24, 4);
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Buffer.BlockCopy(buffer, 0, Bytes, 24, 4);
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -155,13 +155,13 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                return (VhdCreatorApplication)GetInt32(this.Bytes, 28);
+                return (VhdCreatorApplication)GetInt32(Bytes, 28);
             }
             set
             {
                 var buffer = GetBytes((int)value);
-                Buffer.BlockCopy(buffer, 0, this.Bytes, 28, 4);
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Buffer.BlockCopy(buffer, 0, Bytes, 28, 4);
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -172,8 +172,8 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                var major = GetUInt16(this.Bytes, 32);
-                var minor = GetUInt16(this.Bytes, 34);
+                var major = GetUInt16(Bytes, 32);
+                var minor = GetUInt16(Bytes, 34);
                 return new Version(major, minor);
 
             }
@@ -181,9 +181,9 @@ namespace VirtualHardDiskImage
             {
                 var major = GetBytes((UInt16)value.Major);
                 var minor = GetBytes((UInt16)value.Minor);
-                Buffer.BlockCopy(major, 0, this.Bytes, 32, 2);
-                Buffer.BlockCopy(minor, 0, this.Bytes, 34, 2);
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Buffer.BlockCopy(major, 0, Bytes, 32, 2);
+                Buffer.BlockCopy(minor, 0, Bytes, 34, 2);
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -196,13 +196,13 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                return (VhdCreatorHostOs)GetInt32(this.Bytes, 36);
+                return (VhdCreatorHostOs)GetInt32(Bytes, 36);
             }
             set
             {
                 var buffer = GetBytes((int)value);
-                Buffer.BlockCopy(buffer, 0, this.Bytes, 36, 4);
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Buffer.BlockCopy(buffer, 0, Bytes, 36, 4);
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -213,13 +213,13 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                return GetUInt64(this.Bytes, 40);
+                return GetUInt64(Bytes, 40);
             }
             set
             {
                 var buffer = GetBytes(value);
-                Buffer.BlockCopy(buffer, 0, this.Bytes, 40, 8);
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Buffer.BlockCopy(buffer, 0, Bytes, 40, 8);
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -230,13 +230,13 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                return GetUInt64(this.Bytes, 48);
+                return GetUInt64(Bytes, 48);
             }
             set
             {
                 var buffer = GetBytes(value);
-                Buffer.BlockCopy(buffer, 0, this.Bytes, 48, 8);
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Buffer.BlockCopy(buffer, 0, Bytes, 48, 8);
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -247,13 +247,13 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                return GetUInt16(this.Bytes, 56);
+                return GetUInt16(Bytes, 56);
             }
             set
             {
                 var buffer = GetBytes(value);
-                Buffer.BlockCopy(buffer, 0, this.Bytes, 56, 2);
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Buffer.BlockCopy(buffer, 0, Bytes, 56, 2);
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -264,12 +264,12 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                return this.Bytes[58];
+                return Bytes[58];
             }
             set
             {
-                this.Bytes[58] = value;
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Bytes[58] = value;
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -280,12 +280,12 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                return this.Bytes[59];
+                return Bytes[59];
             }
             set
             {
-                this.Bytes[59] = value;
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Bytes[59] = value;
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -296,13 +296,13 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                return (VhdDiskType)GetInt32(this.Bytes, 60);
+                return (VhdDiskType)GetInt32(Bytes, 60);
             }
             set
             {
                 var buffer = GetBytes((int)value);
-                Buffer.BlockCopy(buffer, 0, this.Bytes, 60, 4);
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Buffer.BlockCopy(buffer, 0, Bytes, 60, 4);
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -315,14 +315,14 @@ namespace VirtualHardDiskImage
             get
             {
                 var buffer = new Byte[4];
-                Buffer.BlockCopy(this.Bytes, 64, buffer, 0, 4);
+                Buffer.BlockCopy(Bytes, 64, buffer, 0, 4);
                 return buffer;
             }
             set
             {
                 if (value == null) { throw new ArgumentNullException("value", "Value cannot be null."); }
                 if (value.Length != 4) { throw new ArgumentException("Value must be 4 bytes in length.", "value"); }
-                Buffer.BlockCopy(value, 0, this.Bytes, 64, 4);
+                Buffer.BlockCopy(value, 0, Bytes, 64, 4);
             }
         }
 
@@ -333,8 +333,8 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                var curr = this.Checksum;
-                var valid = GetFooterChecksum(this.Bytes);
+                var curr = Checksum;
+                var valid = GetFooterChecksum(Bytes);
                 return (curr[0] == valid[0]) && (curr[1] == valid[1]) && (curr[2] == valid[2]) && (curr[3] == valid[3]);
             }
         }
@@ -348,14 +348,14 @@ namespace VirtualHardDiskImage
             get
             {
                 var buffer = new byte[16];
-                Buffer.BlockCopy(this.Bytes, 68, buffer, 0, 16);
+                Buffer.BlockCopy(Bytes, 68, buffer, 0, 16);
                 return new Guid(buffer);
             }
             set
             {
                 var buffer = value.ToByteArray();
-                Buffer.BlockCopy(buffer, 0, this.Bytes, 68, 16);
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Buffer.BlockCopy(buffer, 0, Bytes, 68, 16);
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -366,12 +366,12 @@ namespace VirtualHardDiskImage
         {
             get
             {
-                return (this.Bytes[84] == 1);
+                return (Bytes[84] == 1);
             }
             set
             {
-                this.Bytes[84] = (value) ? (Byte)1 : (Byte)0;
-                if (this.UpdateCounter == 0) { this.UpdateChecksum(); }
+                Bytes[84] = (value) ? (Byte)1 : (Byte)0;
+                if (UpdateCounter == 0) { UpdateChecksum(); }
             }
         }
 
@@ -382,7 +382,7 @@ namespace VirtualHardDiskImage
         public void SetSize(UInt64 size)
         {
             ulong totalSectors = size / 512;
-            this.CurrentSize = totalSectors * 512;
+            CurrentSize = totalSectors * 512;
 
             ulong cylinders;
             ulong heads;
@@ -423,9 +423,9 @@ namespace VirtualHardDiskImage
             }
             cylinders = cylinderTimesHeads / heads;
 
-            this.DiskGeometryCylinders = (UInt16)cylinders;
-            this.DiskGeometryHeads = (Byte)heads;
-            this.DiskGeometrySectors = (Byte)sectorsPerTrack;
+            DiskGeometryCylinders = (UInt16)cylinders;
+            DiskGeometryHeads = (Byte)heads;
+            DiskGeometrySectors = (Byte)sectorsPerTrack;
         }
 
 
@@ -442,7 +442,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public void BeginUpdate()
         {
-            this.UpdateCounter += 1;
+            UpdateCounter += 1;
         }
 
         /// <summary>
@@ -450,8 +450,8 @@ namespace VirtualHardDiskImage
         /// </summary>
         public void EndUpdate()
         {
-            this.UpdateCounter = Math.Max(this.UpdateCounter - 1, 0);
-            if (this.UpdateCounter == 0)
+            UpdateCounter = Math.Max(UpdateCounter - 1, 0);
+            if (UpdateCounter == 0)
             {
                 UpdateChecksum();
             }
@@ -462,8 +462,8 @@ namespace VirtualHardDiskImage
         /// </summary>
         public void UpdateChecksum()
         {
-            var buffer = GetFooterChecksum(this.Bytes);
-            Buffer.BlockCopy(buffer, 0, this.Bytes, 64, 4);
+            var buffer = GetFooterChecksum(Bytes);
+            Buffer.BlockCopy(buffer, 0, Bytes, 64, 4);
         }
 
 
@@ -485,12 +485,10 @@ namespace VirtualHardDiskImage
             var bytes = BitConverter.GetBytes(value);
             if (BitConverter.IsLittleEndian)
             {
-                return new byte[] { bytes[1], bytes[0] };
+                return new[] { bytes[1], bytes[0] };
             }
-            else
-            {
-                return bytes;
-            }
+
+            return bytes;
         }
 
         private static Byte[] GetBytes(Int32 value)
@@ -498,12 +496,10 @@ namespace VirtualHardDiskImage
             var bytes = BitConverter.GetBytes(value);
             if (BitConverter.IsLittleEndian)
             {
-                return new byte[] { bytes[3], bytes[2], bytes[1], bytes[0] };
+                return new[] { bytes[3], bytes[2], bytes[1], bytes[0] };
             }
-            else
-            {
-                return bytes;
-            }
+
+            return bytes;
         }
 
         private static Byte[] GetBytes(UInt32 value)
@@ -511,12 +507,10 @@ namespace VirtualHardDiskImage
             var bytes = BitConverter.GetBytes(value);
             if (BitConverter.IsLittleEndian)
             {
-                return new byte[] { bytes[3], bytes[2], bytes[1], bytes[0] };
+                return new[] { bytes[3], bytes[2], bytes[1], bytes[0] };
             }
-            else
-            {
-                return bytes;
-            }
+
+            return bytes;
         }
 
         private static Byte[] GetBytes(UInt64 value)
@@ -524,12 +518,10 @@ namespace VirtualHardDiskImage
             var bytes = BitConverter.GetBytes(value);
             if (BitConverter.IsLittleEndian)
             {
-                return new byte[] { bytes[7], bytes[6], bytes[5], bytes[4], bytes[3], bytes[2], bytes[1], bytes[0] };
+                return new[] { bytes[7], bytes[6], bytes[5], bytes[4], bytes[3], bytes[2], bytes[1], bytes[0] };
             }
-            else
-            {
-                return bytes;
-            }
+
+            return bytes;
         }
 
 
@@ -537,48 +529,40 @@ namespace VirtualHardDiskImage
         {
             if (BitConverter.IsLittleEndian)
             {
-                return BitConverter.ToUInt16(new byte[] { bytes[offset + 1], bytes[offset + 0] }, 0);
+                return BitConverter.ToUInt16(new[] { bytes[offset + 1], bytes[offset + 0] }, 0);
             }
-            else
-            {
-                return BitConverter.ToUInt16(bytes, offset);
-            }
+
+            return BitConverter.ToUInt16(bytes, offset);
         }
 
         private static Int32 GetInt32(byte[] bytes, int offset)
         {
             if (BitConverter.IsLittleEndian)
             {
-                return BitConverter.ToInt32(new byte[] { bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0] }, 0);
+                return BitConverter.ToInt32(new[] { bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0] }, 0);
             }
-            else
-            {
-                return BitConverter.ToInt32(bytes, offset);
-            }
+
+            return BitConverter.ToInt32(bytes, offset);
         }
 
         private static UInt32 GetUInt32(byte[] bytes, int offset)
         {
             if (BitConverter.IsLittleEndian)
             {
-                return BitConverter.ToUInt32(new byte[] { bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0] }, 0);
+                return BitConverter.ToUInt32(new[] { bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0] }, 0);
             }
-            else
-            {
-                return BitConverter.ToUInt32(bytes, offset);
-            }
+
+            return BitConverter.ToUInt32(bytes, offset);
         }
 
         private static UInt64 GetUInt64(byte[] bytes, int offset)
         {
             if (BitConverter.IsLittleEndian)
             {
-                return BitConverter.ToUInt64(new byte[] { bytes[offset + 7], bytes[offset + 6], bytes[offset + 5], bytes[offset + 4], bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0] }, 0);
+                return BitConverter.ToUInt64(new[] { bytes[offset + 7], bytes[offset + 6], bytes[offset + 5], bytes[offset + 4], bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0] }, 0);
             }
-            else
-            {
-                return BitConverter.ToUInt64(bytes, offset);
-            }
+
+            return BitConverter.ToUInt64(bytes, offset);
         }
 
     }

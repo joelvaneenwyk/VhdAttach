@@ -14,22 +14,22 @@ namespace VhdAttachService
 
         public static void Start()
         {
-            if (ServiceStatusThread.Thread != null) { return; }
+            if (Thread != null) { return; }
 
-            ServiceStatusThread.CancelEvent = new ManualResetEvent(false);
-            ServiceStatusThread.Thread = new Thread(Run);
-            ServiceStatusThread.Thread.Name = "Service status";
-            ServiceStatusThread.Thread.CurrentCulture = CultureInfo.InvariantCulture;
-            ServiceStatusThread.Thread.Start();
+            CancelEvent = new ManualResetEvent(false);
+            Thread = new Thread(Run);
+            Thread.Name = "Service status";
+            Thread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread.Start();
         }
 
         public static void Stop()
         {
             try
             {
-                ServiceStatusThread.CancelEvent.Set();
-                while (ServiceStatusThread.Thread.IsAlive) { Thread.Sleep(10); }
-                ServiceStatusThread.Thread = null;
+                CancelEvent.Set();
+                while (Thread.IsAlive) { Thread.Sleep(10); }
+                Thread = null;
             }
             catch { }
         }
@@ -44,7 +44,7 @@ namespace VhdAttachService
                 {
                     bool? lastIsRunning = null;
                     Tray.SetStatusToUnknown();
-                    while (!ServiceStatusThread.CancelEvent.WaitOne(0, false))
+                    while (!CancelEvent.WaitOne(0, false))
                     {
                         if ((sw.IsRunning == false) || (sw.ElapsedMilliseconds > 1000))
                         {

@@ -1,8 +1,8 @@
-using Microsoft.Win32.SafeHandles;
 using System;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace VhdAttach
 {
@@ -11,7 +11,7 @@ namespace VhdAttach
 
         public static void RemoveIntegrityStream(FileInfo file)
         {
-            if (!ReFS.HasIntegrityStream(file)) { return; } //cancel if file has no integrity stream
+            if (!HasIntegrityStream(file)) { return; } //cancel if file has no integrity stream
 
             using (var handle = NativeMethods.CreateFile(file.FullName, NativeMethods.GENERIC_READ | NativeMethods.GENERIC_WRITE, FileShare.None, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero))
             {
@@ -21,7 +21,7 @@ namespace VhdAttach
 
         public static void RemoveIntegrityStream(SafeFileHandle handle)
         {
-            if (!ReFS.HasIntegrityStream(handle)) { return; } //cancel if file has no integrity stream
+            if (!HasIntegrityStream(handle)) { return; } //cancel if file has no integrity stream
 
             var oldInfo = new NativeMethods.FSCTL_GET_INTEGRITY_INFORMATION_BUFFER();
             var oldInfoSizeReturn = 0;
@@ -39,7 +39,7 @@ namespace VhdAttach
 
             if (oldInfo.ChecksumAlgorithm == NativeMethods.CHECKSUM_TYPE_NONE) { return; } //already done
 
-            var newInfo = new NativeMethods.FSCTL_SET_INTEGRITY_INFORMATION_BUFFER() { ChecksumAlgorithm = NativeMethods.CHECKSUM_TYPE_NONE, Flags = oldInfo.Flags };
+            var newInfo = new NativeMethods.FSCTL_SET_INTEGRITY_INFORMATION_BUFFER { ChecksumAlgorithm = NativeMethods.CHECKSUM_TYPE_NONE, Flags = oldInfo.Flags };
             var newInfoSizeReturn = 0;
             if (!NativeMethods.DeviceIoControl(handle, NativeMethods.FSCTL_SET_INTEGRITY_INFORMATION, ref newInfo, Marshal.SizeOf(newInfo), IntPtr.Zero, 0, out newInfoSizeReturn, IntPtr.Zero))
             {

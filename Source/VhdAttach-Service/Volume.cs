@@ -17,7 +17,7 @@ namespace VhdAttachCommon
 
         internal Volume(string volumeName)
         {
-            this.VolumeName = volumeName;
+            VolumeName = volumeName;
         }
 
         public string VolumeName { get; private set; }
@@ -26,7 +26,7 @@ namespace VhdAttachCommon
         {
             get
             {
-                return RemoveLastBackslash(this.VolumeName);
+                return RemoveLastBackslash(VolumeName);
             }
         }
 
@@ -39,7 +39,7 @@ namespace VhdAttachCommon
             {
                 var volumePaths = new StringBuilder(4096);
                 int volumePathsLength = 0;
-                if (NativeMethods.GetVolumePathNamesForVolumeName(this.VolumeName, volumePaths, volumePaths.Capacity, out volumePathsLength))
+                if (NativeMethods.GetVolumePathNamesForVolumeName(VolumeName, volumePaths, volumePaths.Capacity, out volumePathsLength))
                 {
                     foreach (var volume in volumePaths.ToString().Split('\0'))
                     {
@@ -57,7 +57,7 @@ namespace VhdAttachCommon
         {
             get
             {
-                var letter = this.DriveLetter3;
+                var letter = DriveLetter3;
                 return (letter != null) ? letter.Substring(0, 2) : null;
             }
         }
@@ -65,10 +65,10 @@ namespace VhdAttachCommon
         public void ChangeLetter(string newLetter)
         {
             newLetter = ParseDriveLetter(newLetter);
-            if (newLetter == this.DriveLetter3) { return; } //nothing to do
+            if (newLetter == DriveLetter3) { return; } //nothing to do
 
-            this.RemoveLetter();
-            if (NativeMethods.SetVolumeMountPoint(newLetter, this.VolumeName) == false)
+            RemoveLetter();
+            if (NativeMethods.SetVolumeMountPoint(newLetter, VolumeName) == false)
             {
                 throw new Win32Exception();
             }
@@ -76,9 +76,9 @@ namespace VhdAttachCommon
 
         public void RemoveLetter()
         {
-            if (this.DriveLetter3 != null)
+            if (DriveLetter3 != null)
             {
-                if (NativeMethods.DeleteVolumeMountPoint(this.DriveLetter3) == false)
+                if (NativeMethods.DeleteVolumeMountPoint(DriveLetter3) == false)
                 {
                     throw new Win32Exception();
                 }
@@ -92,7 +92,7 @@ namespace VhdAttachCommon
             get
             {
                 FillExtentInfo();
-                return this._physicalDriveNumber;
+                return _physicalDriveNumber;
             }
         }
 
@@ -102,7 +102,7 @@ namespace VhdAttachCommon
             get
             {
                 FillExtentInfo();
-                return this._physicalDriveExtentOffset;
+                return _physicalDriveExtentOffset;
             }
         }
 
@@ -112,12 +112,12 @@ namespace VhdAttachCommon
             get
             {
                 FillExtentInfo();
-                return this._physicalDriveExtentLength;
+                return _physicalDriveExtentLength;
             }
         }
 
 
-        private bool _hasExtentInfo = false;
+        private bool _hasExtentInfo;
         private void FillExtentInfo()
         {
             if (_hasExtentInfo) { return; }
@@ -125,11 +125,11 @@ namespace VhdAttachCommon
             int diskNumber;
             long startingOffset;
             long extentLength;
-            if (GetExtentInfo(this.VolumeNameWithoutSlash, out diskNumber, out startingOffset, out extentLength))
+            if (GetExtentInfo(VolumeNameWithoutSlash, out diskNumber, out startingOffset, out extentLength))
             {
-                this._physicalDriveNumber = diskNumber;
-                this._physicalDriveExtentOffset = startingOffset;
-                this._physicalDriveExtentLength = extentLength;
+                _physicalDriveNumber = diskNumber;
+                _physicalDriveExtentOffset = startingOffset;
+                _physicalDriveExtentLength = extentLength;
             }
 
             _hasExtentInfo = true;
@@ -173,10 +173,8 @@ namespace VhdAttachCommon
             {
                 return new Volume(volumeName.ToString());
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
 
@@ -187,14 +185,13 @@ namespace VhdAttachCommon
             {
                 return GetVolumesOnPhysicalDrive(driveNumber);
             }
-            else if ((physicalDrive != null) && physicalDrive.StartsWith(@"\\.\CDROM", StringComparison.InvariantCultureIgnoreCase) && int.TryParse(physicalDrive.Substring(9), NumberStyles.Integer, CultureInfo.InvariantCulture, out driveNumber))
+
+            if ((physicalDrive != null) && physicalDrive.StartsWith(@"\\.\CDROM", StringComparison.InvariantCultureIgnoreCase) && int.TryParse(physicalDrive.Substring(9), NumberStyles.Integer, CultureInfo.InvariantCulture, out driveNumber))
             {
                 return GetVolumesOnCdDrive(driveNumber);
             }
-            else
-            {
-                return new List<Volume>().AsReadOnly();
-            }
+
+            return new List<Volume>().AsReadOnly();
         }
 
         public static IList<Volume> GetVolumesOnPhysicalDrive(int driveNumber)
@@ -223,14 +220,13 @@ namespace VhdAttachCommon
                     {
                         return -1;
                     }
-                    else if ((volume1.PhysicalDriveExtentOffset ?? -1) > (volume2.PhysicalDriveExtentOffset ?? -1))
+
+                    if ((volume1.PhysicalDriveExtentOffset ?? -1) > (volume2.PhysicalDriveExtentOffset ?? -1))
                     {
                         return +1;
                     }
-                    else
-                    {
-                        return 0;
-                    }
+
+                    return 0;
                 }
             );
 
@@ -248,7 +244,7 @@ namespace VhdAttachCommon
                 if (NativeMethods.QueryDosDevice(dosDevice, sb, sb.Capacity) > 0)
                 {
                     var dosPath = sb.ToString();
-                    Debug.WriteLine(sb.ToString() + " is at " + dosDevice);
+                    Debug.WriteLine(sb + " is at " + dosDevice);
                     if (dosPath.StartsWith(@"\Device\CdRom", StringComparison.OrdinalIgnoreCase))
                     {
                         int cdromNumber = 0;
@@ -256,7 +252,7 @@ namespace VhdAttachCommon
                         {
                             if (cdromNumber == driveNumber)
                             {
-                                volumes.Add(Volume.GetFromLetter(dosDevice));
+                                volumes.Add(GetFromLetter(dosDevice));
                             }
                         }
                     }
@@ -282,10 +278,8 @@ namespace VhdAttachCommon
             {
                 return text.Remove(text.Length - 1);
             }
-            else
-            {
-                return text;
-            }
+
+            return text;
         }
 
 
@@ -316,44 +310,43 @@ namespace VhdAttachCommon
 
             [DllImportAttribute("kernel32.dll", EntryPoint = "DeleteVolumeMountPointW", SetLastError = true)]
             [return: MarshalAsAttribute(UnmanagedType.Bool)]
-            public static extern Boolean DeleteVolumeMountPoint([InAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpszVolumeMountPoint);
+            public static extern Boolean DeleteVolumeMountPoint([InAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpszVolumeMountPoint);
 
             [DllImportAttribute("kernel32.dll", EntryPoint = "GetVolumeNameForVolumeMountPointW", SetLastError = true)]
             [return: MarshalAsAttribute(UnmanagedType.Bool)]
-            public static extern Boolean GetVolumeNameForVolumeMountPoint([InAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpszVolumeMountPoint, [OutAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpszVolumeName, Int32 cchBufferLength);
+            public static extern Boolean GetVolumeNameForVolumeMountPoint([InAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpszVolumeMountPoint, [OutAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpszVolumeName, Int32 cchBufferLength);
 
             [DllImportAttribute("kernel32.dll", EntryPoint = "GetVolumePathNamesForVolumeNameW", SetLastError = true)]
             [return: MarshalAsAttribute(UnmanagedType.Bool)]
-            public static extern Boolean GetVolumePathNamesForVolumeName([InAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpszVolumeName, [OutAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpszVolumePathNames, Int32 cchBufferLength, [OutAttribute()] out Int32 lpcchReturnLength);
+            public static extern Boolean GetVolumePathNamesForVolumeName([InAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpszVolumeName, [OutAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpszVolumePathNames, Int32 cchBufferLength, [OutAttribute] out Int32 lpcchReturnLength);
 
             [DllImportAttribute("kernel32.dll", EntryPoint = "SetVolumeMountPointW", SetLastError = true)]
             [return: MarshalAsAttribute(UnmanagedType.Bool)]
-            public static extern Boolean SetVolumeMountPoint([InAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpszVolumeMountPoint, [InAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpszVolumeName);
+            public static extern Boolean SetVolumeMountPoint([InAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpszVolumeMountPoint, [InAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpszVolumeName);
 
 
             [DllImportAttribute("kernel32.dll", EntryPoint = "CreateFileW", SetLastError = true)]
-            public static extern VolumeSafeHandle CreateFile([InAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpFileName, UInt32 dwDesiredAccess, UInt32 dwShareMode, [InAttribute()] IntPtr lpSecurityAttributes, UInt32 dwCreationDisposition, UInt32 dwFlagsAndAttributes, [InAttribute()] IntPtr hTemplateFile);
+            public static extern VolumeSafeHandle CreateFile([InAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpFileName, UInt32 dwDesiredAccess, UInt32 dwShareMode, [InAttribute] IntPtr lpSecurityAttributes, UInt32 dwCreationDisposition, UInt32 dwFlagsAndAttributes, [InAttribute] IntPtr hTemplateFile);
 
             [DllImportAttribute("kernel32.dll", EntryPoint = "DeviceIoControl", SetLastError = true)]
             [return: MarshalAsAttribute(UnmanagedType.Bool)]
-            public static extern bool DeviceIoControl([InAttribute()] VolumeSafeHandle hDevice, UInt32 dwIoControlCode, [InAttribute()] IntPtr lpInBuffer, Int32 nInBufferSize, ref VOLUME_DISK_EXTENTS lpOutBuffer, Int32 nOutBufferSize, ref Int32 lpBytesReturned, IntPtr lpOverlapped);
+            public static extern bool DeviceIoControl([InAttribute] VolumeSafeHandle hDevice, UInt32 dwIoControlCode, [InAttribute] IntPtr lpInBuffer, Int32 nInBufferSize, ref VOLUME_DISK_EXTENTS lpOutBuffer, Int32 nOutBufferSize, ref Int32 lpBytesReturned, IntPtr lpOverlapped);
 
 
             [DllImportAttribute("kernel32.dll", EntryPoint = "FindFirstVolumeW", SetLastError = true)]
-            public static extern SearchSafeHandle FindFirstVolume([OutAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpszVolumeName, Int32 cchBufferLength);
+            public static extern SearchSafeHandle FindFirstVolume([OutAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpszVolumeName, Int32 cchBufferLength);
 
             [DllImportAttribute("kernel32.dll", EntryPoint = "FindNextVolumeW", SetLastError = true)]
             [return: MarshalAsAttribute(UnmanagedType.Bool)]
-            public static extern Boolean FindNextVolume(SearchSafeHandle hFindVolume, [OutAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpszVolumeName, Int32 cchBufferLength);
+            public static extern Boolean FindNextVolume(SearchSafeHandle hFindVolume, [OutAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpszVolumeName, Int32 cchBufferLength);
 
 
             [DllImportAttribute("kernel32.dll", EntryPoint = "QueryDosDeviceW", SetLastError = true)]
-            public static extern Int32 QueryDosDevice([InAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpDeviceName, [OutAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpTargetPath, Int32 ucchMax);
+            public static extern Int32 QueryDosDevice([InAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] String lpDeviceName, [OutAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpTargetPath, Int32 ucchMax);
 
 
             #region SafeHandles
 
-            [SecurityPermission(SecurityAction.Demand)]
             public class VolumeSafeHandle : SafeHandleMinusOneIsInvalid
             {
 
@@ -363,12 +356,12 @@ namespace VhdAttachCommon
 
                 protected override bool ReleaseHandle()
                 {
-                    return CloseHandle(this.handle);
+                    return CloseHandle(handle);
                 }
 
                 public override string ToString()
                 {
-                    return this.handle.ToString();
+                    return handle.ToString();
                 }
 
                 [DllImportAttribute("kernel32.dll", SetLastError = true)]
@@ -377,7 +370,6 @@ namespace VhdAttachCommon
 
             }
 
-            [SecurityPermission(SecurityAction.Demand)]
             public class SearchSafeHandle : SafeHandleMinusOneIsInvalid
             {
 
@@ -387,17 +379,17 @@ namespace VhdAttachCommon
 
                 protected override bool ReleaseHandle()
                 {
-                    return FindVolumeClose(this.handle);
+                    return FindVolumeClose(handle);
                 }
 
                 public override string ToString()
                 {
-                    return this.handle.ToString();
+                    return handle.ToString();
                 }
 
                 [DllImportAttribute("kernel32.dll", EntryPoint = "FindVolumeClose")]
                 [return: MarshalAsAttribute(UnmanagedType.Bool)]
-                public static extern bool FindVolumeClose([InAttribute()] IntPtr hFindVolume);
+                public static extern bool FindVolumeClose([InAttribute] IntPtr hFindVolume);
 
             }
 

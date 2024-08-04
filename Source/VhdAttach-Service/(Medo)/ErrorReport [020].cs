@@ -35,10 +35,15 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Security;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Medo.Diagnostics
@@ -59,15 +64,15 @@ namespace Medo.Diagnostics
         private static readonly string _infoProductTitle;
         private static readonly string _infoProductVersion;
         private static readonly string _infoAssemblyFullName;
-        private static readonly string _infoOsVersion = System.Environment.OSVersion.ToString();
-        private static readonly string _infoFrameworkVersion = ".NET Framework " + System.Environment.Version.ToString();
+        private static readonly string _infoOsVersion = Environment.OSVersion.ToString();
+        private static readonly string _infoFrameworkVersion = ".NET Framework " + Environment.Version;
         private static readonly string[] _infoReferencedAssemblies;
 
 
         /// <summary>
         /// Setting up of initial variable values in order to avoid setting them once problems (e.g. OutOfMemoryException) occur.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "This cannot be done with in-field assignments.")]
+        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "This cannot be done with in-field assignments.")]
         static ErrorReport()
         {
             var assembly = Assembly.GetEntryAssembly();
@@ -75,22 +80,22 @@ namespace Medo.Diagnostics
             var productAttributes = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), true);
             if ((productAttributes != null) && (productAttributes.Length >= 1))
             {
-                ErrorReport._infoProductTitle = ((AssemblyProductAttribute)productAttributes[productAttributes.Length - 1]).Product;
+                _infoProductTitle = ((AssemblyProductAttribute)productAttributes[productAttributes.Length - 1]).Product;
             }
             else
             {
                 var titleAttributes = assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), true);
                 if ((titleAttributes != null) && (titleAttributes.Length >= 1))
                 {
-                    ErrorReport._infoProductTitle = ((AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
+                    _infoProductTitle = ((AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
                 }
                 else
                 {
-                    ErrorReport._infoProductTitle = assembly.GetName().Name;
+                    _infoProductTitle = assembly.GetName().Name;
                 }
             }
             _infoProductVersion = assembly.GetName().Version.ToString();
-            ErrorReport._logFileName = System.IO.Path.Combine(System.IO.Path.GetTempPath(), string.Format(System.Globalization.CultureInfo.InvariantCulture, "ErrorReport [{0}].log", _infoProductTitle));
+            _logFileName = Path.Combine(Path.GetTempPath(), string.Format(CultureInfo.InvariantCulture, "ErrorReport [{0}].log", _infoProductTitle));
 
             _infoAssemblyFullName = assembly.FullName;
 
@@ -148,7 +153,7 @@ namespace Medo.Diagnostics
             {
                 LogBufferFillFromException(exception, additionalInformation);
 
-                if ((exception != null) && !ErrorReport.DisableAutomaticSaveToTemp)
+                if ((exception != null) && !DisableAutomaticSaveToTemp)
                 {
                     LogBufferSaveToLogFile();
                 }
@@ -213,7 +218,7 @@ namespace Medo.Diagnostics
                 }
                 catch (WebException ex)
                 {
-                    System.Diagnostics.Debug.WriteLine("W: " + ex.Message + ".    {{Medo.Diagnostics.ErrorReport}}");
+                    Debug.WriteLine("W: " + ex.Message + ".    {{Medo.Diagnostics.ErrorReport}}");
                 }
 
                 return DialogResult.Cancel;
@@ -290,7 +295,7 @@ namespace Medo.Diagnostics
             {
                 LogBufferFillFromException(exception, additionalInformation);
 
-                if ((exception != null) && !ErrorReport.DisableAutomaticSaveToTemp)
+                if ((exception != null) && !DisableAutomaticSaveToTemp)
                 {
                     LogBufferSaveToLogFile();
                 }
@@ -312,7 +317,7 @@ namespace Medo.Diagnostics
         /// <summary>
         /// Gets/sets whether window will appear top-most.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "TopMost", Justification = "Spelling is same as Form's TopMost property.")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "TopMost", Justification = "Spelling is same as Form's TopMost property.")]
         public static bool TopMost { get; set; }
 
 
@@ -342,18 +347,18 @@ namespace Medo.Diagnostics
                 form.MinimizeBox = false;
                 form.ShowInTaskbar = false;
                 form.Text = _infoProductTitle;
-                form.TopMost = ErrorReport.TopMost;
+                form.TopMost = TopMost;
 
                 int dluW, dluH;
                 using (var graphics = form.CreateGraphics())
                 {
                     var fewCharSize = graphics.MeasureString(Resources.MeasurementText, form.Font);
-                    dluW = (int)System.Math.Ceiling(fewCharSize.Width / Resources.MeasurementText.Length);
-                    dluH = (int)System.Math.Ceiling(fewCharSize.Height);
+                    dluW = (int)Math.Ceiling(fewCharSize.Width / Resources.MeasurementText.Length);
+                    dluH = (int)Math.Ceiling(fewCharSize.Height);
                 }
                 var dluBorder = dluH / 2;
 
-                form.ClientSize = new Size(System.Math.Min(36 * dluW, Screen.GetWorkingArea(form).Width - 4 * dluH), System.Math.Min(6 * dluH, Screen.GetWorkingArea(form).Height - 4 * dluH));
+                form.ClientSize = new Size(Math.Min(36 * dluW, Screen.GetWorkingArea(form).Width - 4 * dluH), Math.Min(6 * dluH, Screen.GetWorkingArea(form).Height - 4 * dluH));
 
                 //sendButton
                 sendButton.AutoEllipsis = true;
@@ -428,19 +433,19 @@ namespace Medo.Diagnostics
                 form.MinimizeBox = false;
                 form.ShowInTaskbar = false;
                 form.Text = _infoProductTitle;
-                form.TopMost = ErrorReport.TopMost;
+                form.TopMost = TopMost;
 
                 int dluW, dluH;
                 using (var graphics = form.CreateGraphics())
                 {
                     var fewCharSize = graphics.MeasureString(Resources.MeasurementText, form.Font);
-                    dluW = (int)System.Math.Ceiling(fewCharSize.Width / Resources.MeasurementText.Length);
-                    dluH = (int)System.Math.Ceiling(fewCharSize.Height);
+                    dluW = (int)Math.Ceiling(fewCharSize.Width / Resources.MeasurementText.Length);
+                    dluH = (int)Math.Ceiling(fewCharSize.Height);
                 }
                 var dluBorder = dluH / 2;
                 var dluSpace = dluH / 3;
 
-                form.ClientSize = new Size(System.Math.Min(64 * dluW, Screen.GetWorkingArea(form).Width - 4 * dluH), System.Math.Min(32 * dluH, Screen.GetWorkingArea(form).Height - 4 * dluH));
+                form.ClientSize = new Size(Math.Min(64 * dluW, Screen.GetWorkingArea(form).Width - 4 * dluH), Math.Min(32 * dluH, Screen.GetWorkingArea(form).Height - 4 * dluH));
 
                 //panel
                 panelContent.BackColor = SystemColors.Window;
@@ -484,16 +489,16 @@ namespace Medo.Diagnostics
                 if (exception == null)
                 {
                     textMessage.Tag = sendButton;
-                    textMessage.TextChanged += new EventHandler(textMessage_TextChanged);
+                    textMessage.TextChanged += textMessage_TextChanged;
                 }
-                textMessage.PreviewKeyDown += new PreviewKeyDownEventHandler(text_PreviewKeyDown);
+                textMessage.PreviewKeyDown += text_PreviewKeyDown;
 
                 //textEmail
                 textEmail.BackColor = SystemColors.Window;
                 textEmail.ForeColor = SystemColors.WindowText;
                 textEmail.Size = new Size(form.ClientRectangle.Width - dluW * 15 - dluBorder * 2, dluH);
                 textEmail.Location = new Point(form.ClientRectangle.Width - textEmail.Width - dluBorder, textMessage.Bottom + dluSpace);
-                textEmail.PreviewKeyDown += new PreviewKeyDownEventHandler(text_PreviewKeyDown);
+                textEmail.PreviewKeyDown += text_PreviewKeyDown;
 
                 //labelEmail
                 labelEmail.BackColor = SystemColors.Window;
@@ -509,7 +514,7 @@ namespace Medo.Diagnostics
                 textName.ForeColor = SystemColors.WindowText;
                 textName.Size = new Size(form.ClientRectangle.Width - dluW * 15 - dluBorder * 2, dluH);
                 textName.Location = new Point(form.ClientRectangle.Width - textName.Width - dluBorder, textEmail.Bottom + dluSpace + dluSpace);
-                textName.PreviewKeyDown += new PreviewKeyDownEventHandler(text_PreviewKeyDown);
+                textName.PreviewKeyDown += text_PreviewKeyDown;
 
                 //labelName
                 labelName.AutoEllipsis = true;
@@ -539,7 +544,7 @@ namespace Medo.Diagnostics
                 textReport.Text = LogBufferGetString();
                 textReport.Location = new Point(dluBorder, labelReport.Bottom + dluSpace);
                 textReport.Size = new Size(form.ClientRectangle.Width - dluBorder * 2, panelContent.ClientRectangle.Height - textReport.Top - dluBorder);
-                textReport.PreviewKeyDown += new PreviewKeyDownEventHandler(text_PreviewKeyDown);
+                textReport.PreviewKeyDown += text_PreviewKeyDown;
 
                 //sendButton
                 sendButton.AutoEllipsis = true;
@@ -578,13 +583,11 @@ namespace Medo.Diagnostics
                     displayName = textName.Text.Trim();
                     return DialogResult.OK;
                 }
-                else
-                {
-                    message = null;
-                    email = null;
-                    displayName = null;
-                    return DialogResult.Cancel;
-                }
+
+                message = null;
+                email = null;
+                displayName = null;
+                return DialogResult.Cancel;
             }
         }
 
@@ -637,20 +640,20 @@ namespace Medo.Diagnostics
                 form.MinimizeBox = false;
                 form.ShowInTaskbar = false;
                 form.Text = _infoProductTitle;
-                form.TopMost = ErrorReport.TopMost;
+                form.TopMost = TopMost;
 
                 int dluW, dluH;
                 using (var graphics = form.CreateGraphics())
                 {
                     var fewCharSize = graphics.MeasureString(Resources.MeasurementText, form.Font);
-                    dluW = (int)System.Math.Ceiling(fewCharSize.Width / Resources.MeasurementText.Length);
-                    dluH = (int)System.Math.Ceiling(fewCharSize.Height);
+                    dluW = (int)Math.Ceiling(fewCharSize.Width / Resources.MeasurementText.Length);
+                    dluH = (int)Math.Ceiling(fewCharSize.Height);
                 }
 
                 var dluBorder = dluH / 2;
                 var dluSpace = dluH / 3;
 
-                form.ClientSize = new Size(System.Math.Min(36 * dluW, Screen.GetWorkingArea(form).Width - 4 * dluH), System.Math.Min(4 * dluH, Screen.GetWorkingArea(form).Height - 4 * dluH));
+                form.ClientSize = new Size(Math.Min(36 * dluW, Screen.GetWorkingArea(form).Width - 4 * dluH), Math.Min(4 * dluH, Screen.GetWorkingArea(form).Height - 4 * dluH));
 
                 //label
                 label.AutoEllipsis = true;
@@ -666,8 +669,8 @@ namespace Medo.Diagnostics
                 progressBar.Location = new Point(dluBorder, form.ClientRectangle.Bottom - dluBorder - progressBar.Height);
 
                 //backgroundWorker
-                backgroundWorker.DoWork += new DoWorkEventHandler(backgroundWorker_DoWork);
-                backgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_RunWorkerCompleted);
+                backgroundWorker.DoWork += backgroundWorker_DoWork;
+                backgroundWorker.RunWorkerCompleted += backgroundWorker_RunWorkerCompleted;
 
 
                 form.Controls.Add(label);
@@ -688,32 +691,28 @@ namespace Medo.Diagnostics
                 if ((ownerForm != null) && (ownerForm.RightToLeft == RightToLeft.Yes)) { mbOptions |= MessageBoxOptions.RightAlign | MessageBoxOptions.RtlReading; }
                 if (form.ShowDialog(owner) == DialogResult.OK)
                 {
-                    System.Windows.Forms.MessageBox.Show(owner, Resources.GetInCurrentLanguage("Error report was successfully sent.", "Izvještaj o grešci je uspješno poslan."), _infoProductTitle, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, mbOptions);
+                    MessageBox.Show(owner, Resources.GetInCurrentLanguage("Error report was successfully sent.", "Izvještaj o grešci je uspješno poslan."), _infoProductTitle, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, mbOptions);
                     return DialogResult.OK;
                 }
-                else
+
+                if (!DisableAutomaticSaveToTemp)
                 {
-                    if (!ErrorReport.DisableAutomaticSaveToTemp)
+                    try
                     {
-                        try
-                        {
-                            var fullLogFileName = System.IO.Path.Combine(System.IO.Path.GetTempPath(), string.Format(System.Globalization.CultureInfo.InvariantCulture, @"ErrorReport [{0}] {1:yyyyMMdd\THHmmss}.log", _infoProductTitle, DateTime.Now));
-                            System.IO.File.WriteAllText(fullLogFileName, message);
-                        }
-                        catch (System.Security.SecurityException)
-                        {
-                        }
-                        catch (System.IO.IOException) { }
+                        var fullLogFileName = Path.Combine(Path.GetTempPath(), string.Format(CultureInfo.InvariantCulture, @"ErrorReport [{0}] {1:yyyyMMdd\THHmmss}.log", _infoProductTitle, DateTime.Now));
+                        File.WriteAllText(fullLogFileName, message);
                     }
-                    if (System.Windows.Forms.MessageBox.Show(owner, Resources.GetInCurrentLanguage("Error report cannot be sent.\nDo you wish to retry?", "Izvještaj o grešci ne može biti poslan.\nŽelite li ponovno pokušati?"), _infoProductTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, mbOptions) == DialogResult.Yes)
+                    catch (SecurityException)
                     {
-                        return DialogResult.Retry;
                     }
-                    else
-                    {
-                        return DialogResult.Cancel;
-                    }
+                    catch (IOException) { }
                 }
+                if (MessageBox.Show(owner, Resources.GetInCurrentLanguage("Error report cannot be sent.\nDo you wish to retry?", "Izvještaj o grešci ne može biti poslan.\nŽelite li ponovno pokušati?"), _infoProductTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, mbOptions) == DialogResult.Yes)
+                {
+                    return DialogResult.Retry;
+                }
+
+                return DialogResult.Cancel;
             }
         }
 
@@ -754,7 +753,7 @@ namespace Medo.Diagnostics
                 {
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
-                        using (var reader = new System.IO.StreamReader(response.GetResponseStream()))
+                        using (var reader = new StreamReader(response.GetResponseStream()))
                         {
                             var responseFromServer = reader.ReadToEnd();
                             if (responseFromServer.Length == 0)
@@ -777,7 +776,7 @@ namespace Medo.Diagnostics
             }
             catch (WebException ex)
             {
-                System.Diagnostics.Debug.WriteLine("W: " + ex.Message + ".    {{Medo.Diagnostics.ErrorReport}}");
+                Debug.WriteLine("W: " + ex.Message + ".    {{Medo.Diagnostics.ErrorReport}}");
                 e.Result = new object[] { form, DialogResult.Cancel };
             }
         }
@@ -793,12 +792,12 @@ namespace Medo.Diagnostics
 
         private static void LogBufferSaveToLogFile()
         {
-            if (System.IO.File.Exists(_logFileName))
+            if (File.Exists(_logFileName))
             {
-                System.IO.File.AppendAllText(_logFileName, _logSeparator);
+                File.AppendAllText(_logFileName, _logSeparator);
             }
 
-            System.IO.File.AppendAllText(_logFileName, LogBufferGetString());
+            File.AppendAllText(_logFileName, LogBufferGetString());
         }
 
         private static void LogBufferFillFromException(Exception exception, params string[] additionalInformation)
@@ -813,7 +812,7 @@ namespace Medo.Diagnostics
             AppendLine(_infoFrameworkVersion, _logBuffer, 1, true);
             if (isOutOfMemoryException == false)
             {
-                AppendLine("Local time is " + DateTime.Now.ToString(@"yyyy\-MM\-dd\THH\:mm\:ssK", System.Globalization.CultureInfo.InvariantCulture), _logBuffer, 1, true); //it will fail in OutOfMemory situation
+                AppendLine("Local time is " + DateTime.Now.ToString(@"yyyy\-MM\-dd\THH\:mm\:ssK", CultureInfo.InvariantCulture), _logBuffer, 1, true); //it will fail in OutOfMemory situation
             }
 
             if (exception != null)
@@ -915,17 +914,17 @@ namespace Medo.Diagnostics
 
         private static string UrlEncode(string text)
         {
-            var source = System.Text.UTF8Encoding.UTF8.GetBytes(text);
+            var source = UTF8Encoding.UTF8.GetBytes(text);
             var sb = new StringBuilder();
             for (var i = 0; i < source.Length; ++i)
             {
                 if (((source[i] >= 48) && (source[i] <= 57)) || ((source[i] >= 65) && (source[i] <= 90)) || ((source[i] >= 97) && (source[i] <= 122)) || (source[i] == 45) || (source[i] == 46) || (source[i] == 95) || (source[i] == 126))
                 { //A-Z a-z - . _ ~
-                    sb.Append(System.Convert.ToChar(source[i]));
+                    sb.Append(Convert.ToChar(source[i]));
                 }
                 else
                 {
-                    sb.Append("%" + source[i].ToString("X2", System.Globalization.CultureInfo.InvariantCulture));
+                    sb.Append("%" + source[i].ToString("X2", CultureInfo.InvariantCulture));
                 }
             }
             return sb.ToString();
@@ -983,7 +982,7 @@ namespace Medo.Diagnostics
                     }
                     else
                     {
-                        nextCrLfBreak = System.Math.Min(nextCrBreak, nextLfBreak);
+                        nextCrLfBreak = Math.Min(nextCrBreak, nextLfBreak);
                     }
                     if ((nextCrLfBreak != -1) && ((nextCrLfBreak - firstChar) <= maxWidth))
                     {
@@ -1011,7 +1010,7 @@ namespace Medo.Diagnostics
                             var nextOtherBreak2 = input.LastIndexOf(':', firstChar + maxWidth, maxWidth);
                             var nextOtherBreak3 = input.LastIndexOf('(', firstChar + maxWidth, maxWidth);
                             var nextOtherBreak4 = input.LastIndexOf(',', firstChar + maxWidth, maxWidth);
-                            var nextOtherBreak = System.Math.Max(nextOtherBreak1, System.Math.Max(nextOtherBreak2, System.Math.Max(nextOtherBreak3, nextOtherBreak4)));
+                            var nextOtherBreak = Math.Max(nextOtherBreak1, Math.Max(nextOtherBreak2, Math.Max(nextOtherBreak3, nextOtherBreak4)));
                             if ((nextOtherBreak != -1) && ((nextOtherBreak - firstChar) <= maxWidth))
                             {
                                 lastChar = nextOtherBreak;
@@ -1081,7 +1080,7 @@ namespace Medo.Diagnostics
 
             internal static string GetInCurrentLanguage(string en_US, string hr_HR)
             {
-                switch (System.Threading.Thread.CurrentThread.CurrentUICulture.Name.ToUpperInvariant())
+                switch (Thread.CurrentThread.CurrentUICulture.Name.ToUpperInvariant())
                 {
                     case "EN":
                     case "EN-US":

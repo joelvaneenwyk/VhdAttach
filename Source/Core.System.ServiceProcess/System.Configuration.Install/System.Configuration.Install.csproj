@@ -18,6 +18,7 @@
     <PackageProjectUrl>https://github.com/flamencist/Core.System.Configuration.Install</PackageProjectUrl>
     <RepositoryUrl>https://github.com/flamencist/Core.System.Configuration.Install</RepositoryUrl>
     <PackageReleaseNotes>Using the official System.Diagnostic classes. Thanks Gábor Zavarkó</PackageReleaseNotes>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

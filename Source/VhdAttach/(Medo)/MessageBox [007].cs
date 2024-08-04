@@ -11,8 +11,13 @@
 
 
 using System;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Reflection;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Medo
@@ -146,7 +151,7 @@ namespace Medo
         /// <param name="defaultButton">One of the MessageBoxDefaultButton values that specifies the default button for the message box.</param>
         public static DialogResult ShowDialog(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton)
         {
-            if (!MessageBox.IsRunningOnMono)
+            if (!IsRunningOnMono)
             {
                 lock (_syncRoot)
                 {
@@ -157,19 +162,14 @@ namespace Medo
                             return (DialogResult)NativeMethods.MessageBox(owner.Handle, text, caption, (uint)buttons | (uint)icon | (uint)defaultButton);
                         }
                     }
-                    else
+
+                    using (CbtHook ch = new CbtHook(null))
                     {
-                        using (CbtHook ch = new CbtHook(null))
-                        {
-                            return (DialogResult)NativeMethods.MessageBox(System.IntPtr.Zero, text, caption, (uint)buttons | (uint)icon | (uint)defaultButton);
-                        }
+                        return (DialogResult)NativeMethods.MessageBox(IntPtr.Zero, text, caption, (uint)buttons | (uint)icon | (uint)defaultButton);
                     }
                 } //lock
-            }
-            else
-            { //MONO
-                return System.Windows.Forms.MessageBox.Show(owner, text, caption, buttons, icon, defaultButton, 0);
-            }
+            }  //MONO
+            return System.Windows.Forms.MessageBox.Show(owner, text, caption, buttons, icon, defaultButton, 0);
         }
 
 
@@ -548,20 +548,20 @@ namespace Medo
             {
                 get
                 {
-                    System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
+                    Assembly assembly = Assembly.GetEntryAssembly();
 
                     string caption;
-                    object[] productAttributes = assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyProductAttribute), true);
+                    object[] productAttributes = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), true);
                     if ((productAttributes != null) && (productAttributes.Length >= 1))
                     {
-                        caption = ((System.Reflection.AssemblyProductAttribute)productAttributes[productAttributes.Length - 1]).Product;
+                        caption = ((AssemblyProductAttribute)productAttributes[productAttributes.Length - 1]).Product;
                     }
                     else
                     {
-                        object[] titleAttributes = assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyTitleAttribute), true);
+                        object[] titleAttributes = assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), true);
                         if ((titleAttributes != null) && (titleAttributes.Length >= 1))
                         {
-                            caption = ((System.Reflection.AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
+                            caption = ((AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
                         }
                         else
                         {
@@ -617,7 +617,7 @@ namespace Medo
             {
                 get
                 {
-                    switch (System.Threading.Thread.CurrentThread.CurrentUICulture.Name.ToUpperInvariant())
+                    switch (Thread.CurrentThread.CurrentUICulture.Name.ToUpperInvariant())
                     {
                         case "EN":
                         case "EN-US":
@@ -635,7 +635,7 @@ namespace Medo
 
             private static string GetInCurrentLanguage(string en_US, string hr_HR)
             {
-                switch (System.Threading.Thread.CurrentThread.CurrentUICulture.Name.ToUpperInvariant())
+                switch (Thread.CurrentThread.CurrentUICulture.Name.ToUpperInvariant())
                 {
                     case "EN":
                     case "EN-US":
@@ -657,7 +657,7 @@ namespace Medo
 
         #region Native
 
-        private class CbtHook : System.IDisposable
+        private class CbtHook : IDisposable
         {
 
             private IWin32Window _owner;
@@ -668,10 +668,10 @@ namespace Medo
 
             public CbtHook(IWin32Window owner)
             {
-                this._owner = owner;
-                this._cbtHookProc = new NativeMethods.CbtHookProcDelegate(CbtHookProc);
-                this._hook = NativeMethods.SetWindowsHookEx(NativeMethods.WH_CBT, this._cbtHookProc, System.IntPtr.Zero, NativeMethods.GetCurrentThreadId());
-                System.Diagnostics.Debug.WriteLine(string.Format(System.Globalization.CultureInfo.InvariantCulture, "I: Created CBT hook (ID={0}).    {{Medo.MessageBox}}", this._hook.ToString()));
+                _owner = owner;
+                _cbtHookProc = CbtHookProc;
+                _hook = NativeMethods.SetWindowsHookEx(NativeMethods.WH_CBT, _cbtHookProc, IntPtr.Zero, NativeMethods.GetCurrentThreadId());
+                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "I: Created CBT hook (ID={0}).    {{Medo.MessageBox}}", _hook.ToString()));
             }
 
             ~CbtHook()
@@ -680,18 +680,18 @@ namespace Medo
             }
 
 
-            public System.IntPtr CbtHookProc(int nCode, System.IntPtr wParam, System.IntPtr lParam)
+            public IntPtr CbtHookProc(int nCode, IntPtr wParam, IntPtr lParam)
             {
                 switch (nCode)
                 {
                     case NativeMethods.HCBT_ACTIVATE:
-                        System.Diagnostics.Debug.WriteLine(string.Format(System.Globalization.CultureInfo.InvariantCulture, "I: Dialog HCBT_ACTIVATE (hWnd={0}).    {{Medo.MessageBox}}", wParam.ToString()));
+                        Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "I: Dialog HCBT_ACTIVATE (hWnd={0}).    {{Medo.MessageBox}}", wParam.ToString()));
 
-                        if (this._owner != null)
+                        if (_owner != null)
                         {
                             NativeMethods.RECT rectMessage = new NativeMethods.RECT();
                             NativeMethods.RECT rectOwner = new NativeMethods.RECT();
-                            if ((NativeMethods.GetWindowRect(wParam, ref rectMessage)) && (NativeMethods.GetWindowRect(this._owner.Handle, ref rectOwner)))
+                            if ((NativeMethods.GetWindowRect(wParam, ref rectMessage)) && (NativeMethods.GetWindowRect(_owner.Handle, ref rectOwner)))
                             {
                                 int widthMessage = rectMessage.right - rectMessage.left;
                                 int heightMessage = rectMessage.bottom - rectMessage.top;
@@ -701,7 +701,7 @@ namespace Medo
                                 int newLeft = rectOwner.left + (widthOwner - widthMessage) / 2;
                                 int newTop = rectOwner.top + (heightOwner - heightMessage) / 2;
 
-                                NativeMethods.SetWindowPos(wParam, System.IntPtr.Zero, newLeft, newTop, 0, 0, NativeMethods.SWP_NOSIZE | NativeMethods.SWP_NOZORDER | NativeMethods.SWP_NOACTIVATE);
+                                NativeMethods.SetWindowPos(wParam, IntPtr.Zero, newLeft, newTop, 0, 0, NativeMethods.SWP_NOSIZE | NativeMethods.SWP_NOZORDER | NativeMethods.SWP_NOACTIVATE);
                             }
                         }
 
@@ -718,14 +718,14 @@ namespace Medo
 
                         try
                         {
-                            return NativeMethods.CallNextHookEx(this._hook, nCode, wParam, lParam);
+                            return NativeMethods.CallNextHookEx(_hook, nCode, wParam, lParam);
                         }
                         finally
                         {
-                            this.Dispose();
+                            Dispose();
                         }
                 }
-                return NativeMethods.CallNextHookEx(this._hook, nCode, wParam, lParam);
+                return NativeMethods.CallNextHookEx(_hook, nCode, wParam, lParam);
             }
 
 
@@ -734,19 +734,19 @@ namespace Medo
             public void Dispose()
             {
                 //System.GC.KeepAlive(this._cbtHookProc);
-                if (!this._hook.IsClosed)
+                if (!_hook.IsClosed)
                 {
-                    this._hook.Close();
-                    if (this._hook.IsClosed)
+                    _hook.Close();
+                    if (_hook.IsClosed)
                     {
-                        System.Diagnostics.Debug.WriteLine(string.Format(System.Globalization.CultureInfo.InvariantCulture, "I: CBT Hook destroyed (ID={0}).    {{Medo.MessageBox}}", this._hook.ToString()));
+                        Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "I: CBT Hook destroyed (ID={0}).    {{Medo.MessageBox}}", _hook.ToString()));
                     }
                     else
                     {
-                        throw new System.InvalidOperationException(Resources.ExceptionCbtHookCannotBeRemoved);
+                        throw new InvalidOperationException(Resources.ExceptionCbtHookCannotBeRemoved);
                     }
                 }
-                this._hook.Dispose();
+                _hook.Dispose();
                 //if (!this._hook.Equals(System.IntPtr.Zero)) {
                 //    if (NativeMethods.UnhookWindowsHookEx(this._hook)) {
                 //        System.Diagnostics.Debug.WriteLine(string.Format(System.Globalization.CultureInfo.InvariantCulture, "I: Medo.Windows.Forms.MessageBox: CBT Hook destroyed (ID={0}).", this._hook.ToInt32()));
@@ -755,7 +755,7 @@ namespace Medo
                 //        throw new System.InvalidOperationException(Resources.ExceptionCbtHookCannotBeRemoved);
                 //    }
                 //}
-                System.GC.SuppressFinalize(this);
+                GC.SuppressFinalize(this);
             }
 
             #endregion
@@ -783,7 +783,7 @@ namespace Medo
             public const int SWP_NOACTIVATE = 0x10;
 
 
-            [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+            [StructLayout(LayoutKind.Sequential)]
             public struct RECT
             {
                 public int left;
@@ -803,63 +803,63 @@ namespace Medo
 
                 public override bool IsInvalid
                 {
-                    get { return (this.IsClosed) || (base.handle == IntPtr.Zero); }
+                    get { return (IsClosed) || (handle == IntPtr.Zero); }
                 }
 
                 protected override bool ReleaseHandle()
                 {
-                    return UnhookWindowsHookEx(this.handle);
+                    return UnhookWindowsHookEx(handle);
                 }
 
                 public override string ToString()
                 {
-                    return this.handle.ToString();
+                    return handle.ToString();
                 }
 
             }
 
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
-            [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, CallingConvention = System.Runtime.InteropServices.CallingConvention.StdCall)]
-            public static extern System.IntPtr CallNextHookEx(WindowsHookSafeHandle idHook, int nCode, System.IntPtr wParam, System.IntPtr lParam);
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+            public static extern IntPtr CallNextHookEx(WindowsHookSafeHandle idHook, int nCode, IntPtr wParam, IntPtr lParam);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
-            [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, CallingConvention = System.Runtime.InteropServices.CallingConvention.StdCall)]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [DllImport("kernel32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
             public static extern int GetCurrentThreadId();
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
-            [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
-            [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
-            public static extern bool GetWindowRect(System.IntPtr hWnd, ref RECT lpRect);
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [DllImport("user32.dll", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2205:UseManagedEquivalentsOfWin32Api", Justification = "Managed equivalent does not support all needed features.")]
-            [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-            public static extern int MessageBox(System.IntPtr hWnd, string lpText, string lpCaption, uint uType);
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Usage", "CA2205:UseManagedEquivalentsOfWin32Api", Justification = "Managed equivalent does not support all needed features.")]
+            [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+            public static extern int MessageBox(IntPtr hWnd, string lpText, string lpCaption, uint uType);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
-            [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-            [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
-            public static extern bool SetDlgItemText(System.IntPtr hWnd, int nIDDlgItem, string lpString);
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool SetDlgItemText(IntPtr hWnd, int nIDDlgItem, string lpString);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
-            [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
-            [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
-            public static extern bool SetWindowPos(System.IntPtr hWnd, System.IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [DllImport("user32.dll", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-            [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, CallingConvention = System.Runtime.InteropServices.CallingConvention.StdCall)]
-            public static extern WindowsHookSafeHandle SetWindowsHookEx(int idHook, CbtHookProcDelegate lpfn, System.IntPtr hInstance, int threadId);
+            [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+            public static extern WindowsHookSafeHandle SetWindowsHookEx(int idHook, CbtHookProcDelegate lpfn, IntPtr hInstance, int threadId);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [ReliabilityContract(Consistency.MayCorruptProcess, Cer.Success)]
-            [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
-            [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
-            public static extern bool UnhookWindowsHookEx(System.IntPtr idHook);
+            [DllImport("user32.dll", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool UnhookWindowsHookEx(IntPtr idHook);
 
 
-            public delegate System.IntPtr CbtHookProcDelegate(int nCode, System.IntPtr wParam, System.IntPtr lParam);
+            public delegate IntPtr CbtHookProcDelegate(int nCode, IntPtr wParam, IntPtr lParam);
 
         }
 

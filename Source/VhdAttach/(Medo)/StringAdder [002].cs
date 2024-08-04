@@ -4,8 +4,11 @@
 //2008-04-11: Cleaned code to match FxCop 1.36 beta 2 (SpecifyIFormatProvider, SpecifyStringComparison).
 
 
-using System.Globalization;
 using System;
+using System.Globalization;
+using System.Text;
+using System.Threading;
+
 namespace Medo.Text
 {
 
@@ -20,8 +23,8 @@ namespace Medo.Text
         /// </summary>
         public StringAdder()
         {
-            this.StringBuilder = new System.Text.StringBuilder();
-            this.Separator = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator;
+            StringBuilder = new StringBuilder();
+            Separator = Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator;
         }
 
         /// <summary>
@@ -30,8 +33,8 @@ namespace Medo.Text
         /// <param name="separator">String to use for separating different values.</param>
         public StringAdder(string separator)
         {
-            this.StringBuilder = new System.Text.StringBuilder();
-            this.Separator = separator;
+            StringBuilder = new StringBuilder();
+            Separator = separator;
         }
 
 
@@ -42,7 +45,7 @@ namespace Medo.Text
         /// <param name="value">The System.String to append.</param>
         public void Append(string value)
         {
-            Append(value, this.Separator);
+            Append(value, Separator);
         }
 
         /// <summary>
@@ -52,7 +55,7 @@ namespace Medo.Text
         /// <param name="checkForExistingSeparator">If true, additional check is made to see if separator already exists.</param>
         public void Append(string value, bool checkForExistingSeparator)
         {
-            this.Append(value, this.Separator, checkForExistingSeparator);
+            Append(value, Separator, checkForExistingSeparator);
         }
 
         /// <summary>
@@ -62,7 +65,7 @@ namespace Medo.Text
         /// <param name="separator">Separator to be added before text.</param>
         public void Append(string value, string separator)
         {
-            this.Append(value, separator, false);
+            Append(value, separator, false);
         }
 
         /// <summary>
@@ -75,17 +78,17 @@ namespace Medo.Text
         {
             if (value == null) { return; }
             if (separator == null) { separator = string.Empty; }
-            if (this.StringBuilder.Length == 0)
+            if (StringBuilder.Length == 0)
             {
-                this.StringBuilder.Append(value);
+                StringBuilder.Append(value);
             }
             else
             {
-                if ((checkForExistingSeparator == false) || ((!this.StringBuilder.ToString().EndsWith(this.Separator, StringComparison.CurrentCulture)) && (!value.StartsWith(this.Separator, StringComparison.CurrentCulture)) && (!string.IsNullOrEmpty(value))))
+                if ((checkForExistingSeparator == false) || ((!StringBuilder.ToString().EndsWith(Separator, StringComparison.CurrentCulture)) && (!value.StartsWith(Separator, StringComparison.CurrentCulture)) && (!string.IsNullOrEmpty(value))))
                 {
-                    this.StringBuilder.Append(separator);
+                    StringBuilder.Append(separator);
                 }
-                this.StringBuilder.Append(value);
+                StringBuilder.Append(value);
             }
         }
 
@@ -109,14 +112,14 @@ namespace Medo.Text
         /// <returns>A reference to this instance with format appended. Any format specification in format is replaced by the string representation of the corresponding object argument.</returns>
         public StringAdder AppendFormat(IFormatProvider provider, string format, params object[] args)
         {
-            if (this.StringBuilder.Length == 0)
+            if (StringBuilder.Length == 0)
             {
-                this._stringBuilder.AppendFormat(provider, format, args);
+                _stringBuilder.AppendFormat(provider, format, args);
             }
             else
             {
-                this.StringBuilder.Append(this.Separator);
-                this._stringBuilder.AppendFormat(provider, format, args);
+                StringBuilder.Append(Separator);
+                _stringBuilder.AppendFormat(provider, format, args);
             }
             return this;
         }
@@ -128,7 +131,7 @@ namespace Medo.Text
         /// <returns>String.</returns>
         public new string ToString()
         {
-            return this.StringBuilder.ToString();
+            return StringBuilder.ToString();
         }
 
 
@@ -139,18 +142,18 @@ namespace Medo.Text
         /// </summary>
         public string Separator
         {
-            get { return this._separator; }
-            set { this._separator = value; }
+            get { return _separator; }
+            set { _separator = value; }
         }
 
-        private System.Text.StringBuilder _stringBuilder;
+        private StringBuilder _stringBuilder;
         /// <summary>
         /// Gets underlying string builder.
         /// </summary>
-        public System.Text.StringBuilder StringBuilder
+        public StringBuilder StringBuilder
         {
-            get { return this._stringBuilder; }
-            private set { this._stringBuilder = value; }
+            get { return _stringBuilder; }
+            private set { _stringBuilder = value; }
         }
 
     }

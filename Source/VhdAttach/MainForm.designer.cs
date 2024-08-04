@@ -1,9 +1,12 @@
+using System.ComponentModel;
+using System.Windows.Forms;
+
 namespace VhdAttach {
     partial class MainForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -482,47 +485,47 @@ namespace VhdAttach {
 
         #endregion
 
-        private System.Windows.Forms.ListView list;
-        private System.Windows.Forms.ColumnHeader list_Property;
-        private System.Windows.Forms.ColumnHeader list_Value;
-        private System.Windows.Forms.ContextMenuStrip mnxList;
-        private System.Windows.Forms.ToolStripMenuItem mnxListCopy;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem6;
-        private System.Windows.Forms.ToolStripMenuItem mnxListSelectAll;
-        private System.ComponentModel.BackgroundWorker bwExecutor;
-        private System.Windows.Forms.ToolStripButton mnuNew;
-        private System.Windows.Forms.ToolStripSplitButton mnuAttach;
-        private System.Windows.Forms.ToolStripMenuItem mnuAttachReadOnly;
-        private System.Windows.Forms.ToolStripSplitButton mnuOpen;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripButton mnuDetach;
-        private System.Windows.Forms.ToolStripDropDownButton mnuApp;
-        private System.Windows.Forms.ToolStripMenuItem mnuAppFeedback;
-        private System.Windows.Forms.ToolStripMenuItem mnuAppAbout;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripButton mnuRefresh;
-        private System.Windows.Forms.ToolStrip mnu;
-        private System.Windows.Forms.ToolStripMenuItem mnuAppUpgrade;
-        private System.Windows.Forms.ToolStripSeparator mnuApp1;
-        private System.Windows.Forms.StatusStrip staErrorStolenExtension;
-        private System.Windows.Forms.ToolStripStatusLabel staErrorStolenExtensionText;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.StatusStrip staErrorServiceMissing;
-        private System.Windows.Forms.ToolStripStatusLabel staErrorServiceMissingText;
-        private System.Windows.Forms.StatusStrip staErrorServiceNotRunning;
-        private System.Windows.Forms.ToolStripStatusLabel staErrorServiceNotRunningText;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
-        private System.Windows.Forms.ToolStripSplitButton mnuDrive;
-        private System.Windows.Forms.ToolStripSplitButton mnuAutomount;
-        private System.Windows.Forms.ToolStripMenuItem mnuAutomountNormal;
-        private System.Windows.Forms.ToolStripMenuItem mnuAutomountReadonly;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
-        private System.Windows.Forms.ToolStripMenuItem mnuAutomountDisable;
-        private System.Windows.Forms.Timer tmrUpdateMenu;
-        private System.Windows.Forms.ToolStripMenuItem mnuAppOptions;
-        private System.Windows.Forms.ToolStripSeparator mnuApp0;
-        private System.ComponentModel.BackgroundWorker bwCheckForUpgrade;
+        private ListView list;
+        private ColumnHeader list_Property;
+        private ColumnHeader list_Value;
+        private ContextMenuStrip mnxList;
+        private ToolStripMenuItem mnxListCopy;
+        private ToolStripSeparator toolStripMenuItem6;
+        private ToolStripMenuItem mnxListSelectAll;
+        private BackgroundWorker bwExecutor;
+        private ToolStripButton mnuNew;
+        private ToolStripSplitButton mnuAttach;
+        private ToolStripMenuItem mnuAttachReadOnly;
+        private ToolStripSplitButton mnuOpen;
+        private ToolStripSeparator toolStripSeparator3;
+        private ToolStripButton mnuDetach;
+        private ToolStripDropDownButton mnuApp;
+        private ToolStripMenuItem mnuAppFeedback;
+        private ToolStripMenuItem mnuAppAbout;
+        private ToolStripSeparator toolStripSeparator4;
+        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripButton mnuRefresh;
+        private ToolStrip mnu;
+        private ToolStripMenuItem mnuAppUpgrade;
+        private ToolStripSeparator mnuApp1;
+        private StatusStrip staErrorStolenExtension;
+        private ToolStripStatusLabel staErrorStolenExtensionText;
+        private ToolStripSeparator toolStripSeparator1;
+        private StatusStrip staErrorServiceMissing;
+        private ToolStripStatusLabel staErrorServiceMissingText;
+        private StatusStrip staErrorServiceNotRunning;
+        private ToolStripStatusLabel staErrorServiceNotRunningText;
+        private ToolStripSeparator toolStripSeparator5;
+        private ToolStripSplitButton mnuDrive;
+        private ToolStripSplitButton mnuAutomount;
+        private ToolStripMenuItem mnuAutomountNormal;
+        private ToolStripMenuItem mnuAutomountReadonly;
+        private ToolStripSeparator toolStripMenuItem2;
+        private ToolStripMenuItem mnuAutomountDisable;
+        private Timer tmrUpdateMenu;
+        private ToolStripMenuItem mnuAppOptions;
+        private ToolStripSeparator mnuApp0;
+        private BackgroundWorker bwCheckForUpgrade;
     }
 }
 

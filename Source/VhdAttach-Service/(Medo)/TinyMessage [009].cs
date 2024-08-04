@@ -21,6 +21,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -48,7 +49,7 @@ namespace Medo.Net
         /// Creates new instance.
         /// </summary>
         public TinyMessage()
-            : this(new IPEndPoint(IPAddress.Any, TinyMessage.DefaultPort))
+            : this(new IPEndPoint(IPAddress.Any, DefaultPort))
         {
         }
 
@@ -60,7 +61,7 @@ namespace Medo.Net
         public TinyMessage(IPEndPoint localEndPoint)
         {
             if (localEndPoint == null) { throw new ArgumentNullException("localEndPoint", "Local IP end point is null."); }
-            this.LocalEndPoint = localEndPoint;
+            LocalEndPoint = localEndPoint;
         }
 
         /// <summary>
@@ -74,13 +75,13 @@ namespace Medo.Net
         /// </summary>
         public void ListenAsync()
         {
-            lock (this.ListenSyncRoot)
+            lock (ListenSyncRoot)
             {
-                if (this.ListenThread != null) { throw new InvalidOperationException("Already listening."); }
+                if (ListenThread != null) { throw new InvalidOperationException("Already listening."); }
 
-                this.ListenCancelEvent = new ManualResetEvent(false);
-                this.ListenThread = new Thread(Run) { IsBackground = true, Name = "TinyMessage " + this.LocalEndPoint.ToString() };
-                this.ListenThread.Start();
+                ListenCancelEvent = new ManualResetEvent(false);
+                ListenThread = new Thread(Run) { IsBackground = true, Name = "TinyMessage " + LocalEndPoint };
+                ListenThread.Start();
             }
         }
 
@@ -89,17 +90,17 @@ namespace Medo.Net
         /// </summary>
         public void CloseAsync()
         {
-            lock (this.ListenSyncRoot)
+            lock (ListenSyncRoot)
             {
-                if (this.ListenThread == null) { return; }
+                if (ListenThread == null) { return; }
 
-                this.ListenCancelEvent.Set();
-                this.ListenSocket.Shutdown(SocketShutdown.Both);
-                this.ListenSocket.Close();
+                ListenCancelEvent.Set();
+                ListenSocket.Shutdown(SocketShutdown.Both);
+                ListenSocket.Close();
 
-                while (this.ListenThread.IsAlive) { Thread.Sleep(100); }
-                ((IDisposable)this.ListenCancelEvent).Dispose();
-                this.ListenThread = null;
+                while (ListenThread.IsAlive) { Thread.Sleep(100); }
+                ((IDisposable)ListenCancelEvent).Dispose();
+                ListenThread = null;
             }
         }
 
@@ -108,7 +109,7 @@ namespace Medo.Net
         /// </summary>
         public Boolean IsListening
         {
-            get { return (this.ListenThread != null) && (this.ListenThread.IsAlive); }
+            get { return (ListenThread != null) && (ListenThread.IsAlive); }
         }
 
         /// <summary>
@@ -120,9 +121,9 @@ namespace Medo.Net
         #region Threading
 
         private Thread ListenThread;
-        private ManualResetEvent ListenCancelEvent = null;
+        private ManualResetEvent ListenCancelEvent;
         private readonly object ListenSyncRoot = new object();
-        private Socket ListenSocket = null;
+        private Socket ListenSocket;
 
         private bool IsCanceled { get { return ListenCancelEvent.WaitOne(0, false); } }
 
@@ -130,19 +131,19 @@ namespace Medo.Net
         {
             try
             {
-                this.ListenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                this.ListenSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                this.ListenSocket.Bind(this.LocalEndPoint);
+                ListenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                ListenSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                ListenSocket.Bind(LocalEndPoint);
 
                 var buffer = new byte[16384];
                 EndPoint remoteEP;
                 int inCount;
-                while (!this.IsCanceled)
+                while (!IsCanceled)
                 {
                     try
                     {
                         remoteEP = new IPEndPoint(IPAddress.Any, 0);
-                        inCount = this.ListenSocket.ReceiveFrom(buffer, ref remoteEP);
+                        inCount = ListenSocket.ReceiveFrom(buffer, ref remoteEP);
                     }
                     catch (SocketException ex)
                     {
@@ -183,10 +184,10 @@ namespace Medo.Net
             }
             finally
             {
-                if (this.ListenSocket != null)
+                if (ListenSocket != null)
                 {
-                    ((IDisposable)this.ListenSocket).Dispose();
-                    this.ListenSocket = null;
+                    ((IDisposable)ListenSocket).Dispose();
+                    ListenSocket = null;
                 }
             }
 
@@ -203,7 +204,7 @@ namespace Medo.Net
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
         public static void Send(TinyPacket packet, IPAddress address)
         {
-            Send(packet, new IPEndPoint(address, TinyMessage.DefaultPort));
+            Send(packet, new IPEndPoint(address, DefaultPort));
         }
 
         /// <summary>
@@ -250,7 +251,7 @@ namespace Medo.Net
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
         public static TinyPacket SendAndReceive(TinyPacket packet, IPAddress address)
         {
-            return SendAndReceive(packet, new IPEndPoint(address, TinyMessage.DefaultPort), 250);
+            return SendAndReceive(packet, new IPEndPoint(address, DefaultPort), 250);
         }
 
         /// <summary>
@@ -291,12 +292,12 @@ namespace Medo.Net
                 socket.SendTo(bytesOut, bytesOut.Length, SocketFlags.None, remoteEndPoint);
                 Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage [{0} -> {1}]", packet, remoteEndPoint));
 
-                EndPoint remoteEndPointIn = (EndPoint)(new IPEndPoint(IPAddress.Any, 0));
+                EndPoint remoteEndPointIn = new IPEndPoint(IPAddress.Any, 0);
                 var bytesIn = new byte[65536];
                 try
                 {
                     int len = socket.ReceiveFrom(bytesIn, ref remoteEndPointIn);
-                    var packetIn = Medo.Net.TinyPacket.Parse(bytesIn, 0, len);
+                    var packetIn = TinyPacket.Parse(bytesIn, 0, len);
                     Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage [{0} <- {1}]", packetIn, remoteEndPointIn));
                     return packetIn;
                 }
@@ -315,8 +316,8 @@ namespace Medo.Net
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
-            System.GC.SuppressFinalize(this);
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -327,7 +328,7 @@ namespace Medo.Net
         {
             if (disposing)
             {
-                this.CloseAsync();
+                CloseAsync();
             }
         }
 
@@ -342,7 +343,7 @@ namespace Medo.Net
     /// <summary>
     /// Encoder/decoder for Tiny packets.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
+    [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
     [DebuggerDisplay(@"{Product + "":"" + Operation}")]
     public class TinyPacket : IDisposable, IEnumerable<KeyValuePair<String, String>>
     {
@@ -361,9 +362,9 @@ namespace Medo.Net
             if (string.IsNullOrEmpty(operation)) { throw new ArgumentNullException("operation", "Operation is null or empty."); }
             if (operation.Contains(" ")) { throw new ArgumentException("Operation contains space character.", "operation"); }
 
-            this.Product = product;
-            this.Operation = operation;
-            this.Items = new Dictionary<string, string>();
+            Product = product;
+            Operation = operation;
+            Items = new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -381,10 +382,10 @@ namespace Medo.Net
             if (string.IsNullOrEmpty(operation)) { throw new ArgumentNullException("operation", "Operation is null or empty."); }
             if (operation.Contains(" ")) { throw new ArgumentException("Operation contains space character.", "operation"); }
 
-            this.Product = product;
-            this.Operation = operation;
-            this.Items = items ?? new Dictionary<string, string>();
-            this.IsReadOnly = true;
+            Product = product;
+            Operation = operation;
+            Items = items ?? new Dictionary<string, string>();
+            IsReadOnly = true;
         }
 
         /// <summary>
@@ -409,25 +410,23 @@ namespace Medo.Net
         {
             get
             {
-                if (this.Items.ContainsKey(key))
+                if (Items.ContainsKey(key))
                 {
-                    return this.Items[key];
+                    return Items[key];
                 }
-                else
-                {
-                    return null;
-                }
+
+                return null;
             }
             set
             {
-                if (this.IsReadOnly) { throw new NotSupportedException("Data is read-only."); }
-                if (this.Items.ContainsKey(key))
+                if (IsReadOnly) { throw new NotSupportedException("Data is read-only."); }
+                if (Items.ContainsKey(key))
                 {
-                    this.Items[key] = value;
+                    Items[key] = value;
                 }
                 else
                 {
-                    this.Items.Add(key, value);
+                    Items.Add(key, value);
                 }
             }
         }
@@ -446,19 +445,19 @@ namespace Medo.Net
                 stream.Write(protocolBytes, 0, protocolBytes.Length);
                 stream.Write(new byte[] { 0x20 }, 0, 1);
 
-                byte[] productBytes = TextEncoding.GetBytes(this.Product);
+                byte[] productBytes = TextEncoding.GetBytes(Product);
                 stream.Write(productBytes, 0, productBytes.Length);
                 stream.Write(new byte[] { 0x20 }, 0, 1);
 
-                byte[] operationBytes = TextEncoding.GetBytes(this.Operation);
+                byte[] operationBytes = TextEncoding.GetBytes(Operation);
                 stream.Write(operationBytes, 0, operationBytes.Length);
                 stream.Write(new byte[] { 0x20 }, 0, 1);
 
                 var addComma = false;
-                if (this.Items != null)
+                if (Items != null)
                 {
                     stream.Write(new byte[] { 0x7B }, 0, 1); //{
-                    foreach (var item in this.Items)
+                    foreach (var item in Items)
                     {
                         if (addComma) { stream.Write(new byte[] { 0x2C }, 0, 1); } //,
                         byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
@@ -553,12 +552,12 @@ namespace Medo.Net
             using (var stream = new MemoryStream(buffer, offset, count))
             {
                 string protocol = ReadToSpaceOrEnd(stream);
-                if (string.Equals(protocol, "Tiny", StringComparison.Ordinal) == false) { throw new System.FormatException("Cannot parse packet."); }
+                if (string.Equals(protocol, "Tiny", StringComparison.Ordinal) == false) { throw new FormatException("Cannot parse packet."); }
 
                 string product = ReadToSpaceOrEnd(stream);
-                if (string.IsNullOrEmpty(product)) { throw new System.FormatException("Cannot parse packet."); }
+                if (string.IsNullOrEmpty(product)) { throw new FormatException("Cannot parse packet."); }
                 string operation = ReadToSpaceOrEnd(stream);
-                if (string.IsNullOrEmpty(operation)) { throw new System.FormatException("Cannot parse packet."); }
+                if (string.IsNullOrEmpty(operation)) { throw new FormatException("Cannot parse packet."); }
 
                 return new TinyPacket(product, operation, null);
             }
@@ -583,12 +582,12 @@ namespace Medo.Net
             using (var stream = new MemoryStream(buffer, offset, count))
             {
                 string protocol = ReadToSpaceOrEnd(stream);
-                if (string.Equals(protocol, "Tiny", StringComparison.Ordinal) == false) { throw new System.FormatException("Cannot parse packet."); }
+                if (string.Equals(protocol, "Tiny", StringComparison.Ordinal) == false) { throw new FormatException("Cannot parse packet."); }
 
                 string product = ReadToSpaceOrEnd(stream);
-                if (string.IsNullOrEmpty(product)) { throw new System.FormatException("Cannot parse packet."); }
+                if (string.IsNullOrEmpty(product)) { throw new FormatException("Cannot parse packet."); }
                 string operation = ReadToSpaceOrEnd(stream);
-                if (string.IsNullOrEmpty(operation)) { throw new System.FormatException("Cannot parse packet."); }
+                if (string.IsNullOrEmpty(operation)) { throw new FormatException("Cannot parse packet."); }
 
                 var data = new Dictionary<string, string>();
 
@@ -628,7 +627,7 @@ namespace Medo.Net
                                     }
                                 }
                             }
-                            throw new System.FormatException("Cannot determine data kind.");
+                            throw new FormatException("Cannot determine data kind.");
                         }
                     }
                 }
@@ -636,7 +635,7 @@ namespace Medo.Net
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Cyclomatic complexity is actually lower than code analysis shows.")]
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Cyclomatic complexity is actually lower than code analysis shows.")]
         private static JsonState ParseJsonObject(Queue<char> jsonText, Dictionary<string, string> data)
         {
             var state = JsonState.Default;
@@ -652,7 +651,7 @@ namespace Medo.Net
                             switch (ch)
                             {
                                 case '{': state = JsonState.LookingForNameStart; break;
-                                default: throw new System.FormatException("Cannot find item start.");
+                                default: throw new FormatException("Cannot find item start.");
                             }
                         }
                         break;
@@ -664,7 +663,7 @@ namespace Medo.Net
                                 case ' ': break;
                                 case '}': state = JsonState.DeadEnd; break; //empty object
                                 case '\"': state = JsonState.LookingForNameEnd; break;
-                                default: throw new System.FormatException("Cannot find key name start.");
+                                default: throw new FormatException("Cannot find key name start.");
                             }
                         }
                         break;
@@ -686,7 +685,7 @@ namespace Medo.Net
                             {
                                 case ' ': break;
                                 case ':': state = JsonState.LookingForValueStart; break;
-                                default: throw new System.FormatException("Cannot find name/value separator.");
+                                default: throw new FormatException("Cannot find name/value separator.");
                             }
                         }
                         break;
@@ -698,7 +697,7 @@ namespace Medo.Net
                                 case ' ': break;
                                 case '\"': state = JsonState.LookingForValueEnd; break;
                                 case 'n': state = JsonState.LookingForNullChar2; break;
-                                default: throw new System.FormatException("Cannot find key value start.");
+                                default: throw new FormatException("Cannot find key value start.");
                             }
                         }
                         break;
@@ -733,7 +732,7 @@ namespace Medo.Net
                             switch (ch)
                             {
                                 case 'u': state = JsonState.LookingForNullChar3; break;
-                                default: throw new System.FormatException("Cannot find null.");
+                                default: throw new FormatException("Cannot find null.");
                             }
                         }
                         break;
@@ -743,7 +742,7 @@ namespace Medo.Net
                             switch (ch)
                             {
                                 case 'l': state = JsonState.LookingForNullChar4; break;
-                                default: throw new System.FormatException("Cannot find null.");
+                                default: throw new FormatException("Cannot find null.");
                             }
                         }
                         break;
@@ -766,7 +765,7 @@ namespace Medo.Net
                                     sbValue.Length = 0;
                                     state = JsonState.LookingForObjectEnd;
                                     break;
-                                default: throw new System.FormatException("Cannot find null.");
+                                default: throw new FormatException("Cannot find null.");
                             }
                         }
                         break;
@@ -778,7 +777,7 @@ namespace Medo.Net
                                 case ' ': break;
                                 case ',': state = JsonState.LookingForNameStart; break;
                                 case '}': state = JsonState.DeadEnd; break;
-                                default: throw new System.FormatException("Cannot find item start.");
+                                default: throw new FormatException("Cannot find item start.");
                             }
                         }
                         break;
@@ -788,12 +787,12 @@ namespace Medo.Net
                             switch (ch)
                             {
                                 case ' ': break;
-                                default: throw new System.FormatException("Unexpected data.");
+                                default: throw new FormatException("Unexpected data.");
                             }
                         }
                         break;
 
-                    default: throw new System.FormatException("Unexpected state.");
+                    default: throw new FormatException("Unexpected state.");
 
                 }
             }
@@ -808,16 +807,16 @@ namespace Medo.Net
                 case '\"': return "\"";
                 case '\\': return "\\";
                 case '/': return "/";
-                case 'b': return System.Convert.ToChar(0x08).ToString();
-                case 'f': return System.Convert.ToChar(0x0C).ToString();
-                case 'n': return System.Convert.ToChar(0x0A).ToString();
-                case 'r': return System.Convert.ToChar(0x0D).ToString();
-                case 't': return System.Convert.ToChar(0x09).ToString();
+                case 'b': return Convert.ToChar(0x08).ToString();
+                case 'f': return Convert.ToChar(0x0C).ToString();
+                case 'n': return Convert.ToChar(0x0A).ToString();
+                case 'r': return Convert.ToChar(0x0D).ToString();
+                case 't': return Convert.ToChar(0x09).ToString();
                 case 'u':
-                    var hex = new string(new char[] { jsonText.Dequeue(), jsonText.Dequeue(), jsonText.Dequeue(), jsonText.Dequeue() });
+                    var hex = new string(new[] { jsonText.Dequeue(), jsonText.Dequeue(), jsonText.Dequeue(), jsonText.Dequeue() });
                     var codepoint = UInt32.Parse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-                    return System.Convert.ToChar(codepoint).ToString();
-                default: throw new System.FormatException("Cannot decode escape sequence.");
+                    return Convert.ToChar(codepoint).ToString();
+                default: throw new FormatException("Cannot decode escape sequence.");
             }
         }
 
@@ -831,10 +830,8 @@ namespace Medo.Net
                 {
                     break;
                 }
-                else
-                {
-                    bytes.Add(oneByte);
-                }
+
+                bytes.Add(oneByte);
             }
             return TextEncoding.GetString(bytes.ToArray());
         }
@@ -853,7 +850,7 @@ namespace Medo.Net
         /// </summary>
         public override Int32 GetHashCode()
         {
-            return (this.Product).GetHashCode() ^ this.Operation.GetHashCode();
+            return (Product).GetHashCode() ^ Operation.GetHashCode();
         }
 
 
@@ -864,8 +861,8 @@ namespace Medo.Net
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
-            System.GC.SuppressFinalize(this);
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -876,9 +873,9 @@ namespace Medo.Net
         {
             if (disposing)
             {
-                this.Product = null;
-                this.Operation = null;
-                this.Items.Clear();
+                Product = null;
+                Operation = null;
+                Items.Clear();
             }
         }
 
@@ -891,7 +888,7 @@ namespace Medo.Net
         /// </summary>
         public IEnumerator<KeyValuePair<String, String>> GetEnumerator()
         {
-            return this.Items.GetEnumerator();
+            return Items.GetEnumerator();
         }
 
         /// <summary>
@@ -899,7 +896,7 @@ namespace Medo.Net
         /// </summary>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
         #endregion
@@ -952,10 +949,10 @@ namespace Medo.Net
             if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
             if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
 
-            this.Buffer = buffer;
-            this.Offset = offset;
-            this.Count = count;
-            this.RemoteEndPoint = remoteEndPoint;
+            Buffer = buffer;
+            Offset = offset;
+            Count = count;
+            RemoteEndPoint = remoteEndPoint;
         }
 
         /// <summary>
@@ -967,20 +964,20 @@ namespace Medo.Net
         /// Returns parsed packet.
         /// </summary>
         /// <exception cref="System.FormatException">Cannot parse packet.</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method might throw exception.")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method might throw exception.")]
         public TinyPacket GetPacket()
         {
-            return TinyPacket.Parse(this.Buffer, this.Offset, this.Count);
+            return TinyPacket.Parse(Buffer, Offset, Count);
         }
 
         /// <summary>
         /// Returns parsed packet.
         /// </summary>
         /// <exception cref="System.FormatException">Cannot parse packet.</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is appropriate here.")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is appropriate here.")]
         public TinyPacket GetPacketWithoutData()
         {
-            return TinyPacket.ParseHeaderOnly(this.Buffer, this.Offset, this.Count);
+            return TinyPacket.ParseHeaderOnly(Buffer, Offset, Count);
         }
 
     }

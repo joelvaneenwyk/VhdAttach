@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 //using MSTestExtensions;
 
 namespace System.Configuration.Install.Tests.System.Configuration.Install
@@ -30,7 +31,7 @@ namespace System.Configuration.Install.Tests.System.Configuration.Install
         [TestMethod]
         public void Should_Rollback_Component()
         {
-            var log = new StringBuilder();
+            StringBuilder log = new();
             InstallerLogHandler.Instance.OnLog += (source, message) => { log.AppendLine(message); };
             Assert.ThrowsException<InvalidOperationException>(() => ManagedInstallerClass.InstallHelper(new[]
                 {"-ThrowException=True", "-AssemblyName",  Assembly.GetExecutingAssembly().GetName().Name}));

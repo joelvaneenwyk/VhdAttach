@@ -19,6 +19,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
@@ -44,7 +45,7 @@ namespace Medo.IO
         /// <param name="fileName">Full path of VHD file.</param>
         public VirtualDisk(string fileName)
         {
-            this.FileName = fileName;
+            FileName = fileName;
         }
 
         /// <summary>
@@ -62,8 +63,8 @@ namespace Medo.IO
         /// </summary>
         public bool IsOpen
         {
-            [SecurityPermission(SecurityAction.Demand)]
-            get { return !(this._handle.IsClosed || this._handle.IsInvalid); }
+
+            get { return !(_handle.IsClosed || _handle.IsInvalid); }
         }
 
         /// <summary>
@@ -72,7 +73,7 @@ namespace Medo.IO
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
-        [SecurityPermission(SecurityAction.Demand)]
+
         public void Open()
         {
             Open(VirtualDiskAccessMask.All);
@@ -85,10 +86,10 @@ namespace Medo.IO
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
-        [SecurityPermission(SecurityAction.Demand)]
+
         public void Open(VirtualDiskAccessMask fileAccess)
         {
-            this.Open(fileAccess, VirtualDiskType.AutoDetect);
+            Open(fileAccess, VirtualDiskType.AutoDetect);
         }
 
         /// <summary>
@@ -109,22 +110,22 @@ namespace Medo.IO
             switch (type)
             {
                 case VirtualDiskType.AutoDetect:
-                    if (this.FileName.EndsWith(".iso", StringComparison.OrdinalIgnoreCase))
+                    if (FileName.EndsWith(".iso", StringComparison.OrdinalIgnoreCase))
                     {
                         storageType.DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_ISO;
                         fileAccess = ((fileAccess & VirtualDiskAccessMask.GetInfo) == VirtualDiskAccessMask.GetInfo) ? VirtualDiskAccessMask.GetInfo : 0;
                         fileAccess |= VirtualDiskAccessMask.AttachReadOnly;
-                        this.DiskType = VirtualDiskType.Iso;
+                        DiskType = VirtualDiskType.Iso;
                     }
-                    else if (this.FileName.EndsWith(".vhdx", StringComparison.OrdinalIgnoreCase))
+                    else if (FileName.EndsWith(".vhdx", StringComparison.OrdinalIgnoreCase))
                     {
                         storageType.DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_VHDX;
-                        this.DiskType = VirtualDiskType.Vhdx;
+                        DiskType = VirtualDiskType.Vhdx;
                     }
                     else
                     {
                         storageType.DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_VHD;
-                        this.DiskType = VirtualDiskType.Vhd;
+                        DiskType = VirtualDiskType.Vhd;
                     }
                     break;
 
@@ -132,22 +133,22 @@ namespace Medo.IO
                     storageType.DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_ISO;
                     fileAccess = ((fileAccess & VirtualDiskAccessMask.GetInfo) == VirtualDiskAccessMask.GetInfo) ? VirtualDiskAccessMask.GetInfo : 0;
                     fileAccess |= VirtualDiskAccessMask.AttachReadOnly;
-                    this.DiskType = VirtualDiskType.Iso;
+                    DiskType = VirtualDiskType.Iso;
                     break;
 
                 case VirtualDiskType.Vhd:
                     storageType.DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_VHD;
-                    this.DiskType = VirtualDiskType.Vhd;
+                    DiskType = VirtualDiskType.Vhd;
                     break;
 
                 case VirtualDiskType.Vhdx:
                     storageType.DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_VHDX;
-                    this.DiskType = VirtualDiskType.Vhdx;
+                    DiskType = VirtualDiskType.Vhdx;
                     break;
             }
             storageType.VendorId = NativeMethods.VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT;
 
-            int res = NativeMethods.OpenVirtualDisk(ref storageType, this.FileName, (NativeMethods.VIRTUAL_DISK_ACCESS_MASK)fileAccess, NativeMethods.OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, ref parameters, ref _handle);
+            int res = NativeMethods.OpenVirtualDisk(ref storageType, FileName, (NativeMethods.VIRTUAL_DISK_ACCESS_MASK)fileAccess, NativeMethods.OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, ref parameters, ref _handle);
             if (res == NativeMethods.ERROR_SUCCESS)
             {
             }
@@ -158,18 +159,18 @@ namespace Medo.IO
                 {
                     throw new FileNotFoundException("File not found.");
                 }
-                else if (res == NativeMethods.ERROR_ACCESS_DENIED)
+
+                if (res == NativeMethods.ERROR_ACCESS_DENIED)
                 {
                     throw new IOException("Access is denied.");
                 }
-                else if (res == NativeMethods.ERROR_FILE_CORRUPT)
+
+                if (res == NativeMethods.ERROR_FILE_CORRUPT)
                 {
                     throw new InvalidDataException("File type not recognized.");
                 }
-                else
-                {
-                    throw new Win32Exception(res);
-                }
+
+                throw new Win32Exception(res);
             }
         }
 
@@ -182,7 +183,7 @@ namespace Medo.IO
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
-        [SecurityPermission(SecurityAction.Demand)]
+
         public void Create(long size)
         {
             Create(VirtualDiskType.AutoDetect, size, VirtualDiskCreateOptions.None, 0, 0, false);
@@ -199,10 +200,10 @@ namespace Medo.IO
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
-        [SecurityPermission(SecurityAction.Demand)]
+
         public void Create(long size, VirtualDiskCreateOptions options)
         {
-            this.Create(VirtualDiskType.AutoDetect, size, options, 0, 0, false);
+            Create(VirtualDiskType.AutoDetect, size, options, 0, 0, false);
         }
 
         /// <summary>
@@ -219,10 +220,10 @@ namespace Medo.IO
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
-        [SecurityPermission(SecurityAction.Demand)]
+
         public void Create(long size, VirtualDiskCreateOptions options, int blockSize, int sectorSize, VirtualDiskType type)
         {
-            this.Create(type, size, options, blockSize, sectorSize, false);
+            Create(type, size, options, blockSize, sectorSize, false);
         }
 
         /// <summary>
@@ -235,7 +236,7 @@ namespace Medo.IO
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
-        [SecurityPermission(SecurityAction.Demand)]
+
         public void CreateAsync(long size)
         {
             Create(VirtualDiskType.AutoDetect, size, VirtualDiskCreateOptions.None, 0, 0, true);
@@ -252,10 +253,10 @@ namespace Medo.IO
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
-        [SecurityPermission(SecurityAction.Demand)]
+
         public void CreateAsync(long size, VirtualDiskCreateOptions options)
         {
-            this.Create(VirtualDiskType.AutoDetect, size, options, 0, 0, true);
+            Create(VirtualDiskType.AutoDetect, size, options, 0, 0, true);
         }
 
         /// <summary>
@@ -271,10 +272,10 @@ namespace Medo.IO
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
-        [SecurityPermission(SecurityAction.Demand)]
+
         public void CreateAsync(long size, VirtualDiskCreateOptions options, int blockSize, int sectorSize)
         {
-            this.Create(VirtualDiskType.AutoDetect, size, options, blockSize, sectorSize, true);
+            Create(VirtualDiskType.AutoDetect, size, options, blockSize, sectorSize, true);
         }
 
         /// <summary>
@@ -291,10 +292,10 @@ namespace Medo.IO
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
-        [SecurityPermission(SecurityAction.Demand)]
+
         public void CreateAsync(long size, VirtualDiskCreateOptions options, int blockSize, int sectorSize, VirtualDiskType type)
         {
-            this.Create(type, size, options, blockSize, sectorSize, true);
+            Create(type, size, options, blockSize, sectorSize, true);
         }
 
         /// <summary>
@@ -312,7 +313,7 @@ namespace Medo.IO
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
-        [SecurityPermission(SecurityAction.Demand)]
+
         private void Create(VirtualDiskType type, long size, VirtualDiskCreateOptions options, int blockSize, int sectorSize, bool createAsync)
         {
             var parameters = new NativeMethods.CREATE_VIRTUAL_DISK_PARAMETERS();
@@ -343,11 +344,12 @@ namespace Medo.IO
             switch (type)
             {
                 case VirtualDiskType.AutoDetect:
-                    if (this.FileName.EndsWith(".iso", StringComparison.OrdinalIgnoreCase))
+                    if (FileName.EndsWith(".iso", StringComparison.OrdinalIgnoreCase))
                     {
                         throw new InvalidOperationException("Cannot create iso file.");
                     }
-                    else if (this.FileName.EndsWith(".vhdx", StringComparison.OrdinalIgnoreCase))
+
+                    if (FileName.EndsWith(".vhdx", StringComparison.OrdinalIgnoreCase))
                     {
                         storageType.DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_VHDX;
                     }
@@ -369,18 +371,18 @@ namespace Medo.IO
             int res;
             if (createAsync)
             {
-                this._createOverlapEvent = new ManualResetEvent(false);
-                this._createOverlap = new NativeOverlapped();
-                this._createOverlap.OffsetLow = 0;
-                this._createOverlap.OffsetHigh = 0;
+                _createOverlapEvent = new ManualResetEvent(false);
+                _createOverlap = new NativeOverlapped();
+                _createOverlap.OffsetLow = 0;
+                _createOverlap.OffsetHigh = 0;
 #pragma warning disable 0618
-                this._createOverlap.EventHandle = this._createOverlapEvent.Handle;
+                _createOverlap.EventHandle = _createOverlapEvent.Handle;
 #pragma warning restore 0618
-                res = NativeMethods.CreateVirtualDisk(ref storageType, this.FileName, NativeMethods.VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ALL, IntPtr.Zero, (NativeMethods.CREATE_VIRTUAL_DISK_FLAG)options, 0, ref parameters, ref _createOverlap, ref _handle);
+                res = NativeMethods.CreateVirtualDisk(ref storageType, FileName, NativeMethods.VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ALL, IntPtr.Zero, (NativeMethods.CREATE_VIRTUAL_DISK_FLAG)options, 0, ref parameters, ref _createOverlap, ref _handle);
             }
             else
             {
-                res = NativeMethods.CreateVirtualDisk(ref storageType, this.FileName, NativeMethods.VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ALL, IntPtr.Zero, (NativeMethods.CREATE_VIRTUAL_DISK_FLAG)options, 0, ref parameters, IntPtr.Zero, ref _handle);
+                res = NativeMethods.CreateVirtualDisk(ref storageType, FileName, NativeMethods.VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ALL, IntPtr.Zero, (NativeMethods.CREATE_VIRTUAL_DISK_FLAG)options, 0, ref parameters, IntPtr.Zero, ref _handle);
             }
             if (res == NativeMethods.ERROR_SUCCESS)
             {
@@ -395,26 +397,28 @@ namespace Medo.IO
                 {
                     throw new FileNotFoundException("File not found.");
                 }
-                else if (res == NativeMethods.ERROR_FILE_CORRUPT)
+
+                if (res == NativeMethods.ERROR_FILE_CORRUPT)
                 {
                     throw new InvalidDataException("File type not recognized.");
                 }
-                else if (res == NativeMethods.ERROR_FILE_EXISTS)
+
+                if (res == NativeMethods.ERROR_FILE_EXISTS)
                 {
                     throw new IOException("File already exists.");
                 }
-                else if (res == NativeMethods.ERROR_FILE_SYSTEM_LIMITATION)
+
+                if (res == NativeMethods.ERROR_FILE_SYSTEM_LIMITATION)
                 {
                     throw new IOException("Virtual disk creation could not be completed due to a file system limitation.");
                 }
-                else if (res == NativeMethods.ERROR_INVALID_PARAMETER)
+
+                if (res == NativeMethods.ERROR_INVALID_PARAMETER)
                 {
                     throw new ArgumentException("Invalid parameter.", "size");
                 }
-                else
-                {
-                    throw new Win32Exception(res);
-                }
+
+                throw new Win32Exception(res);
             }
         }
 
@@ -426,11 +430,11 @@ namespace Medo.IO
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         /// <exception cref="System.IO.IOException">File already exists.</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method may throw exceptions.")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method may throw exceptions.")]
         public VirtualDiskOperationProgress GetCreateProgress()
         {
             var progress = new NativeMethods.VIRTUAL_DISK_PROGRESS();
-            int res = NativeMethods.GetVirtualDiskOperationProgress(this._handle, ref this._createOverlap, ref progress);
+            int res = NativeMethods.GetVirtualDiskOperationProgress(_handle, ref _createOverlap, ref progress);
             if (res == NativeMethods.ERROR_SUCCESS)
             {
                 res = progress.OperationStatus; //overwrites original res in order for copy/paste error handling to work (copy/paste is from Create method and may be used in future also)
@@ -438,41 +442,36 @@ namespace Medo.IO
                 {
                     return new VirtualDiskOperationProgress(100, true);
                 }
-                else if (res == NativeMethods.ERROR_IO_PENDING)
+
+                if (res == NativeMethods.ERROR_IO_PENDING)
                 {
-                    if (this._createOverlapEvent.WaitOne(0, false))
+                    if (_createOverlapEvent.WaitOne(0, false))
                     {
                         return new VirtualDiskOperationProgress(100, true);
                     }
-                    else
-                    {
-                        return new VirtualDiskOperationProgress((int)((progress.CurrentValue * 100) / progress.CompletionValue), false);
-                    }
+
+                    return new VirtualDiskOperationProgress((int)((progress.CurrentValue * 100) / progress.CompletionValue), false);
                 }
-                else
+
+                if ((res == NativeMethods.ERROR_FILE_NOT_FOUND) || (res == NativeMethods.ERROR_PATH_NOT_FOUND))
                 {
-                    if ((res == NativeMethods.ERROR_FILE_NOT_FOUND) || (res == NativeMethods.ERROR_PATH_NOT_FOUND))
-                    {
-                        throw new FileNotFoundException("File not found.");
-                    }
-                    else if (res == NativeMethods.ERROR_FILE_CORRUPT)
-                    {
-                        throw new InvalidDataException("File type not recognized.");
-                    }
-                    else if (res == NativeMethods.ERROR_FILE_EXISTS)
-                    {
-                        throw new IOException("File already exists.");
-                    }
-                    else
-                    {
-                        throw new Win32Exception(res);
-                    }
+                    throw new FileNotFoundException("File not found.");
                 }
-            }
-            else
-            {
+
+                if (res == NativeMethods.ERROR_FILE_CORRUPT)
+                {
+                    throw new InvalidDataException("File type not recognized.");
+                }
+
+                if (res == NativeMethods.ERROR_FILE_EXISTS)
+                {
+                    throw new IOException("File already exists.");
+                }
+
                 throw new Win32Exception(res);
             }
+
+            throw new Win32Exception(res);
         }
 
         /// <summary>
@@ -486,7 +485,7 @@ namespace Medo.IO
         /// <exception cref="System.IO.IOException">Access is denied.</exception>
         public void Attach(VirtualDiskAttachOptions options)
         {
-            if (this.DiskType == VirtualDiskType.Iso) { options |= VirtualDiskAttachOptions.ReadOnly; }
+            if (DiskType == VirtualDiskType.Iso) { options |= VirtualDiskAttachOptions.ReadOnly; }
 
             var parameters = new NativeMethods.ATTACH_VIRTUAL_DISK_PARAMETERS();
             parameters.Version = NativeMethods.ATTACH_VIRTUAL_DISK_VERSION.ATTACH_VIRTUAL_DISK_VERSION_1;
@@ -505,7 +504,7 @@ namespace Medo.IO
             }
             else if (res == NativeMethods.ERROR_BAD_COMMAND)
             {
-                throw new System.NotSupportedException("Command is not supported in current state.");
+                throw new NotSupportedException("Command is not supported in current state.");
             }
             else if (res == NativeMethods.ERROR_PRIVILEGE_NOT_HELD)
             {
@@ -522,7 +521,7 @@ namespace Medo.IO
         /// </summary>
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.IOException">Device could not be accessed.</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method may not return immediately when called.")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method may not return immediately when called.")]
         public string GetAttachedPath()
         {
             int res = 0;
@@ -540,14 +539,13 @@ namespace Medo.IO
             {
                 return path.ToString(0, pathSize / 2 - 1); //unicode
             }
-            else if (res == NativeMethods.ERROR_DEV_NOT_EXIST)
+
+            if (res == NativeMethods.ERROR_DEV_NOT_EXIST)
             {
                 throw new IOException("Device could not be accessed.");
             }
-            else
-            {
-                throw new Win32Exception(res);
-            }
+
+            throw new Win32Exception(res);
         }
 
         /// <summary>
@@ -585,12 +583,12 @@ namespace Medo.IO
         /// <summary>
         /// Closes connection to file.
         /// </summary>
-        [SecurityPermission(SecurityAction.Demand)]
+
         public void Close()
         {
-            if (this.IsOpen)
+            if (IsOpen)
             {
-                this._handle.Close();
+                _handle.Close();
             }
         }
 
@@ -608,7 +606,7 @@ namespace Medo.IO
 
             int size = Marshal.SizeOf(info);
             int sizeUsed = 0;
-            int res = NativeMethods.GetVirtualDiskInformation(this._handle, ref size, ref info, ref sizeUsed);
+            int res = NativeMethods.GetVirtualDiskInformation(_handle, ref size, ref info, ref sizeUsed);
 
             if (res == NativeMethods.ERROR_SUCCESS)
             {
@@ -632,7 +630,7 @@ namespace Medo.IO
         /// <summary>
         /// Gets unique identifier of the VHD.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method does not behave as field.")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method does not behave as field.")]
         public Guid GetIdentifier()
         {
             var info = new NativeMethods.GET_VIRTUAL_DISK_INFO();
@@ -640,7 +638,7 @@ namespace Medo.IO
 
             int size = Marshal.SizeOf(info);
             int sizeUsed = 0;
-            int res = NativeMethods.GetVirtualDiskInformation(this._handle, ref size, ref info, ref sizeUsed);
+            int res = NativeMethods.GetVirtualDiskInformation(_handle, ref size, ref info, ref sizeUsed);
 
             if (res == NativeMethods.ERROR_SUCCESS)
             {
@@ -648,14 +646,13 @@ namespace Medo.IO
                 return info.Union.Identifier;
 
             }
-            else if (res == NativeMethods.ERROR_DEV_NOT_EXIST)
+
+            if (res == NativeMethods.ERROR_DEV_NOT_EXIST)
             {
                 throw new IOException("Device could not be accessed.");
             }
-            else
-            {
-                throw new Win32Exception(res);
-            }
+
+            throw new Win32Exception(res);
         }
 
         /// <summary>
@@ -670,7 +667,7 @@ namespace Medo.IO
 
             int size = Marshal.SizeOf(info);
             int sizeUsed = 0;
-            int res = NativeMethods.GetVirtualDiskInformation(this._handle, ref size, ref info, ref sizeUsed);
+            int res = NativeMethods.GetVirtualDiskInformation(_handle, ref size, ref info, ref sizeUsed);
 
             if (res == NativeMethods.ERROR_SUCCESS)
             {
@@ -692,7 +689,7 @@ namespace Medo.IO
         /// <summary>
         /// Gets provider-specific subtype.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method does not behave as field.")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method does not behave as field.")]
         public int GetProviderSubtype()
         {
             var info = new NativeMethods.GET_VIRTUAL_DISK_INFO();
@@ -700,7 +697,7 @@ namespace Medo.IO
 
             int size = Marshal.SizeOf(info);
             int sizeUsed = 0;
-            int res = NativeMethods.GetVirtualDiskInformation(this._handle, ref size, ref info, ref sizeUsed);
+            int res = NativeMethods.GetVirtualDiskInformation(_handle, ref size, ref info, ref sizeUsed);
 
             if (res == NativeMethods.ERROR_SUCCESS)
             {
@@ -708,14 +705,13 @@ namespace Medo.IO
                 return info.Union.ProviderSubtype;
 
             }
-            else if (res == NativeMethods.ERROR_DEV_NOT_EXIST)
+
+            if (res == NativeMethods.ERROR_DEV_NOT_EXIST)
             {
                 throw new IOException("Device could not be accessed.");
             }
-            else
-            {
-                throw new Win32Exception(res);
-            }
+
+            throw new Win32Exception(res);
         }
 
 
@@ -727,8 +723,8 @@ namespace Medo.IO
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
-            System.GC.SuppressFinalize(this);
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -739,8 +735,8 @@ namespace Medo.IO
         {
             if (disposing)
             {
-                if (this._createOverlapEvent != null) { this._createOverlapEvent.Close(); }
-                this.Close();
+                if (_createOverlapEvent != null) { _createOverlapEvent.Close(); }
+                Close();
             }
         }
 
@@ -803,7 +799,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains virtual disk attach request flags.
             /// </summary>
-            public enum ATTACH_VIRTUAL_DISK_FLAG : int
+            public enum ATTACH_VIRTUAL_DISK_FLAG
             {
                 /// <summary>
                 /// No flags. Use system defaults.
@@ -834,7 +830,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains the version of the virtual hard disk (VHD) ATTACH_VIRTUAL_DISK_PARAMETERS structure to use in calls to VHD functions.
             /// </summary>
-            public enum ATTACH_VIRTUAL_DISK_VERSION : int
+            public enum ATTACH_VIRTUAL_DISK_VERSION
             {
                 /// <summary>
                 /// </summary>
@@ -848,7 +844,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains virtual hard disk (VHD) compact request flags.
             /// </summary>
-            public enum COMPACT_VIRTUAL_DISK_FLAG : int
+            public enum COMPACT_VIRTUAL_DISK_FLAG
             {
                 /// <summary>
                 /// </summary>
@@ -858,7 +854,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains the version of the virtual hard disk (VHD) COMPACT_VIRTUAL_DISK_PARAMETERS structure to use in calls to VHD functions.
             /// </summary>
-            public enum COMPACT_VIRTUAL_DISK_VERSION : int
+            public enum COMPACT_VIRTUAL_DISK_VERSION
             {
                 /// <summary>
                 /// </summary>
@@ -872,7 +868,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains virtual disk creation flags.
             /// </summary>
-            public enum CREATE_VIRTUAL_DISK_FLAG : int
+            public enum CREATE_VIRTUAL_DISK_FLAG
             {
                 /// <summary>
                 /// No special creation conditions; system defaults are used.
@@ -888,7 +884,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains the version of the virtual hard disk (VHD) CREATE_VIRTUAL_DISK_PARAMETERS structure to use in calls to VHD functions.
             /// </summary>
-            public enum CREATE_VIRTUAL_DISK_VERSION : int
+            public enum CREATE_VIRTUAL_DISK_VERSION
             {
                 /// <summary>
                 /// </summary>
@@ -902,7 +898,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains virtual disk dependency information flags.
             /// </summary>
-            public enum DEPENDENT_DISK_FLAG : int
+            public enum DEPENDENT_DISK_FLAG
             {
                 /// <summary>
                 /// No flags specified. Use system defaults.
@@ -968,7 +964,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains virtual hard disk (VHD) detach request flags.
             /// </summary>
-            public enum DETACH_VIRTUAL_DISK_FLAG : int
+            public enum DETACH_VIRTUAL_DISK_FLAG
             {
                 /// <summary>
                 /// No flags. Use system defaults.
@@ -979,7 +975,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains virtual hard disk (VHD) expand request flags.
             /// </summary>
-            public enum EXPAND_VIRTUAL_DISK_FLAG : int
+            public enum EXPAND_VIRTUAL_DISK_FLAG
             {
                 /// <summary>
                 /// </summary>
@@ -989,7 +985,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains the version of the virtual hard disk (VHD) EXPAND_VIRTUAL_DISK_PARAMETERS structure to use in calls to VHD functions.
             /// </summary>
-            public enum EXPAND_VIRTUAL_DISK_VERSION : int
+            public enum EXPAND_VIRTUAL_DISK_VERSION
             {
                 /// <summary>
                 /// </summary>
@@ -1003,7 +999,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains virtual hard disk (VHD) storage dependency request flags.
             /// </summary>
-            public enum GET_STORAGE_DEPENDENCY_FLAG : int
+            public enum GET_STORAGE_DEPENDENCY_FLAG
             {
                 /// <summary>
                 /// No flags specified.
@@ -1024,7 +1020,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains virtual hard disk (VHD) information retrieval identifiers.
             /// </summary>
-            public enum GET_VIRTUAL_DISK_INFO_VERSION : int
+            public enum GET_VIRTUAL_DISK_INFO_VERSION
             {
                 /// <summary>
                 /// Unspecified.
@@ -1070,7 +1066,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains virtual hard disk (VHD) merge request flags.
             /// </summary>
-            public enum MERGE_VIRTUAL_DISK_FLAG : int
+            public enum MERGE_VIRTUAL_DISK_FLAG
             {
                 /// <summary>
                 /// </summary>
@@ -1080,7 +1076,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains the version of the virtual hard disk (VHD) MERGE_VIRTUAL_DISK_PARAMETERS structure to use in calls to VHD functions.
             /// </summary>
-            public enum MERGE_VIRTUAL_DISK_VERSION : int
+            public enum MERGE_VIRTUAL_DISK_VERSION
             {
                 /// <summary>
                 /// </summary>
@@ -1094,7 +1090,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains virtual disk open request flags.
             /// </summary>
-            public enum OPEN_VIRTUAL_DISK_FLAG : int
+            public enum OPEN_VIRTUAL_DISK_FLAG
             {
                 /// <summary>
                 /// No flag specified.
@@ -1120,7 +1116,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains the version of the virtual hard disk (VHD) OPEN_VIRTUAL_DISK_PARAMETERS structure to use in calls to VHD functions.
             /// </summary>
-            public enum OPEN_VIRTUAL_DISK_VERSION : int
+            public enum OPEN_VIRTUAL_DISK_VERSION
             {
                 /// <summary>
                 /// </summary>
@@ -1134,7 +1130,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains the version of the virtual hard disk (VHD) SET_VIRTUAL_DISK_INFO structure to use in calls to VHD functions.
             /// </summary>
-            public enum SET_VIRTUAL_DISK_INFO_VERSION : int
+            public enum SET_VIRTUAL_DISK_INFO_VERSION
             {
                 /// <summary>
                 /// Not used. Will fail the operation.
@@ -1155,7 +1151,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains the version of the virtual hard disk (VHD) STORAGE_DEPENDENCY_INFO structure to use in calls to VHD functions.
             /// </summary>
-            public enum STORAGE_DEPENDENCY_INFO_VERSION : int
+            public enum STORAGE_DEPENDENCY_INFO_VERSION
             {
                 /// <summary>
                 /// The version is not specified.
@@ -1176,7 +1172,7 @@ namespace Medo.IO
             /// <summary>
             /// Contains the bit mask for specifying access rights to a virtual hard disk (VHD).
             /// </summary>
-            public enum VIRTUAL_DISK_ACCESS_MASK : int
+            public enum VIRTUAL_DISK_ACCESS_MASK
             {
                 /// <summary>
                 /// Open the virtual disk for read-only attach access. The caller must have READ access to the virtual disk image file. If used in a request to open a virtual disk that is already open, the other handles must be limited to either VIRTUAL_DISK_ACCESS_DETACH or VIRTUAL_DISK_ACCESS_GET_INFO access, otherwise the open request with this flag will fail.
@@ -1733,7 +1729,7 @@ namespace Medo.IO
             /// <param name="Parameters">A pointer to a valid SURFACE_VIRTUAL_DISK_PARAMETERS structure that contains surfacing (attachment) parameter data.</param>
             /// <param name="Overlapped">An optional pointer to a valid OVERLAPPED structure if asynchronous operation is desired.</param>
             /// <returns>If the function succeeds, the return value is ERROR_SUCCESS and the Handle parameter contains a valid pointer to the new virtual disk object. If the function fails, the return value is an error code and the value of the Handle parameter is undefined.</returns>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("virtdisk.dll", CharSet = CharSet.Unicode)]
             public static extern Int32 AttachVirtualDisk(VirtualDiskSafeHandle VirtualDiskHandle, IntPtr SecurityDescriptor, ATTACH_VIRTUAL_DISK_FLAG Flags, Int32 ProviderSpecificFlags, ref ATTACH_VIRTUAL_DISK_PARAMETERS Parameters, IntPtr Overlapped);
 
@@ -1761,7 +1757,7 @@ namespace Medo.IO
             /// <param name="Overlapped">An optional pointer to a valid OVERLAPPED structure if asynchronous operation is desired.</param>
             /// <param name="Handle">A pointer to the handle object that represents the newly created virtual disk.</param>
             /// <returns>If the function succeeds, the return value is ERROR_SUCCESS and the Handle parameter contains a valid pointer to the new virtual disk object. If the function fails, the return value is an error code and the value of the Handle parameter is undefined.</returns>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("virtdisk.dll", CharSet = CharSet.Unicode)]
             public static extern Int32 CreateVirtualDisk(ref VIRTUAL_STORAGE_TYPE VirtualStorageType, String Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, IntPtr SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAG Flags, Int32 ProviderSpecificFlags, ref CREATE_VIRTUAL_DISK_PARAMETERS Parameters, IntPtr Overlapped, ref VirtualDiskSafeHandle Handle);
 
@@ -1778,7 +1774,7 @@ namespace Medo.IO
             /// <param name="Overlapped">An optional pointer to a valid OVERLAPPED structure if asynchronous operation is desired.</param>
             /// <param name="Handle">A pointer to the handle object that represents the newly created virtual disk.</param>
             /// <returns>If the function succeeds, the return value is ERROR_SUCCESS and the Handle parameter contains a valid pointer to the new virtual disk object. If the function fails, the return value is an error code and the value of the Handle parameter is undefined.</returns>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("virtdisk.dll", CharSet = CharSet.Unicode)]
             public static extern Int32 CreateVirtualDisk(ref VIRTUAL_STORAGE_TYPE VirtualStorageType, String Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, IntPtr SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAG Flags, Int32 ProviderSpecificFlags, ref CREATE_VIRTUAL_DISK_PARAMETERS Parameters, ref NativeOverlapped Overlapped, ref VirtualDiskSafeHandle Handle);
 
@@ -1789,7 +1785,7 @@ namespace Medo.IO
             /// <param name="Flags">A valid combination of values of the UNSURFACE_VIRTUAL_DISK_FLAG enumeration.</param>
             /// <param name="ProviderSpecificFlags">Flags specific to the type of virtual disk being unsurfaced. May be zero if none are required.</param>
             /// <returns>If the function succeeds, the return value is ERROR_SUCCESS and the Handle parameter contains a valid pointer to the new virtual disk object. If the function fails, the return value is an error code and the value of the Handle parameter is undefined.</returns>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("virtdisk.dll", CharSet = CharSet.Unicode)]
             public static extern Int32 DetachVirtualDisk(VirtualDiskSafeHandle VirtualDiskHandle, DETACH_VIRTUAL_DISK_FLAG Flags, Int32 ProviderSpecificFlags);
 
@@ -1824,7 +1820,7 @@ namespace Medo.IO
             /// <param name="VirtualDiskInfo">A pointer to a valid GET_VIRTUAL_DISK_INFO structure. The format of the data returned is dependent on the value passed in the Version member by the caller.</param>
             /// <param name="SizeUsed">A pointer to a ULONG that contains the size used.</param>
             /// <returns>If the function succeeds, the return value is ERROR_SUCCESS and the Handle parameter contains a valid pointer to the new virtual disk object. If the function fails, the return value is an error code and the value of the Handle parameter is undefined.</returns>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("virtdisk.dll", CharSet = CharSet.Unicode)]
             public static extern Int32 GetVirtualDiskInformation(VirtualDiskSafeHandle VirtualDiskHandle, ref Int32 VirtualDiskInfoSize, ref GET_VIRTUAL_DISK_INFO VirtualDiskInfo, ref Int32 SizeUsed);
 
@@ -1835,7 +1831,7 @@ namespace Medo.IO
             /// <param name="Overlapped">A pointer to a valid OVERLAPPED structure. This parameter must reference the same structure previously sent to the virtual disk operation being checked for progress.</param>
             /// <param name="Progress">A pointer to a VIRTUAL_DISK_PROGRESS structure that receives the current virtual disk operation progress.</param>
             /// <returns>If the function succeeds, the return value is ERROR_SUCCESS and the Handle parameter contains a valid pointer to the new virtual disk object. If the function fails, the return value is an error code and the value of the Handle parameter is undefined.</returns>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("virtdisk.dll", CharSet = CharSet.Unicode)]
             public static extern Int32 GetVirtualDiskOperationProgress(VirtualDiskSafeHandle VirtualDiskHandle, ref NativeOverlapped Overlapped, ref VIRTUAL_DISK_PROGRESS Progress);
 
@@ -1847,7 +1843,7 @@ namespace Medo.IO
             /// <param name="DiskPathSizeInBytes">The size, in bytes, of the buffer pointed to by the DiskPath parameter.</param>
             /// <param name="DiskPath">A target buffer to receive the path of the physical disk device that contains the VHD.</param>
             /// <returns>If the function succeeds, the return value is ERROR_SUCCESS and the Handle parameter contains a valid pointer to the new virtual disk object. If the function fails, the return value is an error code and the value of the Handle parameter is undefined.</returns>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("virtdisk.dll", CharSet = CharSet.Unicode)]
             public static extern Int32 GetVirtualDiskPhysicalPath(VirtualDiskSafeHandle VirtualDiskHandle, ref Int32 DiskPathSizeInBytes, StringBuilder DiskPath);
 
@@ -1872,7 +1868,7 @@ namespace Medo.IO
             /// <param name="Parameters">An optional pointer to a valid OPEN_VIRTUAL_DISK_PARAMETERS structure. Can be NULL. </param>
             /// <param name="Handle">A pointer to the handle object that represents the open VHD.</param>
             /// <returns>If the function succeeds, the return value is ERROR_SUCCESS and the Handle parameter contains a valid pointer to the new virtual disk object. If the function fails, the return value is an error code and the value of the Handle parameter is undefined.</returns>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("virtdisk.dll", CharSet = CharSet.Unicode)]
             public static extern Int32 OpenVirtualDisk(ref VIRTUAL_STORAGE_TYPE VirtualStorageType, String Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, ref OPEN_VIRTUAL_DISK_PARAMETERS Parameters, ref VirtualDiskSafeHandle Handle);
 
@@ -1979,7 +1975,7 @@ namespace Medo.IO
             /// </summary>
             /// <param name="hObject">A valid handle to an open object.</param>
             /// <returns>If the function succeeds, the return value is nonzero. If the function fails, the return value is zero. To get extended error information, call GetLastError.</returns>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImportAttribute("kernel32.dll", SetLastError = true)]
             [return: MarshalAsAttribute(UnmanagedType.Bool)]
             public static extern Boolean CloseHandle(IntPtr hObject);
@@ -1989,7 +1985,6 @@ namespace Medo.IO
 
             #region SafeHandle
 
-            [SecurityPermission(SecurityAction.Demand)]
             public class VirtualDiskSafeHandle : SafeHandle
             {
 
@@ -1999,17 +1994,17 @@ namespace Medo.IO
 
                 public override bool IsInvalid
                 {
-                    get { return (this.IsClosed) || (base.handle == IntPtr.Zero); }
+                    get { return (IsClosed) || (handle == IntPtr.Zero); }
                 }
 
                 protected override bool ReleaseHandle()
                 {
-                    return CloseHandle(this.handle);
+                    return CloseHandle(handle);
                 }
 
                 public override string ToString()
                 {
-                    return this.handle.ToString();
+                    return handle.ToString();
                 }
 
             }
@@ -2024,7 +2019,7 @@ namespace Medo.IO
     /// <summary>
     /// Contains virtual disk attach request flags.
     /// </summary>
-    [Flags()]
+    [Flags]
     public enum VirtualDiskAttachOptions
     {
         /// <summary>
@@ -2046,7 +2041,7 @@ namespace Medo.IO
         /// <summary>
         /// Reserved.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "LocalHost", Justification = "Naming is same as in Windows API definition.")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "LocalHost", Justification = "Naming is same as in Windows API definition.")]
         NoLocalHost = 0x00000008,
     }
 
@@ -2078,8 +2073,8 @@ namespace Medo.IO
     /// <summary>
     /// Options for create operations.
     /// </summary>
-    [Flags()]
-    public enum VirtualDiskCreateOptions : int
+    [Flags]
+    public enum VirtualDiskCreateOptions
     {
         /// <summary>
         /// No additional options are set.
@@ -2096,8 +2091,8 @@ namespace Medo.IO
     /// <summary>
     /// Contains the bit mask for specifying access rights to a virtual hard disk (VHD).
     /// </summary>
-    [Flags()]
-    public enum VirtualDiskAccessMask : int
+    [Flags]
+    public enum VirtualDiskAccessMask
     {
         /// <summary>
         /// Open the virtual disk for read-only attach access. The caller must have READ access to the virtual disk image file. If used in a request to open a virtual disk that is already open, the other handles must be limited to either VIRTUAL_DISK_ACCESS_DETACH or VIRTUAL_DISK_ACCESS_GET_INFO access, otherwise the open request with this flag will fail.
@@ -2135,7 +2130,7 @@ namespace Medo.IO
     /// <summary>
     /// Structure with progress of asynchronous VHD operation.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "Equals has no meaning for this structure.")]
+    [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "Equals has no meaning for this structure.")]
     public struct VirtualDiskOperationProgress
     {
 
@@ -2147,8 +2142,8 @@ namespace Medo.IO
         public VirtualDiskOperationProgress(int progressPercentage, bool isDone)
             : this()
         {
-            this.ProgressPercentage = progressPercentage;
-            this.IsDone = isDone;
+            ProgressPercentage = progressPercentage;
+            IsDone = isDone;
         }
 
         /// <summary>

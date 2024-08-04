@@ -2,7 +2,10 @@
 using System.Configuration.Install;
 using System.Reflection;
 using System.ServiceProcess;
+using System.Threading;
 using System.Windows.Forms;
+using Medo.Application;
+using Medo.Diagnostics;
 
 namespace VhdAttachService
 {
@@ -10,12 +13,12 @@ namespace VhdAttachService
     internal static class App
     {
 
-        [STAThread()]
+        [STAThread]
         static void Main()
         {
-            System.AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            if (Medo.Application.Args.Current.ContainsKey("Interactive"))
+            if (Args.Current.ContainsKey("Interactive"))
             {
 
                 Tray.Show();
@@ -27,7 +30,7 @@ namespace VhdAttachService
                 Environment.Exit(0);
 
             }
-            else if (Medo.Application.Args.Current.ContainsKey("Install"))
+            else if (Args.Current.ContainsKey("Install"))
             {
 
                 try
@@ -39,11 +42,11 @@ namespace VhdAttachService
                 }
                 catch (Exception) { }
 
-                ManagedInstallerClass.InstallHelper(new string[] { Assembly.GetExecutingAssembly().Location });
-                System.Environment.Exit(0);
+                ManagedInstallerClass.InstallHelper(new[] { Assembly.GetExecutingAssembly().Location });
+                Environment.Exit(0);
 
             }
-            else if (Medo.Application.Args.Current.ContainsKey("Uninstall"))
+            else if (Args.Current.ContainsKey("Uninstall"))
             {
 
                 try
@@ -56,16 +59,16 @@ namespace VhdAttachService
                 catch (Exception) { }
                 try
                 {
-                    ManagedInstallerClass.InstallHelper(new string[] { "/u", Assembly.GetExecutingAssembly().Location });
-                    System.Environment.Exit(0);
+                    ManagedInstallerClass.InstallHelper(new[] { "/u", Assembly.GetExecutingAssembly().Location });
+                    Environment.Exit(0);
                 }
-                catch (System.Configuration.Install.InstallException)
+                catch (InstallException)
                 { //no service with that name
-                    System.Environment.Exit(1);
+                    Environment.Exit(1);
                 }
 
             }
-            else if (Medo.Application.Args.Current.ContainsKey("Start"))
+            else if (Args.Current.ContainsKey("Start"))
             {
 
                 try
@@ -80,7 +83,7 @@ namespace VhdAttachService
                     }
                 }
                 catch (Exception) { }
-                System.Environment.Exit(0);
+                Environment.Exit(0);
 
             }
             else
@@ -106,10 +109,10 @@ namespace VhdAttachService
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Medo.Diagnostics.ErrorReport.SaveToTemp(e.ExceptionObject as Exception);
+            ErrorReport.SaveToTemp(e.ExceptionObject as Exception);
             AppService.Instance.ExitCode = 1064; //ERROR_EXCEPTION_IN_SERVICE
             AppService.Instance.AutoLog = false;
-            System.Threading.Thread.Sleep(1000); //just to sort it properly in event log.
+            Thread.Sleep(1000); //just to sort it properly in event log.
             Environment.Exit(AppService.Instance.ExitCode);
         }
 

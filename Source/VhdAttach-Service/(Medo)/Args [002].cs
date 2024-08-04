@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Medo.Application
@@ -43,7 +44,7 @@ namespace Medo.Application
         /// <param name="count">Number of items.</param>
         public Args(string[] array, int offset, int count)
         {
-            InitializeFromArray(array, offset, count, new string[] { "/", "--", "-" }, new char[] { ':', '=' });
+            InitializeFromArray(array, offset, count, new[] { "/", "--", "-" }, new[] { ':', '=' });
         }
 
         /// <summary>
@@ -113,11 +114,11 @@ namespace Medo.Application
 
             if (removeFirstMember)
             {
-                InitializeFromArray(list.ToArray(), 1, list.Count - 1, new string[] { "/", "--", "-" }, new char[] { ':', '=' });
+                InitializeFromArray(list.ToArray(), 1, list.Count - 1, new[] { "/", "--", "-" }, new[] { ':', '=' });
             }
             else
             {
-                InitializeFromArray(list.ToArray(), 0, list.Count, new string[] { "/", "--", "-" }, new char[] { ':', '=' });
+                InitializeFromArray(list.ToArray(), 0, list.Count, new[] { "/", "--", "-" }, new[] { ':', '=' });
             }
         }
 
@@ -234,10 +235,8 @@ namespace Medo.Application
             {
                 return _items[key].ToArray();
             }
-            else
-            {
-                return new string[] { };
-            }
+
+            return new string[] { };
         }
 
         /// <summary>
@@ -261,10 +260,8 @@ namespace Medo.Application
             {
                 return _items[key][_items[key].Count - 1];
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         /// <summary>
@@ -281,10 +278,8 @@ namespace Medo.Application
             {
                 return value;
             }
-            else
-            {
-                return defaultValue;
-            }
+
+            return defaultValue;
         }
 
         /// <summary>
@@ -303,7 +298,7 @@ namespace Medo.Application
                 if (value.Length == 0) { return true; }
 
                 int valueInt;
-                if (int.TryParse(value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out valueInt))
+                if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out valueInt))
                 {
                     return valueInt != 0;
                 }
@@ -331,7 +326,7 @@ namespace Medo.Application
             if (value != null)
             {
                 int valueInt;
-                if (int.TryParse(value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out valueInt))
+                if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out valueInt))
                 {
                     return valueInt;
                 }
@@ -352,7 +347,7 @@ namespace Medo.Application
             if (value != null)
             {
                 double valueX;
-                if (double.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out valueX))
+                if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out valueX))
                 {
                     return valueX;
                 }

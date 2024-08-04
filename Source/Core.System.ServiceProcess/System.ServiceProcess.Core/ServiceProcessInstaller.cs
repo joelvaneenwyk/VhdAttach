@@ -4,14 +4,15 @@
 // </copyright>                                                                
 //------------------------------------------------------------------------------
 
+using System.Collections;
+using System.ComponentModel;
+using System.Configuration.Install;
+using System.Runtime.InteropServices;
+using System.ServiceProcess.Design;
+using System.Text;
+
 namespace System.ServiceProcess
 {
-    using System;
-    using System.Collections;
-    using System.ComponentModel;
-    using System.Configuration.Install;
-    using System.Runtime.InteropServices;
-
     /// <summary>Installs an executable containing classes that extend <see cref="T:System.ServiceProcess.ServiceBase" />. This class is called by installation utilities, such as InstallUtil.exe, when installing a service application.</summary>
     public class ServiceProcessInstaller : ComponentInstaller
     {
@@ -29,11 +30,8 @@ namespace System.ServiceProcess
             {
                 if (helpPrinted)
                     return base.HelpText;
-                else
-                {
-                    helpPrinted = true;
-                    return Res.GetString(Res.HelpText) + "\r\n" + base.HelpText;
-                }
+                helpPrinted = true;
+                return Res.GetString(Res.HelpText) + "\r\n" + base.HelpText;
             }
         }
 
@@ -112,7 +110,7 @@ namespace System.ServiceProcess
         /// </devdoc>
         private static bool AccountHasRight(IntPtr policyHandle, byte[] accountSid, string rightName)
         {
-            IntPtr pRights = (IntPtr)0;
+            IntPtr pRights = 0;
             int rightsCount = 0;
 
             // This function gives us back a pointer to the start of an array of LSA_UNICODE_STRING structs (in pRights).
@@ -172,9 +170,9 @@ namespace System.ServiceProcess
         {
             //Lookup SID
             byte[] newSid = new byte[256];
-            int[] sidLen = new int[] { newSid.Length };
+            int[] sidLen = { newSid.Length };
             char[] domName = new char[1024];
-            int[] domNameLen = new int[] { domName.Length };
+            int[] domNameLen = { domName.Length };
             int[] peUse = new int[1];
             bool success;
 
@@ -182,7 +180,7 @@ namespace System.ServiceProcess
             if (accountName.Substring(0, 2) == ".\\")
             {
                 // Replace the "." with the local computer name.
-                System.Text.StringBuilder compName = new System.Text.StringBuilder(NativeMethods.MAX_COMPUTERNAME_LENGTH + 1);
+                StringBuilder compName = new StringBuilder(NativeMethods.MAX_COMPUTERNAME_LENGTH + 1);
                 int nameLen = NativeMethods.MAX_COMPUTERNAME_LENGTH + 1;
                 success = NativeMethods.GetComputerName(compName, ref nameLen);
                 if (!success)
@@ -196,7 +194,7 @@ namespace System.ServiceProcess
                 throw new Win32Exception();
 
             byte[] sid = new byte[sidLen[0]];
-            System.Array.Copy(newSid, 0, sid, 0, sidLen[0]);
+            Array.Copy(newSid, 0, sid, 0, sidLen[0]);
             return sid;
         }
 
@@ -209,7 +207,7 @@ namespace System.ServiceProcess
             // if we're in design mode we won't have a context, etc.
             // PS 79665: changed from test for this.DesignMode flag to explicit test for the condition that
             // was causing the AV. -- jonfisch
-            if (Context != null && !this.DesignMode)
+            if (Context != null && !DesignMode)
             {
                 if (haveLoginInfo)
                     return;
@@ -237,21 +235,21 @@ namespace System.ServiceProcess
                         if (canPrompt)
                         {
 #if !NETSTANDARD
-                            using (Design.ServiceInstallerDialog dlg = new Design.ServiceInstallerDialog())
+                            using (ServiceInstallerDialog dlg = new ServiceInstallerDialog())
                             {
                                 if (username != null)
                                     dlg.Username = username;
                                 dlg.ShowDialog();
                                 switch (dlg.Result)
                                 {
-                                    case Design.ServiceInstallerDialogResult.Canceled:
+                                    case ServiceInstallerDialogResult.Canceled:
                                         throw new InvalidOperationException(Res.GetString(Res.UserCanceledInstall, Context.Parameters["assemblypath"]));
-                                    case Design.ServiceInstallerDialogResult.UseSystem:
+                                    case ServiceInstallerDialogResult.UseSystem:
                                         username = null;
                                         password = null;
                                         serviceAccount = ServiceAccount.LocalSystem;
                                         break;
-                                    case Design.ServiceInstallerDialogResult.OK:
+                                    case ServiceInstallerDialogResult.OK:
                                         username = dlg.Username;
                                         password = dlg.Password;
                                         break;

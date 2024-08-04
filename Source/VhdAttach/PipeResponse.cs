@@ -5,8 +5,8 @@
 
         public PipeResponse(bool isError, string message)
         {
-            this.IsError = isError;
-            this.Message = message;
+            IsError = isError;
+            Message = message;
         }
 
         public bool IsError { get; private set; }

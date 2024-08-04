@@ -19,14 +19,15 @@
 //2011-08-26: Added Defaults property.
 
 
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Security;
+using Microsoft.Win32;
 
 namespace Medo.Configuration
 {
@@ -61,7 +62,7 @@ namespace Medo.Configuration
             {
                 lock (_syncRoot)
                 {
-                    if (Settings._subkeyPath == null)
+                    if (_subkeyPath == null)
                     {
                         Assembly assembly = Assembly.GetEntryAssembly();
 
@@ -162,7 +163,7 @@ namespace Medo.Configuration
                     //Registry (HKLM)
                     try
                     {
-                        using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(Settings.SubkeyPath, false))
+                        using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(SubkeyPath, false))
                         {
                             if (rk != null)
                             {
@@ -170,7 +171,7 @@ namespace Medo.Configuration
                                 if (valueLM != null)
                                 {
                                     var valueKind = RegistryValueKind.String;
-                                    if (!Settings.IsRunningOnMono) { rk.GetValueKind(currKey); }
+                                    if (!IsRunningOnMono) { rk.GetValueKind(currKey); }
                                     switch (valueKind)
                                     {
                                         case RegistryValueKind.String:
@@ -190,7 +191,7 @@ namespace Medo.Configuration
                     //Registry (HKCU)
                     try
                     {
-                        using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(Settings.SubkeyPath, false))
+                        using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(SubkeyPath, false))
                         {
                             if (rk != null)
                             {
@@ -198,7 +199,7 @@ namespace Medo.Configuration
                                 if (valueCU != null)
                                 {
                                     var valueKind = RegistryValueKind.String;
-                                    if (!Settings.IsRunningOnMono) { rk.GetValueKind(currKey); }
+                                    if (!IsRunningOnMono) { rk.GetValueKind(currKey); }
                                     switch (valueKind)
                                     {
                                         case RegistryValueKind.String:
@@ -216,16 +217,14 @@ namespace Medo.Configuration
                     catch (SecurityException) { }
 
                     //Defaults
-                    if ((Settings.Defaults != null) && (Settings.Defaults.ContainsKey(currKey)))
+                    if ((Defaults != null) && (Defaults.ContainsKey(currKey)))
                     {
-                        retValue = Settings.Defaults[currKey];
+                        retValue = Defaults[currKey];
                         goto Done;
                     }
 
                     //Default
                     retValue = defaultValue;
-                    goto Done;
-
                 }
                 finally
                 {
@@ -234,7 +233,7 @@ namespace Medo.Configuration
                 }
 
             Done:
-                return (string)retValue;
+                return retValue;
             }
         }
 
@@ -251,7 +250,7 @@ namespace Medo.Configuration
             lock (_syncRoot)
             {
                 Cache.Invalidate(key.ToUpperInvariant());
-                if (Settings.NoRegistryWrites)
+                if (NoRegistryWrites)
                 {
                     Cache.Write(key.ToUpperInvariant(), value);
                 }
@@ -259,7 +258,7 @@ namespace Medo.Configuration
                 {
                     try
                     {
-                        using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(Settings.SubkeyPath))
+                        using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(SubkeyPath))
                         {
                             if (rk != null)
                             {
@@ -320,7 +319,7 @@ namespace Medo.Configuration
                     //registry (HKLM)
                     try
                     {
-                        using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(Settings.SubkeyPath, false))
+                        using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(SubkeyPath, false))
                         {
                             if (rk != null)
                             {
@@ -328,7 +327,7 @@ namespace Medo.Configuration
                                 if (valueLM != null)
                                 {
                                     var valueKind = RegistryValueKind.DWord;
-                                    if (!Settings.IsRunningOnMono) { rk.GetValueKind(currKey); }
+                                    if (!IsRunningOnMono) { rk.GetValueKind(currKey); }
                                     switch (valueKind)
                                     {
                                         case RegistryValueKind.DWord:
@@ -347,7 +346,7 @@ namespace Medo.Configuration
                     //registry (HKCU)
                     try
                     {
-                        using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(Settings.SubkeyPath, false))
+                        using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(SubkeyPath, false))
                         {
                             if (rk != null)
                             {
@@ -355,7 +354,7 @@ namespace Medo.Configuration
                                 if (valueCU != null)
                                 {
                                     var valueKind = RegistryValueKind.DWord;
-                                    if (!Settings.IsRunningOnMono) { rk.GetValueKind(currKey); }
+                                    if (!IsRunningOnMono) { rk.GetValueKind(currKey); }
                                     switch (valueKind)
                                     {
                                         case RegistryValueKind.DWord:
@@ -372,16 +371,14 @@ namespace Medo.Configuration
                     catch (SecurityException) { }
 
                     //Defaults
-                    if ((Settings.Defaults != null) && (Settings.Defaults.ContainsKey(currKey)))
+                    if ((Defaults != null) && (Defaults.ContainsKey(currKey)))
                     {
-                        retValue = int.Parse(Settings.Defaults[currKey], NumberStyles.Integer, CultureInfo.InvariantCulture);
+                        retValue = int.Parse(Defaults[currKey], NumberStyles.Integer, CultureInfo.InvariantCulture);
                         goto Done;
                     }
 
                     //Default
                     retValue = defaultValue;
-                    goto Done;
-
                 }
                 finally
                 {
@@ -407,7 +404,7 @@ namespace Medo.Configuration
             lock (_syncRoot)
             {
                 Cache.Invalidate(key.ToUpperInvariant());
-                if (Settings.NoRegistryWrites)
+                if (NoRegistryWrites)
                 {
                     Cache.Write(key.ToUpperInvariant(), value.ToString(CultureInfo.InvariantCulture));
                 }
@@ -415,7 +412,7 @@ namespace Medo.Configuration
                 {
                     try
                     {
-                        using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(Settings.SubkeyPath))
+                        using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(SubkeyPath))
                         {
                             if (rk != null)
                             {
@@ -504,7 +501,7 @@ namespace Medo.Configuration
                     //registry (HKLM)
                     try
                     {
-                        using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(Settings.SubkeyPath, false))
+                        using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(SubkeyPath, false))
                         {
                             if (rk != null)
                             {
@@ -512,7 +509,7 @@ namespace Medo.Configuration
                                 if (valueRM != null)
                                 {
                                     var valueKind = RegistryValueKind.DWord;
-                                    if (!Settings.IsRunningOnMono) { rk.GetValueKind(currKey); }
+                                    if (!IsRunningOnMono) { rk.GetValueKind(currKey); }
                                     switch (valueKind)
                                     {
                                         case RegistryValueKind.DWord:
@@ -540,7 +537,7 @@ namespace Medo.Configuration
                     //registry (HKCU)
                     try
                     {
-                        using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(Settings.SubkeyPath, false))
+                        using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(SubkeyPath, false))
                         {
                             if (rk != null)
                             {
@@ -548,7 +545,7 @@ namespace Medo.Configuration
                                 if (valueCU != null)
                                 {
                                     var valueKind = RegistryValueKind.DWord;
-                                    if (!Settings.IsRunningOnMono) { rk.GetValueKind(currKey); }
+                                    if (!IsRunningOnMono) { rk.GetValueKind(currKey); }
                                     switch (valueKind)
                                     {
                                         case RegistryValueKind.DWord:
@@ -563,7 +560,7 @@ namespace Medo.Configuration
                                             }
                                             else
                                             {
-                                                retValue = bool.Parse(strValue as string);
+                                                retValue = bool.Parse(strValue);
                                             }
                                             goto Done;
                                     }
@@ -574,9 +571,9 @@ namespace Medo.Configuration
                     catch (SecurityException) { }
 
                     //Defaults
-                    if ((Settings.Defaults != null) && (Settings.Defaults.ContainsKey(currKey)))
+                    if ((Defaults != null) && (Defaults.ContainsKey(currKey)))
                     {
-                        string strValue = Settings.Defaults[currKey];
+                        string strValue = Defaults[currKey];
                         int intValue;
                         if (int.TryParse(strValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out intValue))
                         {
@@ -584,15 +581,13 @@ namespace Medo.Configuration
                         }
                         else
                         {
-                            retValue = bool.Parse(strValue as string);
+                            retValue = bool.Parse(strValue);
                         }
                         goto Done;
                     }
 
                     //Default
                     retValue = defaultValue;
-                    goto Done;
-
                 }
                 finally
                 {
@@ -618,7 +613,7 @@ namespace Medo.Configuration
             lock (_syncRoot)
             {
                 Cache.Invalidate(key.ToUpperInvariant());
-                if (Settings.NoRegistryWrites)
+                if (NoRegistryWrites)
                 {
                     Cache.Write(key.ToUpperInvariant(), value.ToString(CultureInfo.InvariantCulture));
                 }
@@ -626,7 +621,7 @@ namespace Medo.Configuration
                 {
                     try
                     {
-                        using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(Settings.SubkeyPath))
+                        using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(SubkeyPath))
                         {
                             if (rk != null)
                             {
@@ -694,7 +689,7 @@ namespace Medo.Configuration
                     //registry (HKLM)
                     try
                     {
-                        using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(Settings.SubkeyPath, false))
+                        using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(SubkeyPath, false))
                         {
                             if (rk != null)
                             {
@@ -702,7 +697,7 @@ namespace Medo.Configuration
                                 if (valueLM != null)
                                 {
                                     var valueKind = RegistryValueKind.String;
-                                    if (!Settings.IsRunningOnMono) { rk.GetValueKind(currKey); }
+                                    if (!IsRunningOnMono) { rk.GetValueKind(currKey); }
                                     switch (valueKind)
                                     {
                                         case RegistryValueKind.String:
@@ -721,7 +716,7 @@ namespace Medo.Configuration
                     //registry (HKCU)
                     try
                     {
-                        using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(Settings.SubkeyPath, false))
+                        using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(SubkeyPath, false))
                         {
                             if (rk != null)
                             {
@@ -729,7 +724,7 @@ namespace Medo.Configuration
                                 if (valueCU != null)
                                 {
                                     var valueKind = RegistryValueKind.String;
-                                    if (!Settings.IsRunningOnMono) { rk.GetValueKind(currKey); }
+                                    if (!IsRunningOnMono) { rk.GetValueKind(currKey); }
                                     switch (valueKind)
                                     {
                                         case RegistryValueKind.String:
@@ -746,16 +741,14 @@ namespace Medo.Configuration
                     catch (SecurityException) { }
 
                     //Defaults
-                    if ((Settings.Defaults != null) && (Settings.Defaults.ContainsKey(currKey)))
+                    if ((Defaults != null) && (Defaults.ContainsKey(currKey)))
                     {
-                        retValue = double.Parse(Settings.Defaults[currKey], NumberStyles.Float, CultureInfo.InvariantCulture);
+                        retValue = double.Parse(Defaults[currKey], NumberStyles.Float, CultureInfo.InvariantCulture);
                         goto Done;
                     }
 
                     //Default
                     retValue = defaultValue;
-                    goto Done;
-
                 }
                 finally
                 {
@@ -781,7 +774,7 @@ namespace Medo.Configuration
             lock (_syncRoot)
             {
                 Cache.Invalidate(key.ToUpperInvariant());
-                if (Settings.NoRegistryWrites)
+                if (NoRegistryWrites)
                 {
                     Cache.Write(key.ToUpperInvariant(), value.ToString(CultureInfo.InvariantCulture));
                 }
@@ -789,7 +782,7 @@ namespace Medo.Configuration
                 {
                     try
                     {
-                        using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(Settings.SubkeyPath))
+                        using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(SubkeyPath))
                         {
                             if (rk != null)
                             {
@@ -813,7 +806,7 @@ namespace Medo.Configuration
         private static class Cache
         {
 
-            private static System.Collections.Generic.Dictionary<string, string> _cache = new System.Collections.Generic.Dictionary<string, string>();
+            private static Dictionary<string, string> _cache = new Dictionary<string, string>();
             private static readonly object _cacheSyncRoot = new object();
 
 
@@ -878,19 +871,19 @@ namespace Medo.Configuration
 
         #region AppConfig
 
-        private static System.Collections.Generic.Dictionary<string, string> _appConfig;
+        private static Dictionary<string, string> _appConfig;
 
-        private static System.Collections.Generic.Dictionary<string, string> AppConfig
+        private static Dictionary<string, string> AppConfig
         {
             get
             {
                 if (_appConfig == null)
                 {
-                    _appConfig = new System.Collections.Generic.Dictionary<string, string>();
-                    for (int i = 0; i < System.Configuration.ConfigurationManager.AppSettings.Count; ++i)
+                    _appConfig = new Dictionary<string, string>();
+                    for (int i = 0; i < ConfigurationManager.AppSettings.Count; ++i)
                     {
-                        string currKey = System.Configuration.ConfigurationManager.AppSettings.GetKey(i).ToUpperInvariant();
-                        string[] currValues = System.Configuration.ConfigurationManager.AppSettings.GetValues(i);
+                        string currKey = ConfigurationManager.AppSettings.GetKey(i).ToUpperInvariant();
+                        string[] currValues = ConfigurationManager.AppSettings.GetValues(i);
                         string currValue = string.Empty;
                         if (currValues.Length > 0) { currValue = currValues[currValues.Length - 1]; }
                         if (!string.IsNullOrEmpty(currKey))
@@ -946,7 +939,7 @@ namespace Medo.Configuration
             /// <param name="count">Number of items.</param>
             public Args(string[] array, int offset, int count)
             {
-                InitializeFromArray(array, offset, count, new string[] { "/", "--", "-" }, new char[] { ':', '=' });
+                InitializeFromArray(array, offset, count, new[] { "/", "--", "-" }, new[] { ':', '=' });
             }
 
 
@@ -1051,10 +1044,8 @@ namespace Medo.Configuration
                 {
                     return _items[key][_items[key].Count - 1];
                 }
-                else
-                {
-                    return null;
-                }
+
+                return null;
             }
 
 
@@ -1083,13 +1074,13 @@ namespace Medo.Configuration
         /// <param name="value">Setting value.</param>
         public static void SetDefaults(string key, string value)
         {
-            if (Settings.Defaults.ContainsKey(key))
+            if (Defaults.ContainsKey(key))
             {
-                Settings.Defaults[key] = value;
+                Defaults[key] = value;
             }
             else
             {
-                Settings.Defaults.Add(key, value);
+                Defaults.Add(key, value);
             }
         }
         /// <summary>

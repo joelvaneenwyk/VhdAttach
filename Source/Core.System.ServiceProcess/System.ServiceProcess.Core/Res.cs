@@ -8,17 +8,17 @@ namespace System.ServiceProcess
     {
         internal Res()
         {
-            this.resources = new ResourceManager("System.ServiceProcess.Resources", base.GetType().Assembly);
+            resources = new ResourceManager("System.ServiceProcess.Resources", GetType().Assembly);
         }
 
         private static Res GetLoader()
         {
-            if (Res.loader == null)
+            if (loader == null)
             {
                 Res value = new Res();
-                Interlocked.CompareExchange<Res>(ref Res.loader, value, null);
+                Interlocked.CompareExchange(ref loader, value, null);
             }
-            return Res.loader;
+            return loader;
         }
 
         private static CultureInfo Culture
@@ -33,18 +33,18 @@ namespace System.ServiceProcess
         {
             get
             {
-                return Res.GetLoader().resources;
+                return GetLoader().resources;
             }
         }
 
         public static string GetString(string name, params object[] args)
         {
-            Res res = Res.GetLoader();
+            Res res = GetLoader();
             if (res == null)
             {
                 return null;
             }
-            string @string = res.resources.GetString(name, Res.Culture);
+            string @string = res.resources.GetString(name, Culture);
             if (args != null && args.Length != 0)
             {
                 for (int i = 0; i < args.Length; i++)
@@ -62,28 +62,28 @@ namespace System.ServiceProcess
 
         public static string GetString(string name)
         {
-            Res res = Res.GetLoader();
+            Res res = GetLoader();
             if (res == null)
             {
                 return null;
             }
-            return res.resources.GetString(name, Res.Culture);
+            return res.resources.GetString(name, Culture);
         }
 
         public static string GetString(string name, out bool usedFallback)
         {
             usedFallback = false;
-            return Res.GetString(name);
+            return GetString(name);
         }
 
         public static object GetObject(string name)
         {
-            Res res = Res.GetLoader();
+            Res res = GetLoader();
             if (res == null)
             {
                 return null;
             }
-            return res.resources.GetObject(name, Res.Culture);
+            return res.resources.GetObject(name, Culture);
         }
 
         internal const string RTL = "RTL";

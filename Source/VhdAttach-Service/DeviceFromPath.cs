@@ -57,10 +57,8 @@ namespace VhdAttachService
                     {
                         return @"\\?\PHYSICALDRIVE" + wmiPhysicalDiskNumber.ToString(CultureInfo.InvariantCulture);
                     }
-                    else
-                    {
-                        throw new FormatException("Cannot retrieve physical disk number.");
-                    }
+
+                    throw new FormatException("Cannot retrieve physical disk number.");
                 }
             }
             return null;
@@ -99,7 +97,7 @@ namespace VhdAttachService
             if (NativeMethods.QueryDosDeviceW(dosDevice, sb, (uint)sb.Capacity) > 0)
             {
                 var dosPath = sb.ToString();
-                Debug.WriteLine(sb.ToString() + " is at " + dosDevice);
+                Debug.WriteLine(sb + " is at " + dosDevice);
                 if (dosPath.StartsWith(@"\Device\CdRom", StringComparison.OrdinalIgnoreCase))
                 {
                     int cdromNumber = 0;
@@ -118,8 +116,8 @@ namespace VhdAttachService
 
             [DllImportAttribute("kernel32.dll", EntryPoint = "QueryDosDeviceW")]
             public static extern UInt32 QueryDosDeviceW(
-                [InAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] string lpDeviceName,
-                [OutAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpTargetPath,
+                [InAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] string lpDeviceName,
+                [OutAttribute][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpTargetPath,
                 UInt32 ucchMax);
 
         }

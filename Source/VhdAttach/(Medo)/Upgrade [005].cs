@@ -10,6 +10,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -60,7 +61,7 @@ namespace Medo.Services
                 }
             }
             url.Append("/");
-            url.Append(assembly.GetName().Version.ToString());
+            url.Append(assembly.GetName().Version);
             url.Append("/");
             return GetUpgradeFileFromURL(url.ToString());
         }
@@ -97,12 +98,10 @@ namespace Medo.Services
                     frm.StartPosition = FormStartPosition.CenterParent;
                     return frm.ShowDialog(owner);
                 }
-                else
-                {
-                    frm.ShowInTaskbar = true;
-                    frm.StartPosition = FormStartPosition.CenterScreen;
-                    return frm.ShowDialog();
-                }
+
+                frm.ShowInTaskbar = true;
+                frm.StartPosition = FormStartPosition.CenterScreen;
+                return frm.ShowDialog();
             }
         }
 
@@ -124,7 +123,7 @@ namespace Medo.Services
                         case HttpStatusCode.Gone: return null; //no upgrade
                         case HttpStatusCode.MovedPermanently: return GetUpgradeFileFromURL(response.Headers["Location"]); //follow 301 redirect
                         case HttpStatusCode.SeeOther: return new UpgradeFile(new Uri(response.Headers["Location"])); //upgrade at Location
-                        default: throw new InvalidOperationException("Unexpected answer from upgrade server (" + response.StatusCode.ToString() + " " + response.StatusDescription + ").");
+                        default: throw new InvalidOperationException("Unexpected answer from upgrade server (" + response.StatusCode + " " + response.StatusDescription + ").");
                     }
                 }
             }
@@ -139,7 +138,7 @@ namespace Medo.Services
                             case HttpStatusCode.Gone: return null; //no upgrade
                             case HttpStatusCode.Forbidden: return null; //no upgrade (old code)
                             case HttpStatusCode.SeeOther: return new UpgradeFile(new Uri(response.Headers["Location"])); //upgrade at Location
-                            default: throw new InvalidOperationException("Unexpected answer from upgrade server (" + response.StatusCode.ToString() + " " + response.StatusDescription + ").", ex);
+                            default: throw new InvalidOperationException("Unexpected answer from upgrade server (" + response.StatusCode + " " + response.StatusDescription + ").", ex);
                         }
                     }
                 }
@@ -158,18 +157,14 @@ namespace Medo.Services
             {
                 return ((AssemblyProductAttribute)productAttributes[productAttributes.Length - 1]).Product;
             }
-            else
+
+            var titleAttributes = assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), true);
+            if ((titleAttributes != null) && (titleAttributes.Length >= 1))
             {
-                var titleAttributes = assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), true);
-                if ((titleAttributes != null) && (titleAttributes.Length >= 1))
-                {
-                    return ((AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
-                }
-                else
-                {
-                    return assembly.GetName().Name;
-                }
+                return ((AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
             }
+
+            return assembly.GetName().Name;
         }
 
         private static void TryProtocolUpgrade()
@@ -207,7 +202,7 @@ namespace Medo.Services
             private readonly Uri ServiceUri;
             private readonly Assembly Assembly;
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "All controls are disposed in Form's Dispose method.")]
+            [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "All controls are disposed in Form's Dispose method.")]
             internal UpgradeForm(Uri serviceUri, Assembly assembly)
             {
                 ServiceUri = serviceUri;
@@ -223,7 +218,7 @@ namespace Medo.Services
                 ShowIcon = false;
                 Text = string.Format(CultureInfo.CurrentUICulture, Resources.Caption, GetProduct(assembly));
 
-                FormClosing += new FormClosingEventHandler(Form_FormClosing);
+                FormClosing += Form_FormClosing;
 
                 Controls.Add(prgProgress);
                 Controls.Add(lblStatus);
@@ -244,16 +239,16 @@ namespace Medo.Services
                 btnCancel.Location = new Point(ClientSize.Width - btnCancel.Width - 7, ClientSize.Height - btnCancel.Height - 7);
 
 
-                bwCheck.DoWork += new DoWorkEventHandler(bwCheck_DoWork);
-                bwCheck.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bwCheck_RunWorkerCompleted);
+                bwCheck.DoWork += bwCheck_DoWork;
+                bwCheck.RunWorkerCompleted += bwCheck_RunWorkerCompleted;
                 bwCheck.RunWorkerAsync();
 
-                btnUpgrade.Click += new EventHandler(btnUpgrade_Click);
-                btnDownload.Click += new EventHandler(btnDownload_Click);
+                btnUpgrade.Click += btnUpgrade_Click;
+                btnDownload.Click += btnDownload_Click;
 
-                bwDownload.DoWork += new DoWorkEventHandler(bwDownload_DoWork);
-                bwDownload.ProgressChanged += new ProgressChangedEventHandler(bwDownload_ProgressChanged);
-                bwDownload.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bwDownload_RunWorkerCompleted);
+                bwDownload.DoWork += bwDownload_DoWork;
+                bwDownload.ProgressChanged += bwDownload_ProgressChanged;
+                bwDownload.RunWorkerCompleted += bwDownload_RunWorkerCompleted;
             }
 
 
@@ -269,21 +264,21 @@ namespace Medo.Services
             }
 
 
-            private readonly ProgressBar prgProgress = new ProgressBar() { Height = (int)(SystemInformation.HorizontalScrollBarHeight * 1.5), Style = ProgressBarStyle.Marquee };
-            private readonly Label lblStatus = new Label() { AutoSize = true, Text = Resources.StatusChecking };
-            private readonly Button btnCancel = new Button() { AutoSize = true, DialogResult = DialogResult.Cancel, Padding = new Padding(3, 1, 3, 1), Text = Resources.Cancel };
-            private readonly Button btnUpgrade = new Button() { AutoSize = true, Padding = new Padding(3, 1, 3, 1), Text = Resources.Upgrade, Visible = false };
-            private readonly Button btnDownload = new Button() { AutoSize = true, Padding = new Padding(3, 1, 3, 1), Text = Resources.Download, Visible = false };
+            private readonly ProgressBar prgProgress = new ProgressBar { Height = (int)(SystemInformation.HorizontalScrollBarHeight * 1.5), Style = ProgressBarStyle.Marquee };
+            private readonly Label lblStatus = new Label { AutoSize = true, Text = Resources.StatusChecking };
+            private readonly Button btnCancel = new Button { AutoSize = true, DialogResult = DialogResult.Cancel, Padding = new Padding(3, 1, 3, 1), Text = Resources.Cancel };
+            private readonly Button btnUpgrade = new Button { AutoSize = true, Padding = new Padding(3, 1, 3, 1), Text = Resources.Upgrade, Visible = false };
+            private readonly Button btnDownload = new Button { AutoSize = true, Padding = new Padding(3, 1, 3, 1), Text = Resources.Download, Visible = false };
 
-            private readonly BackgroundWorker bwCheck = new BackgroundWorker() { WorkerSupportsCancellation = true };
-            private readonly BackgroundWorker bwDownload = new BackgroundWorker() { WorkerSupportsCancellation = true, WorkerReportsProgress = true };
+            private readonly BackgroundWorker bwCheck = new BackgroundWorker { WorkerSupportsCancellation = true };
+            private readonly BackgroundWorker bwDownload = new BackgroundWorker { WorkerSupportsCancellation = true, WorkerReportsProgress = true };
 
-            private UpgradeFile UpgradeFile = null;
+            private UpgradeFile UpgradeFile;
 
 
             private void bwCheck_DoWork(object sender, DoWorkEventArgs e)
             {
-                e.Result = Medo.Services.Upgrade.GetUpgradeFile(ServiceUri, Assembly);
+                e.Result = GetUpgradeFile(ServiceUri, Assembly);
                 e.Cancel = bwCheck.CancellationPending;
             }
 
@@ -378,7 +373,7 @@ namespace Medo.Services
                 if (e.UserState is string text) { lblStatus.Text = text; }
             }
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "SaveFileDialog is disposed in using.")]
+            [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "SaveFileDialog is disposed in using.")]
             private void bwDownload_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
             {
                 if (e.Cancelled == false)
@@ -407,7 +402,7 @@ namespace Medo.Services
                         else
                         {
                             var filter = string.Format(CultureInfo.CurrentUICulture, Resources.Filter, new FileInfo(UpgradeFile.FileName).Extension);
-                            using (var frm = new SaveFileDialog() { AddExtension = false, CheckPathExists = true, FileName = UpgradeFile.FileName, InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Filter = filter })
+                            using (var frm = new SaveFileDialog { AddExtension = false, CheckPathExists = true, FileName = UpgradeFile.FileName, InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Filter = filter })
                             {
                                 if (frm.ShowDialog(this) == DialogResult.OK)
                                 {
@@ -525,7 +520,7 @@ namespace Medo.Services
         /// <summary>
         /// Returns content stream.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is appropriate since it can produce side effects and each call produces different result.")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is appropriate since it can produce side effects and each call produces different result.")]
         public Stream GetStream()
         {
             var request = (HttpWebRequest)HttpWebRequest.Create(Uri);

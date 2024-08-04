@@ -1,7 +1,10 @@
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using Medo.Windows.Forms;
+using MessageBox = Medo.MessageBox;
 
 namespace VhdAttach
 {
@@ -10,9 +13,9 @@ namespace VhdAttach
         public RemoveIntegrityStreamForm(FileInfo file)
         {
             InitializeComponent();
-            this.Font = SystemFonts.MessageBoxFont;
+            Font = SystemFonts.MessageBoxFont;
 
-            this.File = file;
+            File = file;
         }
 
         private readonly FileInfo File;
@@ -20,28 +23,28 @@ namespace VhdAttach
 
         private void Form_Load(object sender, EventArgs e)
         {
-            Medo.Windows.Forms.TaskbarProgress.SetState(Medo.Windows.Forms.TaskbarProgressState.Indeterminate);
+            TaskbarProgress.SetState(TaskbarProgressState.Indeterminate);
             bwAction.RunWorkerAsync();
         }
 
         private void Form_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Medo.Windows.Forms.TaskbarProgress.SetState(Medo.Windows.Forms.TaskbarProgressState.NoProgress);
+            TaskbarProgress.SetState(TaskbarProgressState.NoProgress);
         }
 
 
-        private void bwAction_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        private void bwAction_DoWork(object sender, DoWorkEventArgs e)
         {
-            ReFS.RemoveIntegrityStream(this.File);
+            ReFS.RemoveIntegrityStream(File);
         }
 
-        private void bwAction_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        private void bwAction_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Error != null)
             {
-                Medo.MessageBox.ShowError(this, "Cannot remove integrity stream.\n\n" + e.Error.Message);
+                MessageBox.ShowError(this, "Cannot remove integrity stream.\n\n" + e.Error.Message);
             }
-            this.Close();
+            Close();
         }
 
     }

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Medo.Reflection;
 
 namespace VhdAttachService
 {
@@ -15,43 +16,43 @@ namespace VhdAttachService
 
         internal static void Show()
         {
-            Tray.Notify = new NotifyIcon();
+            Notify = new NotifyIcon();
             // TODO ContextMenu is no longer supported. Use ContextMenuStrip instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
-            Tray.Notify.ContextMenuStrip = new ContextMenuStrip();
+            Notify.ContextMenuStrip = new ContextMenuStrip();
             // TODO MenuItem is no longer supported. Use ToolStripMenuItem instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
-            Tray.Notify.ContextMenuStrip.Items.Add(new ToolStripMenuItem("Exit", null, Tray_Exit_OnClick));
-            Tray.Notify.Icon = GetApplicationIcon();
-            Tray.Notify.Text = Medo.Reflection.CallingAssembly.Title;
-            Tray.Notify.Visible = true;
+            Notify.ContextMenuStrip.Items.Add(new ToolStripMenuItem("Exit", null, Tray_Exit_OnClick));
+            Notify.Icon = GetApplicationIcon();
+            Notify.Text = CallingAssembly.Title;
+            Notify.Visible = true;
         }
 
         internal static void SetStatusToRunningInteractive()
         {
-            Tray.Notify.Icon = GetAnnotatedIcon(Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(Medo.Reflection.CallingAssembly.Name + ".Resources.Service_RunningInteractive_12.png")));
-            Tray.Notify.Text = Medo.Reflection.CallingAssembly.Title + " (PID=" + Process.GetCurrentProcess().Id.ToString(CultureInfo.InvariantCulture) + ")";
+            Notify.Icon = GetAnnotatedIcon(Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(CallingAssembly.Name + ".Resources.Service_RunningInteractive_12.png")));
+            Notify.Text = CallingAssembly.Title + " (PID=" + Process.GetCurrentProcess().Id.ToString(CultureInfo.InvariantCulture) + ")";
         }
 
         internal static void SetStatusToUnknown()
         {
-            Tray.Notify.Icon = GetAnnotatedIcon(Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(Medo.Reflection.CallingAssembly.Name + ".Resources.Service_Unknown_12.png")));
-            Tray.Notify.Text = Medo.Reflection.CallingAssembly.Title + " - Unknown state.";
+            Notify.Icon = GetAnnotatedIcon(Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(CallingAssembly.Name + ".Resources.Service_Unknown_12.png")));
+            Notify.Text = CallingAssembly.Title + " - Unknown state.";
         }
 
         internal static void SetStatusToRunning()
         {
-            Tray.Notify.Icon = GetAnnotatedIcon(Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(Medo.Reflection.CallingAssembly.Name + ".Resources.Service_Running_12.png")));
-            Tray.Notify.Text = Medo.Reflection.CallingAssembly.Title + " - Running.";
+            Notify.Icon = GetAnnotatedIcon(Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(CallingAssembly.Name + ".Resources.Service_Running_12.png")));
+            Notify.Text = CallingAssembly.Title + " - Running.";
         }
 
         internal static void SetStatusToStopped()
         {
-            Tray.Notify.Icon = GetAnnotatedIcon(Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(Medo.Reflection.CallingAssembly.Name + ".Resources.Service_Stopped_12.png")));
-            Tray.Notify.Text = Medo.Reflection.CallingAssembly.Title + " - Stopped.";
+            Notify.Icon = GetAnnotatedIcon(Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(CallingAssembly.Name + ".Resources.Service_Stopped_12.png")));
+            Notify.Text = CallingAssembly.Title + " - Stopped.";
         }
 
         internal static void Hide()
         {
-            Tray.Notify.Visible = false;
+            Notify.Visible = false;
         }
 
 
@@ -90,7 +91,7 @@ namespace VhdAttachService
             if (!hLibrary.Equals(IntPtr.Zero))
             {
                 IntPtr hIcon = NativeMethods.LoadImage(hLibrary, "#32512", NativeMethods.IMAGE_ICON, 20, 20, 0);
-                if (!hIcon.Equals(System.IntPtr.Zero))
+                if (!hIcon.Equals(IntPtr.Zero))
                 {
                     Icon icon = Icon.FromHandle(hIcon);
                     if (icon != null) { return icon; }

@@ -1,10 +1,12 @@
-﻿using Medo.Extensions;
-using Medo.Localization.Croatia;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
+using Medo.Extensions;
+using Medo.IO;
+using Medo.Localization.Croatia;
+using MessageBox = Medo.MessageBox;
 
 namespace VhdAttach
 {
@@ -13,7 +15,7 @@ namespace VhdAttach
         public NewDiskForm()
         {
             InitializeComponent();
-            this.Font = SystemFonts.MessageBoxFont;
+            Font = SystemFonts.MessageBoxFont;
 
             erpError.SetIconAlignment(btnOK, ErrorIconAlignment.MiddleLeft);
             erpError.SetIconPadding(btnOK, SystemInformation.Border3DSize.Width);
@@ -38,7 +40,7 @@ namespace VhdAttach
         {
             try
             {
-                this.Cursor = Cursors.WaitCursor;
+                Cursor = Cursors.WaitCursor;
 
                 var isFormatVhdX = radFormatVhdX.Checked;
                 var isFormatVhd = !isFormatVhdX;
@@ -49,11 +51,11 @@ namespace VhdAttach
 
                 var filter = isFormatVhdX ? "Virtual disk files (*.vhdx)|*.vhdx|All files (*.*)|*.*" : "Virtual disk files (*.vhd)|*.vhd|All files (*.*)|*.*";
 
-                using (var frm = new SaveFileDialog() { AddExtension = true, AutoUpgradeEnabled = true, Filter = filter, FilterIndex = 0, OverwritePrompt = true, Title = "New disk", ValidateNames = true })
+                using (var frm = new SaveFileDialog { AddExtension = true, AutoUpgradeEnabled = true, Filter = filter, FilterIndex = 0, OverwritePrompt = true, Title = "New disk", ValidateNames = true })
                 {
                     if (frm.ShowDialog(this) == DialogResult.OK)
                     {
-                        this.FileName = frm.FileName;
+                        FileName = frm.FileName;
                     }
                     else
                     {
@@ -64,21 +66,21 @@ namespace VhdAttach
                 DriveInfo drive = null;
                 try
                 {
-                    drive = new DriveInfo(this.FileName);
+                    drive = new DriveInfo(FileName);
                     if (drive.DriveFormat.Equals("NTFS", StringComparison.OrdinalIgnoreCase) == false)
                     {
                         if ((Environment.OSVersion.Version.Major * 1000000 + Environment.OSVersion.Version.Minor) < 6000002)
                         { //Windows 8
                             if (isFormatVhd && isTypeFixed)
                             {
-                                if (Medo.MessageBox.ShowWarning(this, "Due to operating system limitations, virtual disk created on this drive will not be attachable.\nIn order to attach virtual disk it will need to be on NTFS-formatted drive.\n\nDo you wish to continue?", MessageBoxButtons.YesNo) == DialogResult.No)
+                                if (MessageBox.ShowWarning(this, "Due to operating system limitations, virtual disk created on this drive will not be attachable.\nIn order to attach virtual disk it will need to be on NTFS-formatted drive.\n\nDo you wish to continue?", MessageBoxButtons.YesNo) == DialogResult.No)
                                 {
                                     return;
                                 }
                             }
                             else
                             {
-                                if (Medo.MessageBox.ShowWarning(this, "Due to operating system limitations, virtual disk cannot be created.\nIn order to create and attach virtual disk it will need to be on NTFS-formatted drive.\n\nDo you wish to continue anyway?", MessageBoxButtons.YesNo, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                                if (MessageBox.ShowWarning(this, "Due to operating system limitations, virtual disk cannot be created.\nIn order to create and attach virtual disk it will need to be on NTFS-formatted drive.\n\nDo you wish to continue anyway?", MessageBoxButtons.YesNo, MessageBoxDefaultButton.Button2) == DialogResult.No)
                                 {
                                     return;
                                 }
@@ -91,18 +93,18 @@ namespace VhdAttach
 
                 try
                 {
-                    File.Delete(this.FileName);
+                    File.Delete(FileName);
                 }
                 catch (IOException ex)
                 {
-                    this.Cursor = Cursors.Default;
-                    Medo.MessageBox.ShowError(this, "File cannot be deleted.\n\n" + ex.Message);
+                    Cursor = Cursors.Default;
+                    MessageBox.ShowError(this, "File cannot be deleted.\n\n" + ex.Message);
                     return;
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    this.Cursor = Cursors.Default;
-                    Medo.MessageBox.ShowError(this, "File cannot be deleted.\n\n" + ex.Message);
+                    Cursor = Cursors.Default;
+                    MessageBox.ShowError(this, "File cannot be deleted.\n\n" + ex.Message);
                     return;
                 }
 
@@ -114,14 +116,14 @@ namespace VhdAttach
                     { //yes, no overhead is calculated in
                         if (isTypeFixed)
                         {
-                            if (Medo.MessageBox.ShowWarning(this, string.Format("There is not enough free space available!\nVirtual disk will require {0} while drive has only {1} free.\n\nDo you wish to continue?", BinaryPrefixExtensions.ToBinaryPrefixString(diskSize, "B", "0"), BinaryPrefixExtensions.ToBinaryPrefixString(drive.AvailableFreeSpace, "B", "0")), MessageBoxButtons.YesNo) == DialogResult.No)
+                            if (MessageBox.ShowWarning(this, string.Format("There is not enough free space available!\nVirtual disk will require {0} while drive has only {1} free.\n\nDo you wish to continue?", BinaryPrefixExtensions.ToBinaryPrefixString(diskSize, "B", "0"), BinaryPrefixExtensions.ToBinaryPrefixString(drive.AvailableFreeSpace, "B", "0")), MessageBoxButtons.YesNo) == DialogResult.No)
                             {
                                 return;
                             }
                         }
                         else
                         {
-                            if (Medo.MessageBox.ShowInformation(this, string.Format("This disk can expand to size larger than free space available at the moment.\nVirtual disk will require {0} while drive has only {1} free.\n\nDo you wish to continue?", BinaryPrefixExtensions.ToBinaryPrefixString(diskSize, "B", "0"), BinaryPrefixExtensions.ToBinaryPrefixString(drive.AvailableFreeSpace, "B", "0")), MessageBoxButtons.YesNo) == DialogResult.No)
+                            if (MessageBox.ShowInformation(this, string.Format("This disk can expand to size larger than free space available at the moment.\nVirtual disk will require {0} while drive has only {1} free.\n\nDo you wish to continue?", BinaryPrefixExtensions.ToBinaryPrefixString(diskSize, "B", "0"), BinaryPrefixExtensions.ToBinaryPrefixString(drive.AvailableFreeSpace, "B", "0")), MessageBoxButtons.YesNo) == DialogResult.No)
                             {
                                 return;
                             }
@@ -129,7 +131,7 @@ namespace VhdAttach
                     }
                     if (drive.DriveFormat.Equals("FAT32", StringComparison.OrdinalIgnoreCase) && (diskSize > int.MaxValue * 0.9))
                     { //just give warning if getting close to 2GB limit
-                        if (Medo.MessageBox.ShowWarning(this, "Due to operating system limitations it will not be possible to create virtual disk larger than 2 GB.\n\nDo you wish to continue?", MessageBoxButtons.YesNo) == DialogResult.No)
+                        if (MessageBox.ShowWarning(this, "Due to operating system limitations it will not be possible to create virtual disk larger than 2 GB.\n\nDo you wish to continue?", MessageBoxButtons.YesNo) == DialogResult.No)
                         {
                             return;
                         }
@@ -143,7 +145,7 @@ namespace VhdAttach
                     {
                         if (isTypeFixed)
                         {
-                            using (var frm = new CreateFixedDiskForm(this.FileName, diskSize, isFormatVhdX))
+                            using (var frm = new CreateFixedDiskForm(FileName, diskSize, isFormatVhdX))
                             {
                                 if (frm.ShowDialog(this) == DialogResult.Cancel)
                                 {
@@ -153,15 +155,15 @@ namespace VhdAttach
                         }
                         else
                         { //Dynamic
-                            using (var vhd = new Medo.IO.VirtualDisk(this.FileName))
+                            using (var vhd = new VirtualDisk(FileName))
                             {
                                 if (isFormatVhdX)
                                 {
-                                    vhd.Create(diskSize, Medo.IO.VirtualDiskCreateOptions.None, 0, 0, Medo.IO.VirtualDiskType.Vhdx);
+                                    vhd.Create(diskSize, VirtualDiskCreateOptions.None, 0, 0, VirtualDiskType.Vhdx);
                                 }
                                 else
                                 {
-                                    vhd.Create(diskSize, Medo.IO.VirtualDiskCreateOptions.None, 0, 0, Medo.IO.VirtualDiskType.Vhd);
+                                    vhd.Create(diskSize, VirtualDiskCreateOptions.None, 0, 0, VirtualDiskType.Vhd);
                                 }
                             }
                         }
@@ -173,16 +175,16 @@ namespace VhdAttach
                 }
                 catch (InvalidOperationException ex)
                 {
-                    this.Cursor = Cursors.Default;
-                    Medo.MessageBox.ShowError(this, "Virtual disk cannot be created.\n\n" + ex.Message);
+                    Cursor = Cursors.Default;
+                    MessageBox.ShowError(this, "Virtual disk cannot be created.\n\n" + ex.Message);
                     return;
                 }
 
-                this.DialogResult = DialogResult.OK;
+                DialogResult = DialogResult.OK;
             }
             finally
             {
-                this.Cursor = Cursors.Default;
+                Cursor = Cursors.Default;
             }
         }
 
@@ -309,14 +311,13 @@ namespace VhdAttach
             {
                 return (size / 1024.0 / 1024.0).ToString("0.#", CultureInfo.CurrentCulture);
             }
-            else if (unit.Equals("GB", StringComparison.OrdinalIgnoreCase))
+
+            if (unit.Equals("GB", StringComparison.OrdinalIgnoreCase))
             {
                 return (size / 1024.0 / 1024.0 / 1024.0).ToString("0.##", CultureInfo.CurrentCulture);
             }
-            else
-            {
-                return size.ToString(CultureInfo.CurrentUICulture);
-            }
+
+            return size.ToString(CultureInfo.CurrentUICulture);
         }
 
         private static long GetSizeInBytes(string text, string unit, bool use1000 = false)
@@ -330,19 +331,16 @@ namespace VhdAttach
                 {
                     return Convert.ToInt64(value * divider * divider);
                 }
-                else if (unit.Equals("GB", StringComparison.OrdinalIgnoreCase))
+
+                if (unit.Equals("GB", StringComparison.OrdinalIgnoreCase))
                 {
                     return Convert.ToInt64(value * divider * divider * divider);
                 }
-                else
-                {
-                    return Convert.ToInt64(value);
-                }
+
+                return Convert.ToInt64(value);
             }
-            else
-            {
-                return 0;
-            }
+
+            return 0;
         }
 
         private static bool TryParseNumber(string text, out decimal value)
@@ -353,11 +351,9 @@ namespace VhdAttach
                 value = number;
                 return true;
             }
-            else
-            {
-                value = 0;
-                return false;
-            }
+
+            value = 0;
+            return false;
         }
 
     }

@@ -76,7 +76,7 @@ namespace VhdAttachCommon
             }
             set
             {
-                if (value == true)
+                if (value)
                 {
                     using (var rk = Registry.ClassesRoot.OpenSubKey(@".vhd", RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.CreateSubKey))
                     {
@@ -130,7 +130,7 @@ namespace VhdAttachCommon
             }
             set
             {
-                if (value == true)
+                if (value)
                 {
                     using (var rk = Registry.ClassesRoot.OpenSubKey(@".iso\OpenWithProgids", RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.CreateSubKey | RegistryRights.SetValue))
                     {
@@ -162,7 +162,7 @@ namespace VhdAttachCommon
             }
             set
             {
-                if (value == true)
+                if (value)
                 {
                     using (var rk = Registry.ClassesRoot.OpenSubKey(@"Windows.VhdFile\shell", RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl))
                     {
@@ -209,7 +209,7 @@ namespace VhdAttachCommon
             }
             set
             {
-                if (value == true)
+                if (value)
                 {
                     using (var rk = Registry.ClassesRoot.OpenSubKey(@"Windows.VhdFile\shell", RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl))
                     {
@@ -250,7 +250,7 @@ namespace VhdAttachCommon
             }
             set
             {
-                if (value == true)
+                if (value)
                 {
                     using (var rk = Registry.ClassesRoot.OpenSubKey(@"Windows.VhdFile\shell", RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl))
                     {
@@ -291,7 +291,7 @@ namespace VhdAttachCommon
             }
             set
             {
-                if (value == true)
+                if (value)
                 {
                     using (var rk = Registry.ClassesRoot.OpenSubKey(@"Windows.VhdFile\shell", RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl))
                     {
@@ -334,7 +334,7 @@ namespace VhdAttachCommon
             set
             {
                 if ((Environment.OSVersion.Version.Major * 1000000 + Environment.OSVersion.Version.Minor) >= 6000002) { return; } //if Windows 8 or higher, ignore
-                if (value == true)
+                if (value)
                 {
                     using (var rk = Registry.ClassesRoot.OpenSubKey(@"Drive\shell", RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl))
                     {
@@ -378,7 +378,7 @@ namespace VhdAttachCommon
             set
             {
                 if ((Environment.OSVersion.Version.Major * 1000000 + Environment.OSVersion.Version.Minor) < 6000002) { return; } //if lower than Windows 8, ignore
-                if (value == true)
+                if (value)
                 {
                     using (var rk = Registry.ClassesRoot.OpenSubKey(@"Windows.IsoFile\shell", RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl))
                     {
@@ -427,7 +427,7 @@ namespace VhdAttachCommon
             set
             {
                 if ((Environment.OSVersion.Version.Major * 1000000 + Environment.OSVersion.Version.Minor) < 6000002) { return; } //if lower than Windows 8, ignore
-                if (value == true)
+                if (value)
                 {
                     using (var rk = Registry.ClassesRoot.OpenSubKey(@"Windows.IsoFile\shell", RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl))
                     {
@@ -470,7 +470,7 @@ namespace VhdAttachCommon
             set
             {
                 if ((Environment.OSVersion.Version.Major * 1000000 + Environment.OSVersion.Version.Minor) < 6000002) { return; } //if lower than Windows 8, ignore
-                if (value == true)
+                if (value)
                 {
                     using (var rk = Registry.ClassesRoot.OpenSubKey(@"Windows.IsoFile\shell", RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl))
                     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
@@ -12,14 +13,14 @@ namespace VhdAttach
         public ServiceWaitForm(string title, Action action)
         {
             InitializeComponent();
-            this.Font = SystemFonts.MessageBoxFont;
-            this.ControlBox = false;
+            Font = SystemFonts.MessageBoxFont;
+            ControlBox = false;
 
-            this.Text = title;
+            Text = title;
             bw.RunWorkerAsync(action);
         }
 
-        private void bw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        private void bw_DoWork(object sender, DoWorkEventArgs e)
         {
             var exceptions = new List<Exception>();
             var action = (Action)e.Argument;
@@ -33,23 +34,21 @@ namespace VhdAttach
                 {
                     throw ex.InnerException;
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
         }
 
-        private void bw_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Error == null)
             {
-                this.DialogResult = DialogResult.OK;
+                DialogResult = DialogResult.OK;
             }
             else
             {
                 Messages.ShowServiceIOException(this, e.Error);
-                this.DialogResult = DialogResult.Cancel;
+                DialogResult = DialogResult.Cancel;
             }
         }
 

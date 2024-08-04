@@ -5,6 +5,8 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Medo.Diagnostics;
+using Medo.IO;
 using Medo.Net;
 using VhdAttachCommon;
 
@@ -13,7 +15,7 @@ namespace VhdAttachService
     internal static class PipeServer
     {
 
-        public static Medo.IO.NamedPipe Pipe = new Medo.IO.NamedPipe("JosipMedved-VhdAttach-Commands");
+        public static NamedPipe Pipe = new NamedPipe("JosipMedved-VhdAttach-Commands");
 
         public static void Start()
         {
@@ -79,10 +81,8 @@ namespace VhdAttachService
                     return GetResponse(packet, ex);
                 }
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
 
@@ -95,17 +95,17 @@ namespace VhdAttachService
                 var isReadOnly = packet["MountReadOnly"].Equals("True", StringComparison.OrdinalIgnoreCase);
                 var shouldInitialize = packet["InitializeDisk"].Equals("True", StringComparison.OrdinalIgnoreCase);
                 string diskPath = null;
-                using (var disk = new Medo.IO.VirtualDisk(path))
+                using (var disk = new VirtualDisk(path))
                 {
-                    var access = Medo.IO.VirtualDiskAccessMask.All;
-                    var options = Medo.IO.VirtualDiskAttachOptions.PermanentLifetime;
+                    var access = VirtualDiskAccessMask.All;
+                    var options = VirtualDiskAttachOptions.PermanentLifetime;
                     if (isReadOnly)
                     {
                         if (shouldInitialize == false)
                         {
-                            access = Medo.IO.VirtualDiskAccessMask.AttachReadOnly;
+                            access = VirtualDiskAccessMask.AttachReadOnly;
                         }
-                        options |= Medo.IO.VirtualDiskAttachOptions.ReadOnly;
+                        options |= VirtualDiskAttachOptions.ReadOnly;
                     }
                     disk.Open(access);
                     disk.Attach(options);
@@ -127,9 +127,9 @@ namespace VhdAttachService
             try
             {
                 var path = packet["Path"];
-                using (var disk = new Medo.IO.VirtualDisk(path))
+                using (var disk = new VirtualDisk(path))
                 {
-                    disk.Open(Medo.IO.VirtualDiskAccessMask.Detach);
+                    disk.Open(VirtualDiskAccessMask.Detach);
                     disk.Detach();
                 }
             }
@@ -163,7 +163,7 @@ namespace VhdAttachService
             }
             catch (Exception ex)
             {
-                Medo.Diagnostics.ErrorReport.SaveToTemp(ex);
+                ErrorReport.SaveToTemp(ex);
                 throw new InvalidOperationException("Settings cannot be written.", ex);
             }
         }
@@ -178,7 +178,7 @@ namespace VhdAttachService
             }
             catch (Exception ex)
             {
-                Medo.Diagnostics.ErrorReport.SaveToTemp(ex);
+                ErrorReport.SaveToTemp(ex);
                 throw new InvalidOperationException("Settings cannot be written.", ex);
             }
         }
@@ -191,7 +191,7 @@ namespace VhdAttachService
             }
             catch (Exception ex)
             {
-                Medo.Diagnostics.ErrorReport.SaveToTemp(ex);
+                ErrorReport.SaveToTemp(ex);
                 throw new InvalidOperationException("Auto-attach list cannot be written.", ex);
             }
         }
@@ -204,7 +204,7 @@ namespace VhdAttachService
             }
             catch (Exception ex)
             {
-                Medo.Diagnostics.ErrorReport.SaveToTemp(ex);
+                ErrorReport.SaveToTemp(ex);
                 throw new InvalidOperationException("Settings cannot be written.", ex);
             }
         }
@@ -217,7 +217,7 @@ namespace VhdAttachService
             }
             catch (Exception ex)
             {
-                Medo.Diagnostics.ErrorReport.SaveToTemp(ex);
+                ErrorReport.SaveToTemp(ex);
                 throw new InvalidOperationException("Settings cannot be written.", ex);
             }
         }
@@ -239,7 +239,7 @@ namespace VhdAttachService
             }
             catch (Exception ex)
             {
-                Medo.Diagnostics.ErrorReport.SaveToTemp(ex);
+                ErrorReport.SaveToTemp(ex);
                 throw new InvalidOperationException("Cannot change drive letter.", ex);
             }
         }
@@ -248,7 +248,7 @@ namespace VhdAttachService
         private static FileWithOptions[] GetFwoArray(string lines)
         {
             var files = new List<FileWithOptions>();
-            foreach (var line in lines.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var line in lines.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 files.Add(new FileWithOptions(line));
             }
@@ -350,10 +350,8 @@ namespace VhdAttachService
                             vhdFile = new FileInfo(vdiskProperties.pPath);
                             break;
                         }
-                        else
-                        {
-                            Trace.TraceError(diskProperties.pwszName + " = " + vdiskProperties.pPath);
-                        }
+
+                        Trace.TraceError(diskProperties.pwszName + " = " + vdiskProperties.pPath);
                         Console.WriteLine("-> Disk Name=" + diskProperties.pwszName);
                         Console.WriteLine("-> Disk Friendly=" + diskProperties.pwszFriendlyName);
                     }
@@ -366,9 +364,9 @@ namespace VhdAttachService
 
             if (vhdFile != null)
             {
-                using (var disk = new Medo.IO.VirtualDisk(vhdFile.FullName))
+                using (var disk = new VirtualDisk(vhdFile.FullName))
                 {
-                    disk.Open(Medo.IO.VirtualDiskAccessMask.Detach);
+                    disk.Open(VirtualDiskAccessMask.Detach);
                     disk.Detach();
                 }
             }
@@ -406,17 +404,17 @@ namespace VhdAttachService
 
                 public override bool IsInvalid
                 {
-                    get { return (this.IsClosed) || (base.handle == minusOne); }
+                    get { return (IsClosed) || (handle == minusOne); }
                 }
 
                 protected override bool ReleaseHandle()
                 {
-                    return CloseHandle(this.handle);
+                    return CloseHandle(handle);
                 }
 
                 public override string ToString()
                 {
-                    return this.handle.ToString();
+                    return handle.ToString();
                 }
 
             }
@@ -424,7 +422,7 @@ namespace VhdAttachService
 
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool CloseHandle(System.IntPtr hObject);
+            public static extern bool CloseHandle(IntPtr hObject);
 
         }
 

@@ -6,6 +6,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -57,17 +58,15 @@ namespace Medo.Windows.Forms
         public static void SetState(IWin32Window owner, TaskbarProgressState newState)
         {
             if (owner == null) { throw new ArgumentNullException("owner", "Owner cannot be null."); }
-            if (TaskbarProgress.IsRunningOnMono) { return; } //Mono has troubles with accessing COM.
-            if (System.Environment.OSVersion.Version.Build < 7000)
+            if (IsRunningOnMono) { return; } //Mono has troubles with accessing COM.
+            if (Environment.OSVersion.Version.Build < 7000)
             {
                 if (DoNotThrowNotImplementedException)
                 {
                     return;
                 }
-                else
-                {
-                    throw new NotImplementedException("Operation is only supported on Windows 7 and above.");
-                }
+
+                throw new NotImplementedException("Operation is only supported on Windows 7 and above.");
             }
             Init();
             try
@@ -108,17 +107,15 @@ namespace Medo.Windows.Forms
         public static void SetPercentage(IWin32Window owner, int newProgressPercentage)
         {
             if (owner == null) { throw new ArgumentNullException("owner", "Owner cannot be null."); }
-            if (TaskbarProgress.IsRunningOnMono) { return; } //Mono has troubles with accessing COM.
-            if (System.Environment.OSVersion.Version.Build < 7000)
+            if (IsRunningOnMono) { return; } //Mono has troubles with accessing COM.
+            if (Environment.OSVersion.Version.Build < 7000)
             {
                 if (DoNotThrowNotImplementedException)
                 {
                     return;
                 }
-                else
-                {
-                    throw new NotImplementedException("Operation is only supported on Windows 7 and above.");
-                }
+
+                throw new NotImplementedException("Operation is only supported on Windows 7 and above.");
             }
             Init();
             try
@@ -167,10 +164,10 @@ namespace Medo.Windows.Forms
 
             [GuidAttribute("56FDF344-FD6D-11d0-958A-006097C9A090")]
             [ClassInterfaceAttribute(ClassInterfaceType.None)]
-            [ComImportAttribute()]
+            [ComImportAttribute]
             internal class CTaskbarList { }
 
-            [ComImportAttribute()]
+            [ComImportAttribute]
             [GuidAttribute("ea1afb91-9e28-4b86-90e9-9e9f8a5eefaf")]
             [InterfaceTypeAttribute(ComInterfaceType.InterfaceIsIUnknown)]
             internal interface ITaskbarList3
@@ -209,7 +206,7 @@ namespace Medo.Windows.Forms
     /// <summary>
     /// Flags that control the current state of the progress button. Specify only one of the following flags; all states are mutually exclusive of all others.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1027:MarkEnumsWithFlags", Justification = "These values are not flags. Only one can be set at any given time.")]
+    [SuppressMessage("Microsoft.Design", "CA1027:MarkEnumsWithFlags", Justification = "These values are not flags. Only one can be set at any given time.")]
     public enum TaskbarProgressState
     {
         /// <summary>

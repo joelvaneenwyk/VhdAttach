@@ -13,7 +13,10 @@
 
 
 using System;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace Medo.Application
 {
@@ -39,7 +42,7 @@ namespace Medo.Application
         {
             lock (SyncRoot)
             {
-                Attach(System.Windows.Forms.UnhandledExceptionMode.CatchException, true);
+                Attach(UnhandledExceptionMode.CatchException, true);
             }
         }
 
@@ -47,7 +50,7 @@ namespace Medo.Application
         /// Initializes handlers for unhandled exception.
         /// </summary>
         /// <param name="mode">Defines where a Windows Forms application should send unhandled exceptions.</param>
-        public static void Attach(System.Windows.Forms.UnhandledExceptionMode mode)
+        public static void Attach(UnhandledExceptionMode mode)
         {
             lock (SyncRoot)
             {
@@ -60,13 +63,13 @@ namespace Medo.Application
         /// </summary>
         /// <param name="mode">Defines where a Windows Forms application should send unhandled exceptions.</param>
         /// <param name="threadScope">True to set the thread exception mode.</param>
-        public static void Attach(System.Windows.Forms.UnhandledExceptionMode mode, bool threadScope)
+        public static void Attach(UnhandledExceptionMode mode, bool threadScope)
         {
             lock (SyncRoot)
             {
                 System.Windows.Forms.Application.SetUnhandledExceptionMode(mode, threadScope);
                 System.Windows.Forms.Application.ThreadException += Application_ThreadException;
-                System.AppDomain.CurrentDomain.UnhandledException += AppDomain_UnhandledException;
+                AppDomain.CurrentDomain.UnhandledException += AppDomain_UnhandledException;
             }
         }
 
@@ -77,14 +80,14 @@ namespace Medo.Application
         /// <param name="threadScope">True to set the thread exception mode.</param>
         /// <param name="useFailFast">When true, FailFast will be used to stop application. If false, standard Environment.Exit will be used instead.</param>
         [Obsolete("Use UseFailFast property instead.")]
-        public static void Attach(System.Windows.Forms.UnhandledExceptionMode mode, bool threadScope, bool useFailFast)
+        public static void Attach(UnhandledExceptionMode mode, bool threadScope, bool useFailFast)
         {
             lock (SyncRoot)
             {
-                UnhandledCatch.UseFailFast = useFailFast;
+                UseFailFast = useFailFast;
                 System.Windows.Forms.Application.SetUnhandledExceptionMode(mode, threadScope);
                 System.Windows.Forms.Application.ThreadException += Application_ThreadException;
-                System.AppDomain.CurrentDomain.UnhandledException += AppDomain_UnhandledException;
+                AppDomain.CurrentDomain.UnhandledException += AppDomain_UnhandledException;
             }
         }
 
@@ -99,15 +102,15 @@ namespace Medo.Application
             set { lock (SyncRoot) { _useFailFast = value && !IsRunningOnMono; } }
         }
 
-        private static void AppDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
+        private static void AppDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             lock (SyncRoot)
             {
-                Process(e.ExceptionObject as System.Exception);
+                Process(e.ExceptionObject as Exception);
             }
         }
 
-        private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
             lock (SyncRoot)
             {
@@ -116,32 +119,32 @@ namespace Medo.Application
         }
 
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "General exceptions are catched on purpose because this is handler for unhandled exceptions.")]
-        private static void Process(System.Exception exception)
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "General exceptions are catched on purpose because this is handler for unhandled exceptions.")]
+        private static void Process(Exception exception)
         {
             lock (SyncRoot)
             {
-                System.Environment.ExitCode = unchecked((int)0x8000ffff); //E_UNEXPECTED(0x8000ffff)
+                Environment.ExitCode = unchecked((int)0x8000ffff); //E_UNEXPECTED(0x8000ffff)
 
                 if (exception != null)
                 {
-                    System.Diagnostics.Trace.TraceError(exception.ToString() + "  {Medo.Application.UnhandledCatch}");
+                    Trace.TraceError(exception + "  {Medo.Application.UnhandledCatch}");
 
                     System.Windows.Forms.Application.ThreadException -= Application_ThreadException;
-                    System.AppDomain.CurrentDomain.UnhandledException -= AppDomain_UnhandledException;
+                    AppDomain.CurrentDomain.UnhandledException -= AppDomain_UnhandledException;
 
                     if (ThreadException != null) { ThreadException(null, new ThreadExceptionEventArgs(exception)); }
                 }
 
-                System.Diagnostics.Trace.TraceError("Exit(E_UNEXPECTED): Unhandled exception has occurred.  {Medo.Application.UnhandledCatch}");
+                Trace.TraceError("Exit(E_UNEXPECTED): Unhandled exception has occurred.  {Medo.Application.UnhandledCatch}");
 
-                if (UnhandledCatch.UseFailFast)
+                if (UseFailFast)
                 {
-                    System.Environment.FailFast(exception.Message);
+                    Environment.FailFast(exception.Message);
                 }
                 else
                 {
-                    System.Environment.Exit(unchecked((int)0x8000ffff)); //E_UNEXPECTED(0x8000ffff)
+                    Environment.Exit(unchecked((int)0x8000ffff)); //E_UNEXPECTED(0x8000ffff)
                 }
             }
         }

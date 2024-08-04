@@ -7,6 +7,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
@@ -28,7 +29,7 @@ namespace Medo.IO
         /// <param name="pipeName">Pip name.</param>
         public NamedPipe(string pipeName)
         {
-            this.PipeName = pipeName;
+            PipeName = pipeName;
         }
 
         /// <summary>
@@ -39,16 +40,16 @@ namespace Medo.IO
         /// <summary>
         /// Gets full pipe name (e.g. \\.\pipe\example).
         /// </summary>
-        public string FullPipeName { get { return @"\\.\pipe\" + this.PipeName; } }
+        public string FullPipeName { get { return @"\\.\pipe\" + PipeName; } }
 
-        private NativeMethods.FileSafeHandle SafeHandle = null;
+        private NativeMethods.FileSafeHandle SafeHandle;
 
         /// <summary>
         /// Gets native handle.
         /// </summary>
         public IntPtr GetHandle()
         {
-            return (this.SafeHandle != null) ? this.SafeHandle.DangerousGetHandle() : IntPtr.Zero;
+            return (SafeHandle != null) ? SafeHandle.DangerousGetHandle() : IntPtr.Zero;
         }
 
 
@@ -59,9 +60,9 @@ namespace Medo.IO
         /// <exception cref="System.IO.IOException">Cannot create named pipe.</exception>
         public void Create()
         {
-            if (this.SafeHandle != null) { throw new InvalidOperationException("Pipe is already open."); }
-            this.SafeHandle = NativeMethods.CreateNamedPipe(this.FullPipeName, NativeMethods.PIPE_ACCESS_DUPLEX, NativeMethods.PIPE_TYPE_BYTE | NativeMethods.PIPE_READMODE_BYTE | NativeMethods.PIPE_WAIT, NativeMethods.PIPE_UNLIMITED_INSTANCES, 4096, 4096, NativeMethods.NMPWAIT_USE_DEFAULT_WAIT, IntPtr.Zero);
-            if (this.SafeHandle.IsInvalid) { throw new IOException("Cannot create named pipe.", new Win32Exception()); }
+            if (SafeHandle != null) { throw new InvalidOperationException("Pipe is already open."); }
+            SafeHandle = NativeMethods.CreateNamedPipe(FullPipeName, NativeMethods.PIPE_ACCESS_DUPLEX, NativeMethods.PIPE_TYPE_BYTE | NativeMethods.PIPE_READMODE_BYTE | NativeMethods.PIPE_WAIT, NativeMethods.PIPE_UNLIMITED_INSTANCES, 4096, 4096, NativeMethods.NMPWAIT_USE_DEFAULT_WAIT, IntPtr.Zero);
+            if (SafeHandle.IsInvalid) { throw new IOException("Cannot create named pipe.", new Win32Exception()); }
         }
 
         /// <summary>
@@ -71,7 +72,7 @@ namespace Medo.IO
         /// <exception cref="System.IO.IOException">Cannot create named pipe.</exception>
         public void CreateWithFullAccess()
         {
-            if (this.SafeHandle != null) { throw new InvalidOperationException("Pipe is already open."); }
+            if (SafeHandle != null) { throw new InvalidOperationException("Pipe is already open."); }
 
             var sec = new RawSecurityDescriptor(ControlFlags.DiscretionaryAclPresent, null, null, null, null);
             var sa = new NativeMethods.SECURITY_ATTRIBUTES();
@@ -83,8 +84,8 @@ namespace Medo.IO
             sa.lpSecurityDescriptor = Marshal.AllocHGlobal(secBinary.Length);
             Marshal.Copy(secBinary, 0, sa.lpSecurityDescriptor, secBinary.Length);
 
-            this.SafeHandle = NativeMethods.CreateNamedPipe(this.FullPipeName, NativeMethods.PIPE_ACCESS_DUPLEX, NativeMethods.PIPE_TYPE_BYTE | NativeMethods.PIPE_READMODE_BYTE | NativeMethods.PIPE_WAIT, NativeMethods.PIPE_UNLIMITED_INSTANCES, 4096, 4096, NativeMethods.NMPWAIT_USE_DEFAULT_WAIT, ref sa);
-            if (this.SafeHandle.IsInvalid) { throw new IOException("Cannot create named pipe.", new Win32Exception()); }
+            SafeHandle = NativeMethods.CreateNamedPipe(FullPipeName, NativeMethods.PIPE_ACCESS_DUPLEX, NativeMethods.PIPE_TYPE_BYTE | NativeMethods.PIPE_READMODE_BYTE | NativeMethods.PIPE_WAIT, NativeMethods.PIPE_UNLIMITED_INSTANCES, 4096, 4096, NativeMethods.NMPWAIT_USE_DEFAULT_WAIT, ref sa);
+            if (SafeHandle.IsInvalid) { throw new IOException("Cannot create named pipe.", new Win32Exception()); }
         }
 
         /// <summary>
@@ -94,13 +95,13 @@ namespace Medo.IO
         /// <exception cref="System.IO.IOException">Cannot find open named pipe. -or- Cannot open named pipe.</exception>
         public void Open()
         {
-            if (this.SafeHandle != null) { throw new InvalidOperationException("Pipe is already open."); }
-            if (NativeMethods.WaitNamedPipe(this.FullPipeName, NativeMethods.NMPWAIT_USE_DEFAULT_WAIT) == false)
+            if (SafeHandle != null) { throw new InvalidOperationException("Pipe is already open."); }
+            if (NativeMethods.WaitNamedPipe(FullPipeName, NativeMethods.NMPWAIT_USE_DEFAULT_WAIT) == false)
             {
                 throw new IOException("Cannot find open named pipe.", new Win32Exception());
             }
-            this.SafeHandle = NativeMethods.CreateFile(this.FullPipeName, NativeMethods.GENERIC_READ | NativeMethods.GENERIC_WRITE, 0, System.IntPtr.Zero, NativeMethods.OPEN_EXISTING, NativeMethods.FILE_ATTRIBUTE_NORMAL, System.IntPtr.Zero);
-            if (this.SafeHandle.IsInvalid) { throw new IOException("Cannot open named pipe.", new Win32Exception()); }
+            SafeHandle = NativeMethods.CreateFile(FullPipeName, NativeMethods.GENERIC_READ | NativeMethods.GENERIC_WRITE, 0, IntPtr.Zero, NativeMethods.OPEN_EXISTING, NativeMethods.FILE_ATTRIBUTE_NORMAL, IntPtr.Zero);
+            if (SafeHandle.IsInvalid) { throw new IOException("Cannot open named pipe.", new Win32Exception()); }
         }
 
         /// <summary>
@@ -108,10 +109,10 @@ namespace Medo.IO
         /// </summary>
         public void Close()
         {
-            if (this.SafeHandle != null)
+            if (SafeHandle != null)
             {
-                this.SafeHandle.Close();
-                this.SafeHandle = null;
+                SafeHandle.Close();
+                SafeHandle = null;
             }
         }
 
@@ -121,7 +122,7 @@ namespace Medo.IO
         /// <exception cref="System.IO.IOException">Cannot connect to pipe.</exception>
         public void Connect()
         {
-            if (NativeMethods.ConnectNamedPipe(this.SafeHandle, IntPtr.Zero) == false)
+            if (NativeMethods.ConnectNamedPipe(SafeHandle, IntPtr.Zero) == false)
             {
                 throw new IOException("Cannot connect to pipe.", new Win32Exception());
             }
@@ -133,7 +134,7 @@ namespace Medo.IO
         /// <exception cref="System.IO.IOException">Cannot disconnect pipe.</exception>
         public void Disconnect()
         {
-            if (NativeMethods.DisconnectNamedPipe(this.SafeHandle) == false)
+            if (NativeMethods.DisconnectNamedPipe(SafeHandle) == false)
             {
                 throw new IOException("Cannot disconnect pipe.", new Win32Exception());
             }
@@ -145,7 +146,7 @@ namespace Medo.IO
         /// <exception cref="System.IO.IOException">Cannot flush pipe.</exception>
         public void Flush()
         {
-            if (NativeMethods.FlushFileBuffers(this.SafeHandle) == false)
+            if (NativeMethods.FlushFileBuffers(SafeHandle) == false)
             {
                 throw new IOException("Cannot flush pipe.", new Win32Exception());
             }
@@ -156,7 +157,7 @@ namespace Medo.IO
         /// </summary>
         public bool HasBytesToRead
         {
-            get { return (this.BytesToRead > 0); }
+            get { return (BytesToRead > 0); }
         }
 
         /// <summary>
@@ -166,16 +167,14 @@ namespace Medo.IO
         {
             get
             {
-                if (this.SafeHandle == null) { return 0; }
+                if (SafeHandle == null) { return 0; }
                 uint available = 0, bytesRead = 0, thismsg = 0;
-                if (NativeMethods.PeekNamedPipe(this.SafeHandle, null, 0, ref bytesRead, ref available, ref thismsg))
+                if (NativeMethods.PeekNamedPipe(SafeHandle, null, 0, ref bytesRead, ref available, ref thismsg))
                 {
                     return (int)available;
                 }
-                else
-                {
-                    return 0;
-                }
+
+                return 0;
             }
         }
 
@@ -185,15 +184,15 @@ namespace Medo.IO
         /// <exception cref="System.IO.IOException">Pipe is not open. -or- Cannot read from named pipe. -or- Not all bytes can be read.</exception>
         public byte[] ReadAvailable()
         {
-            if (this.SafeHandle == null) { throw new InvalidOperationException("Pipe is not open."); }
+            if (SafeHandle == null) { throw new InvalidOperationException("Pipe is not open."); }
 
-            var available = this.BytesToRead;
+            var available = BytesToRead;
             if (available == 0) { return new byte[] { }; }
 
             byte[] buffer = new byte[available];
             uint read = 0;
             NativeOverlapped overlapped = new NativeOverlapped();
-            if (!NativeMethods.ReadFile(this.SafeHandle, buffer, (uint)buffer.Length, ref read, ref overlapped))
+            if (!NativeMethods.ReadFile(SafeHandle, buffer, (uint)buffer.Length, ref read, ref overlapped))
             {
                 throw new IOException("Cannot read from named pipe.", new Win32Exception());
             }
@@ -211,11 +210,11 @@ namespace Medo.IO
         /// <exception cref="System.IO.IOException">Pipe is not open. -or- Cannot write to pipe. -or- Not all data is written to pipe.</exception>
         public void Write(byte[] buffer)
         {
-            if (this.SafeHandle.Equals(IntPtr.Zero)) { throw new InvalidOperationException("Pipe is not open."); }
+            if (SafeHandle.Equals(IntPtr.Zero)) { throw new InvalidOperationException("Pipe is not open."); }
 
             uint written = 0;
             var overlapped = new NativeOverlapped();
-            if (NativeMethods.WriteFile(this.SafeHandle, buffer, (uint)buffer.Length, ref written, ref overlapped))
+            if (NativeMethods.WriteFile(SafeHandle, buffer, (uint)buffer.Length, ref written, ref overlapped))
             {
                 if (written != buffer.Length)
                 {
@@ -237,7 +236,7 @@ namespace Medo.IO
         [EnvironmentPermissionAttribute(SecurityAction.Demand, Unrestricted = true)]
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -247,7 +246,7 @@ namespace Medo.IO
         /// <param name="disposing">True to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            this.Close();
+            Close();
         }
 
         #endregion
@@ -278,8 +277,8 @@ namespace Medo.IO
 
                 public void Dispose()
                 {
-                    CloseHandle(this.lpSecurityDescriptor);
-                    this.lpSecurityDescriptor = IntPtr.Zero;
+                    CloseHandle(lpSecurityDescriptor);
+                    lpSecurityDescriptor = IntPtr.Zero;
                     GC.SuppressFinalize(this);
                 }
             }
@@ -296,70 +295,70 @@ namespace Medo.IO
 
                 public override bool IsInvalid
                 {
-                    get { return (this.IsClosed) || (base.handle == minusOne); }
+                    get { return (IsClosed) || (handle == minusOne); }
                 }
 
                 protected override bool ReleaseHandle()
                 {
-                    return CloseHandle(this.handle);
+                    return CloseHandle(handle);
                 }
 
                 public override string ToString()
                 {
-                    return this.handle.ToString();
+                    return handle.ToString();
                 }
 
             }
 
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean CloseHandle(IntPtr hObject);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean ConnectNamedPipe(FileSafeHandle hNamedPipe, IntPtr lpOverlapped);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
             public static extern FileSafeHandle CreateFile(String lpFileName, UInt32 dwDesiredAccess, UInt32 dwShareMode, IntPtr lpSecurityAttributes, UInt32 dwCreationDisposition, UInt32 dwFlagsAndAttributes, IntPtr hTemplateFile);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
             public static extern FileSafeHandle CreateNamedPipe(String lpName, UInt32 dwOpenMode, UInt32 dwPipeMode, UInt32 nMaxInstances, UInt32 nOutBufferSize, UInt32 nInBufferSize, UInt32 nDefaultTimeOut, IntPtr lpSecurityAttributes);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
             public static extern FileSafeHandle CreateNamedPipe(String lpName, UInt32 dwOpenMode, UInt32 dwPipeMode, UInt32 nMaxInstances, UInt32 nOutBufferSize, UInt32 nInBufferSize, UInt32 nDefaultTimeOut, ref SECURITY_ATTRIBUTES lpSecurityAttributes);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean DisconnectNamedPipe(FileSafeHandle hNamedPipe);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean FlushFileBuffers(FileSafeHandle hNamedPipe);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean PeekNamedPipe(FileSafeHandle hNamedPipe, Byte[] lpBuffer, UInt32 nBufferSize, ref UInt32 lpBytesRead, ref UInt32 lpTotalBytesAvail, ref UInt32 lpBytesLeftThisMessage);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean ReadFile(FileSafeHandle hFile, Byte[] lpBuffer, UInt32 nNumberOfBytesToRead, ref UInt32 lpNumberOfBytesRead, ref NativeOverlapped lpOverlapped);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean WriteFile(FileSafeHandle hFile, Byte[] lpBuffer, UInt32 nNumberOfBytesToWrite, ref UInt32 lpNumberOfBytesWritten, ref NativeOverlapped lpOverlapped);
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean WaitNamedPipe(String lpNamedPipeName, UInt32 nTimeOut);
