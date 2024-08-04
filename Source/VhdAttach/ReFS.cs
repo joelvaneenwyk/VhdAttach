@@ -4,26 +4,35 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace VhdAttach {
-    internal static class ReFS {
+namespace VhdAttach
+{
+    internal static class ReFS
+    {
 
-        public static void RemoveIntegrityStream(FileInfo file) {
+        public static void RemoveIntegrityStream(FileInfo file)
+        {
             if (!ReFS.HasIntegrityStream(file)) { return; } //cancel if file has no integrity stream
 
-            using (var handle = NativeMethods.CreateFile(file.FullName, NativeMethods.GENERIC_READ | NativeMethods.GENERIC_WRITE, FileShare.None, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero)) {
+            using (var handle = NativeMethods.CreateFile(file.FullName, NativeMethods.GENERIC_READ | NativeMethods.GENERIC_WRITE, FileShare.None, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero))
+            {
                 RemoveIntegrityStream(handle);
             }
         }
 
-        public static void RemoveIntegrityStream(SafeFileHandle handle) {
+        public static void RemoveIntegrityStream(SafeFileHandle handle)
+        {
             if (!ReFS.HasIntegrityStream(handle)) { return; } //cancel if file has no integrity stream
 
             var oldInfo = new NativeMethods.FSCTL_GET_INTEGRITY_INFORMATION_BUFFER();
             var oldInfoSizeReturn = 0;
-            if (!NativeMethods.DeviceIoControl(handle, NativeMethods.FSCTL_GET_INTEGRITY_INFORMATION, IntPtr.Zero, 0, ref oldInfo, Marshal.SizeOf(oldInfo), out oldInfoSizeReturn, IntPtr.Zero)) {
-                try {
+            if (!NativeMethods.DeviceIoControl(handle, NativeMethods.FSCTL_GET_INTEGRITY_INFORMATION, IntPtr.Zero, 0, ref oldInfo, Marshal.SizeOf(oldInfo), out oldInfoSizeReturn, IntPtr.Zero))
+            {
+                try
+                {
                     throw new Win32Exception();
-                } catch (Win32Exception ex) {
+                }
+                catch (Win32Exception ex)
+                {
                     throw new InvalidOperationException(ex.Message, ex);
                 }
             }
@@ -32,29 +41,37 @@ namespace VhdAttach {
 
             var newInfo = new NativeMethods.FSCTL_SET_INTEGRITY_INFORMATION_BUFFER() { ChecksumAlgorithm = NativeMethods.CHECKSUM_TYPE_NONE, Flags = oldInfo.Flags };
             var newInfoSizeReturn = 0;
-            if (!NativeMethods.DeviceIoControl(handle, NativeMethods.FSCTL_SET_INTEGRITY_INFORMATION, ref newInfo, Marshal.SizeOf(newInfo), IntPtr.Zero, 0, out newInfoSizeReturn, IntPtr.Zero)) {
-                try {
+            if (!NativeMethods.DeviceIoControl(handle, NativeMethods.FSCTL_SET_INTEGRITY_INFORMATION, ref newInfo, Marshal.SizeOf(newInfo), IntPtr.Zero, 0, out newInfoSizeReturn, IntPtr.Zero))
+            {
+                try
+                {
                     throw new Win32Exception();
-                } catch (Win32Exception ex) {
+                }
+                catch (Win32Exception ex)
+                {
                     throw new InvalidOperationException(ex.Message, ex);
                 }
             }
         }
 
 
-        public static bool HasIntegrityStream(FileInfo file) {
+        public static bool HasIntegrityStream(FileInfo file)
+        {
             return ((int)(file.Attributes) & NativeMethods.FILE_ATTRIBUTE_INTEGRITY_STREAM) == NativeMethods.FILE_ATTRIBUTE_INTEGRITY_STREAM;
         }
 
-        public static bool HasIntegrityStream(SafeFileHandle handle) {
+        public static bool HasIntegrityStream(SafeFileHandle handle)
+        {
             var fileInfo = new NativeMethods.BY_HANDLE_FILE_INFORMATION();
-            if (NativeMethods.GetFileInformationByHandle(handle, out fileInfo)) {
+            if (NativeMethods.GetFileInformationByHandle(handle, out fileInfo))
+            {
                 return (fileInfo.dwFileAttributes & NativeMethods.FILE_ATTRIBUTE_INTEGRITY_STREAM) == NativeMethods.FILE_ATTRIBUTE_INTEGRITY_STREAM;
             }
             return false;
         }
 
-        private static class NativeMethods {
+        private static class NativeMethods
+        {
 
             internal const Int32 CHECKSUM_TYPE_NONE = 0;
             internal const Int32 CHECKSUM_TYPE_CRC64 = 2;
@@ -69,7 +86,8 @@ namespace VhdAttach {
 
 
             [StructLayout(LayoutKind.Sequential)]
-            internal struct FSCTL_GET_INTEGRITY_INFORMATION_BUFFER {
+            internal struct FSCTL_GET_INTEGRITY_INFORMATION_BUFFER
+            {
                 internal Int16 ChecksumAlgorithm;
                 private Int16 Reserved;
                 internal Int32 Flags;
@@ -78,7 +96,8 @@ namespace VhdAttach {
             }
 
             [StructLayout(LayoutKind.Sequential)]
-            internal struct FSCTL_SET_INTEGRITY_INFORMATION_BUFFER {
+            internal struct FSCTL_SET_INTEGRITY_INFORMATION_BUFFER
+            {
                 internal Int16 ChecksumAlgorithm;
                 private Int16 Reserved;
                 internal Int32 Flags;
@@ -86,7 +105,8 @@ namespace VhdAttach {
 
 
             [StructLayoutAttribute(LayoutKind.Sequential)]
-            public struct BY_HANDLE_FILE_INFORMATION {
+            public struct BY_HANDLE_FILE_INFORMATION
+            {
                 public uint dwFileAttributes;
                 public FILETIME ftCreationTime;
                 public FILETIME ftLastAccessTime;
@@ -100,7 +120,8 @@ namespace VhdAttach {
             }
 
             [StructLayoutAttribute(LayoutKind.Sequential)]
-            public struct FILETIME {
+            public struct FILETIME
+            {
                 public uint dwLowDateTime;
                 public uint dwHighDateTime;
             }

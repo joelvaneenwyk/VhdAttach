@@ -1,7 +1,10 @@
-﻿namespace VhdAttach {
-    internal class PipeResponse {
+﻿namespace VhdAttach
+{
+    internal class PipeResponse
+    {
 
-        public PipeResponse(bool isError, string message) {
+        public PipeResponse(bool isError, string message)
+        {
             this.IsError = isError;
             this.Message = message;
         }

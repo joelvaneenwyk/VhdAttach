@@ -6,10 +6,13 @@ using System.Management;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace VhdAttachService {
-    internal static class DeviceFromPath {
+namespace VhdAttachService
+{
+    internal static class DeviceFromPath
+    {
 
-        public static string GetDevice(string path) {
+        public static string GetDevice(string path)
+        {
             var device = FindCdRom(path);
             if (device == null) { device = FindPhysicalDrive(path); }
             return device;
@@ -18,32 +21,44 @@ namespace VhdAttachService {
 
         #region PhysicalDrive
 
-        private static string FindPhysicalDrive(string path) {
+        private static string FindPhysicalDrive(string path)
+        {
             FileSystemInfo iDirectory = null;
             var wmiQuery = new ObjectQuery("SELECT Antecedent, Dependent FROM Win32_LogicalDiskToPartition");
             var wmiSearcher = new ManagementObjectSearcher(wmiQuery);
 
             var iFile = new FileInfo(path);
-            try {
-                if ((iFile.Attributes & FileAttributes.Directory) == FileAttributes.Directory) {
+            try
+            {
+                if ((iFile.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
+                {
                     iDirectory = new DirectoryInfo(iFile.FullName);
-                } else {
+                }
+                else
+                {
                     iDirectory = iFile;
                     throw new FormatException("Argument is not a directory.");
                 }
-            } catch (IOException) {
+            }
+            catch (IOException)
+            {
                 iDirectory = new DirectoryInfo(iFile.FullName);
             }
 
 
             var wmiPhysicalDiskNumber = -1;
-            foreach (var iReturn in wmiSearcher.Get()) {
+            foreach (var iReturn in wmiSearcher.Get())
+            {
                 var disk = GetSubsubstring((string)iReturn["Antecedent"], "Win32_DiskPartition.DeviceID", "Disk #", ",");
                 var partition = GetSubsubstring((string)iReturn["Dependent"], "Win32_LogicalDisk.DeviceID", "", "");
-                if (iDirectory.Name.StartsWith(partition, StringComparison.InvariantCultureIgnoreCase)) {
-                    if (int.TryParse(disk, NumberStyles.Integer, CultureInfo.InvariantCulture, out wmiPhysicalDiskNumber)) {
+                if (iDirectory.Name.StartsWith(partition, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (int.TryParse(disk, NumberStyles.Integer, CultureInfo.InvariantCulture, out wmiPhysicalDiskNumber))
+                    {
                         return @"\\?\PHYSICALDRIVE" + wmiPhysicalDiskNumber.ToString(CultureInfo.InvariantCulture);
-                    } else {
+                    }
+                    else
+                    {
                         throw new FormatException("Cannot retrieve physical disk number.");
                     }
                 }
@@ -51,7 +66,8 @@ namespace VhdAttachService {
             return null;
         }
 
-        private static string GetSubsubstring(string value, string type, string start, string end) {
+        private static string GetSubsubstring(string value, string type, string start, string end)
+        {
             var xStart0 = value.IndexOf(":" + type + "=\"");
             if (xStart0 < 0) { return null; }
             var xStart1 = value.IndexOf("\"", xStart0 + 1);
@@ -76,15 +92,19 @@ namespace VhdAttachService {
 
         #region CdRom
 
-        private static string FindCdRom(string path) {
+        private static string FindCdRom(string path)
+        {
             var dosDevice = path[0] + ":";
             var sb = new StringBuilder(64);
-            if (NativeMethods.QueryDosDeviceW(dosDevice, sb, (uint)sb.Capacity) > 0) {
+            if (NativeMethods.QueryDosDeviceW(dosDevice, sb, (uint)sb.Capacity) > 0)
+            {
                 var dosPath = sb.ToString();
                 Debug.WriteLine(sb.ToString() + " is at " + dosDevice);
-                if (dosPath.StartsWith(@"\Device\CdRom", StringComparison.OrdinalIgnoreCase)) {
+                if (dosPath.StartsWith(@"\Device\CdRom", StringComparison.OrdinalIgnoreCase))
+                {
                     int cdromNumber = 0;
-                    if (int.TryParse(dosPath.Substring(13), NumberStyles.Integer, CultureInfo.InvariantCulture, out cdromNumber)) {
+                    if (int.TryParse(dosPath.Substring(13), NumberStyles.Integer, CultureInfo.InvariantCulture, out cdromNumber))
+                    {
                         return @"\\?\CDROM" + cdromNumber.ToString(CultureInfo.InvariantCulture);
                     }
                 }
@@ -93,12 +113,13 @@ namespace VhdAttachService {
         }
 
 
-        private static class NativeMethods {
+        private static class NativeMethods
+        {
 
             [DllImportAttribute("kernel32.dll", EntryPoint = "QueryDosDeviceW")]
             public static extern UInt32 QueryDosDeviceW(
-                [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPWStr)] string lpDeviceName,
-                [OutAttribute()] [MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpTargetPath,
+                [InAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] string lpDeviceName,
+                [OutAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpTargetPath,
                 UInt32 ucchMax);
 
         }

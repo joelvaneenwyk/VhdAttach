@@ -48,13 +48,13 @@ namespace System.Configuration.Install.Tests.System.Configuration.Install
 
         private static void InstallComponent()
         {
-            ManagedInstallerClass.InstallHelper(new[] {"-AssemblyName", Assembly.GetExecutingAssembly().GetName().Name});
+            ManagedInstallerClass.InstallHelper(new[] { "-AssemblyName", Assembly.GetExecutingAssembly().GetName().Name });
         }
 
 
         private static void UnInstallComponent()
         {
-            ManagedInstallerClass.InstallHelper(new[] {"-u", "-AssemblyName", Assembly.GetExecutingAssembly().GetName().Name});
+            ManagedInstallerClass.InstallHelper(new[] { "-u", "-AssemblyName", Assembly.GetExecutingAssembly().GetName().Name });
         }
     }
 }

@@ -6,16 +6,24 @@ using System.Management;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace VhdAttach {
-    internal static class PathFromDevice {
+namespace VhdAttach
+{
+    internal static class PathFromDevice
+    {
 
-        public static string[] GetPath(string device) {
+        public static string[] GetPath(string device)
+        {
             int driveNumber;
-            if (device.StartsWith(@"\\.\PHYSICALDRIVE", StringComparison.InvariantCulture) && int.TryParse(device.Substring(17), NumberStyles.Integer, CultureInfo.InvariantCulture, out driveNumber)) {
+            if (device.StartsWith(@"\\.\PHYSICALDRIVE", StringComparison.InvariantCulture) && int.TryParse(device.Substring(17), NumberStyles.Integer, CultureInfo.InvariantCulture, out driveNumber))
+            {
                 return GetLettersFromPhysicalDrive(driveNumber);
-            } else if (device.StartsWith(@"\\.\CDROM", StringComparison.InvariantCulture) && int.TryParse(device.Substring(9), NumberStyles.Integer, CultureInfo.InvariantCulture, out driveNumber)) {
+            }
+            else if (device.StartsWith(@"\\.\CDROM", StringComparison.InvariantCulture) && int.TryParse(device.Substring(9), NumberStyles.Integer, CultureInfo.InvariantCulture, out driveNumber))
+            {
                 return GetLettersFromCdRom(driveNumber);
-            } else {
+            }
+            else
+            {
                 return null;
             }
         }
@@ -23,20 +31,28 @@ namespace VhdAttach {
 
         #region PhysicalDrive
 
-        private static string[] GetLettersFromPhysicalDrive(int driveNumber) {
+        private static string[] GetLettersFromPhysicalDrive(int driveNumber)
+        {
             var list = new List<string>();
 
             var wmiQuery = new ObjectQuery("SELECT Antecedent, Dependent FROM Win32_LogicalDiskToPartition");
-            using (var wmiSearcher = new ManagementObjectSearcher(wmiQuery)) {
-                foreach (var iReturn in wmiSearcher.Get()) {
+            using (var wmiSearcher = new ManagementObjectSearcher(wmiQuery))
+            {
+                foreach (var iReturn in wmiSearcher.Get())
+                {
                     var device = GetSubsubstring((string)iReturn["Antecedent"], "Win32_DiskPartition.DeviceID", "Disk #", ",");
                     var letter = GetSubsubstring((string)iReturn["Dependent"], "Win32_LogicalDisk.DeviceID", "", "");
                     int diskNumber;
-                    if (int.TryParse(device, NumberStyles.Integer, CultureInfo.InvariantCulture, out diskNumber)) {
-                        if (driveNumber == diskNumber) {
-                            if ((letter.Length == 2) && (letter.EndsWith(":", StringComparison.OrdinalIgnoreCase))) {
+                    if (int.TryParse(device, NumberStyles.Integer, CultureInfo.InvariantCulture, out diskNumber))
+                    {
+                        if (driveNumber == diskNumber)
+                        {
+                            if ((letter.Length == 2) && (letter.EndsWith(":", StringComparison.OrdinalIgnoreCase)))
+                            {
                                 list.Add(letter + @"\");
-                            } else {
+                            }
+                            else
+                            {
                                 list.Add(letter);
                             }
                         }
@@ -47,7 +63,8 @@ namespace VhdAttach {
             return list.ToArray();
         }
 
-        private static string GetSubsubstring(string value, string type, string start, string end) {
+        private static string GetSubsubstring(string value, string type, string start, string end)
+        {
             var xStart0 = value.IndexOf(":" + type + "=\"");
             if (xStart0 < 0) { return null; }
             var xStart1 = value.IndexOf("\"", xStart0 + 1);
@@ -72,17 +89,23 @@ namespace VhdAttach {
 
         #region CdRom
 
-        private static string[] GetLettersFromCdRom(int driveNumber) {
-            for (char letter = 'A'; letter <= 'Z'; letter++) {
+        private static string[] GetLettersFromCdRom(int driveNumber)
+        {
+            for (char letter = 'A'; letter <= 'Z'; letter++)
+            {
                 var dosDevice = letter + ":";
                 var sb = new StringBuilder(64);
-                if (NativeMethods.QueryDosDeviceW(dosDevice, sb, (uint)sb.Capacity) > 0) {
+                if (NativeMethods.QueryDosDeviceW(dosDevice, sb, (uint)sb.Capacity) > 0)
+                {
                     var dosPath = sb.ToString();
                     Debug.WriteLine(sb.ToString() + " is at " + dosDevice);
-                    if (dosPath.StartsWith(@"\Device\CdRom", StringComparison.OrdinalIgnoreCase)) {
+                    if (dosPath.StartsWith(@"\Device\CdRom", StringComparison.OrdinalIgnoreCase))
+                    {
                         int cdromNumber = 0;
-                        if (int.TryParse(dosPath.Substring(13), NumberStyles.Integer, CultureInfo.InvariantCulture, out cdromNumber)) {
-                            if (cdromNumber == driveNumber) {
+                        if (int.TryParse(dosPath.Substring(13), NumberStyles.Integer, CultureInfo.InvariantCulture, out cdromNumber))
+                        {
+                            if (cdromNumber == driveNumber)
+                            {
                                 return new string[] { dosDevice + @"\" };
                             }
                         }
@@ -93,12 +116,13 @@ namespace VhdAttach {
         }
 
 
-        private static class NativeMethods {
+        private static class NativeMethods
+        {
 
             [DllImportAttribute("kernel32.dll", EntryPoint = "QueryDosDeviceW")]
             public static extern UInt32 QueryDosDeviceW(
-                [InAttribute()] [MarshalAsAttribute(UnmanagedType.LPWStr)] string lpDeviceName,
-                [OutAttribute()] [MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpTargetPath,
+                [InAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] string lpDeviceName,
+                [OutAttribute()][MarshalAsAttribute(UnmanagedType.LPWStr)] StringBuilder lpTargetPath,
                 UInt32 ucchMax);
 
         }

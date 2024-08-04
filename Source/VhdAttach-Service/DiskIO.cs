@@ -4,11 +4,15 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using Microsoft.Win32.SafeHandles;
 
-namespace VhdAttachService {
-    internal static class DiskIO {
+namespace VhdAttachService
+{
+    internal static class DiskIO
+    {
 
-        public static void InitializeDisk(string path) {
-            using (SafeFileHandle handle = NativeMethods.CreateFile(path, NativeMethods.GENERIC_READ | NativeMethods.GENERIC_WRITE, 0, IntPtr.Zero, NativeMethods.OPEN_EXISTING, 0, IntPtr.Zero)) {
+        public static void InitializeDisk(string path)
+        {
+            using (SafeFileHandle handle = NativeMethods.CreateFile(path, NativeMethods.GENERIC_READ | NativeMethods.GENERIC_WRITE, 0, IntPtr.Zero, NativeMethods.OPEN_EXISTING, 0, IntPtr.Zero))
+            {
                 if (handle.IsInvalid) { throw new Win32Exception(); }
 
                 var signature = new byte[4];
@@ -47,7 +51,8 @@ namespace VhdAttachService {
 
 
 
-        private static class NativeMethods {
+        private static class NativeMethods
+        {
 
             public const int GENERIC_READ = -2147483648;
             public const int GENERIC_WRITE = 1073741824;
@@ -61,7 +66,8 @@ namespace VhdAttachService {
             public const byte PARTITION_IFS = 0x07;
 
 
-            public enum PARTITION_STYLE : int {
+            public enum PARTITION_STYLE : int
+            {
                 PARTITION_STYLE_MBR = 0,
                 PARTITION_STYLE_GPT = 1,
                 PARTITION_STYLE_RAW = 2,
@@ -69,20 +75,23 @@ namespace VhdAttachService {
 
 
             [StructLayoutAttribute(LayoutKind.Sequential)]
-            public struct CREATE_DISK {
+            public struct CREATE_DISK
+            {
                 public PARTITION_STYLE PartitionStyle;
                 public CREATE_DISK_MBR Mbr;
             }
 
             [StructLayoutAttribute(LayoutKind.Sequential)]
-            public struct CREATE_DISK_MBR {
+            public struct CREATE_DISK_MBR
+            {
                 public Int32 Signature;
                 [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
                 public Byte[] Reserved; //because of CREATE_DISK_GPT
             }
 
             [StructLayoutAttribute(LayoutKind.Sequential)]
-            public struct PARTITION_INFORMATION {
+            public struct PARTITION_INFORMATION
+            {
                 public Int64 StartingOffset;
                 public Int64 PartitionLength;
                 public UInt32 HiddenSectors;
@@ -94,7 +103,8 @@ namespace VhdAttachService {
             }
 
             [StructLayoutAttribute(LayoutKind.Sequential)]
-            public struct DRIVE_LAYOUT_INFORMATION_EX {
+            public struct DRIVE_LAYOUT_INFORMATION_EX
+            {
                 public PARTITION_STYLE PartitionStyle;
                 public Int32 PartitionCount;
                 public DRIVE_LAYOUT_INFORMATION_MBR Mbr;
@@ -102,14 +112,16 @@ namespace VhdAttachService {
             }
 
             [StructLayoutAttribute(LayoutKind.Sequential)]
-            public struct DRIVE_LAYOUT_INFORMATION_MBR {
+            public struct DRIVE_LAYOUT_INFORMATION_MBR
+            {
                 public Int32 Signature;
                 [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
                 public Byte[] Reserved; //because of DRIVE_LAYOUT_INFORMATION_GPT
             }
 
             [StructLayoutAttribute(LayoutKind.Sequential)]
-            public struct PARTITION_INFORMATION_EX {
+            public struct PARTITION_INFORMATION_EX
+            {
                 public PARTITION_STYLE PartitionStyle;
                 public Int64 StartingOffset;
                 public Int64 PartitionLength;
@@ -120,7 +132,8 @@ namespace VhdAttachService {
             }
 
             [StructLayoutAttribute(LayoutKind.Sequential)]
-            public struct PARTITION_INFORMATION_MBR {
+            public struct PARTITION_INFORMATION_MBR
+            {
                 public Byte PartitionType;
                 [MarshalAsAttribute(UnmanagedType.Bool)]
                 public Boolean BootIndicator;

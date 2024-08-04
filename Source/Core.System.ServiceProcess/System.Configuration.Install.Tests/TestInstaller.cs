@@ -5,13 +5,13 @@ using System.IO;
 namespace System.Configuration.Install.Tests
 {
     [RunInstaller(true)]
-    public class TestInstaller:Installer
+    public class TestInstaller : Installer
     {
         public override void Install(IDictionary stateSaver)
         {
             base.Install(stateSaver);
             File.Create("test").Dispose();
-            
+
             if (Context.IsParameterTrue("ThrowException"))
             {
                 throw new Exception("The ThrowException parameter is detected.");
@@ -23,7 +23,7 @@ namespace System.Configuration.Install.Tests
             File.Delete("test");
             base.Uninstall(savedState);
         }
-        
+
         public override void Rollback(IDictionary savedState)
         {
             base.Rollback(savedState);

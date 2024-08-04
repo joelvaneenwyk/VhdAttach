@@ -4,13 +4,16 @@ using System.Globalization;
 using System.ServiceProcess;
 using System.Threading;
 
-namespace VhdAttachService {
-    internal static class ServiceStatusThread {
+namespace VhdAttachService
+{
+    internal static class ServiceStatusThread
+    {
 
         private static Thread Thread;
         private static ManualResetEvent CancelEvent;
 
-        public static void Start() {
+        public static void Start()
+        {
             if (ServiceStatusThread.Thread != null) { return; }
 
             ServiceStatusThread.CancelEvent = new ManualResetEvent(false);
@@ -20,36 +23,53 @@ namespace VhdAttachService {
             ServiceStatusThread.Thread.Start();
         }
 
-        public static void Stop() {
-            try {
+        public static void Stop()
+        {
+            try
+            {
                 ServiceStatusThread.CancelEvent.Set();
                 while (ServiceStatusThread.Thread.IsAlive) { Thread.Sleep(10); }
                 ServiceStatusThread.Thread = null;
-            } catch { }
+            }
+            catch { }
         }
 
 
-        private static void Run() {
-            try {
+        private static void Run()
+        {
+            try
+            {
                 var sw = new Stopwatch();
-                using (var service = new ServiceController(AppService.Instance.ServiceName)) {
+                using (var service = new ServiceController(AppService.Instance.ServiceName))
+                {
                     bool? lastIsRunning = null;
                     Tray.SetStatusToUnknown();
-                    while (!ServiceStatusThread.CancelEvent.WaitOne(0, false)) {
-                        if ((sw.IsRunning == false) || (sw.ElapsedMilliseconds > 1000)) {
+                    while (!ServiceStatusThread.CancelEvent.WaitOne(0, false))
+                    {
+                        if ((sw.IsRunning == false) || (sw.ElapsedMilliseconds > 1000))
+                        {
                             bool? currIsRunning;
-                            try {
+                            try
+                            {
                                 service.Refresh();
                                 currIsRunning = (service.Status == ServiceControllerStatus.Running);
-                            } catch (InvalidOperationException) {
+                            }
+                            catch (InvalidOperationException)
+                            {
                                 currIsRunning = null;
                             }
-                            if (lastIsRunning != currIsRunning) {
-                                if (currIsRunning == null) {
+                            if (lastIsRunning != currIsRunning)
+                            {
+                                if (currIsRunning == null)
+                                {
                                     Tray.SetStatusToUnknown();
-                                } else if (currIsRunning == true) {
+                                }
+                                else if (currIsRunning == true)
+                                {
                                     Tray.SetStatusToRunning();
-                                } else {
+                                }
+                                else
+                                {
                                     Tray.SetStatusToStopped();
                                 }
                             }
@@ -60,7 +80,8 @@ namespace VhdAttachService {
                         Thread.Sleep(100);
                     }
                 }
-            } catch (ThreadAbortException) { }
+            }
+            catch (ThreadAbortException) { }
         }
 
     }

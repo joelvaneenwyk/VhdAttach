@@ -10,12 +10,14 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace Medo.Windows.Forms {
+namespace Medo.Windows.Forms
+{
 
     /// <summary>
     /// Support for Windows 7 taskbar progress.
     /// </summary>
-    public static class TaskbarProgress {
+    public static class TaskbarProgress
+    {
 
         private static readonly object _syncRoot = new object();
 
@@ -38,7 +40,8 @@ namespace Medo.Windows.Forms {
         /// <exception cref="System.InvalidOperationException">Default owner must be set before calling this method -or- Native error..</exception>
         /// <exception cref="System.NotImplementedException">Operation is only supported on Windows 7 and above.</exception>
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
-        public static void SetState(TaskbarProgressState newState) {
+        public static void SetState(TaskbarProgressState newState)
+        {
             if (DefaultOwner == null) { throw new InvalidOperationException("Default owner must be set before calling this method."); }
             SetState(DefaultOwner, newState);
         }
@@ -51,23 +54,32 @@ namespace Medo.Windows.Forms {
         /// <exception cref="System.ArgumentNullException">Owner cannot be null.</exception>
         /// <exception cref="System.NotImplementedException">Operation is only supported on Windows 7 and above.</exception>
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
-        public static void SetState(IWin32Window owner, TaskbarProgressState newState) {
+        public static void SetState(IWin32Window owner, TaskbarProgressState newState)
+        {
             if (owner == null) { throw new ArgumentNullException("owner", "Owner cannot be null."); }
             if (TaskbarProgress.IsRunningOnMono) { return; } //Mono has troubles with accessing COM.
-            if (System.Environment.OSVersion.Version.Build < 7000) {
-                if (DoNotThrowNotImplementedException) {
+            if (System.Environment.OSVersion.Version.Build < 7000)
+            {
+                if (DoNotThrowNotImplementedException)
+                {
                     return;
-                } else {
+                }
+                else
+                {
                     throw new NotImplementedException("Operation is only supported on Windows 7 and above.");
                 }
             }
             Init();
-            try {
-                if (_taskbarList != null) {
+            try
+            {
+                if (_taskbarList != null)
+                {
                     var res = _taskbarList.SetProgressState(owner.Handle, newState);
                     if (res != NativeMethods.S_OK) { throw new Win32Exception(string.Format(CultureInfo.InvariantCulture, "Native error {0:x8}.", res)); }
                 }
-            } catch (NotImplementedException) {
+            }
+            catch (NotImplementedException)
+            {
                 if (DoNotThrowNotImplementedException == false) { throw; }
             }
         }
@@ -79,7 +91,8 @@ namespace Medo.Windows.Forms {
         /// <exception cref="System.InvalidOperationException">Default owner must be set before calling this method.</exception>
         /// <exception cref="System.NotImplementedException">Operation is only supported on Windows 7 and above.</exception>
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
-        public static void SetPercentage(int newProgressPercentage) {
+        public static void SetPercentage(int newProgressPercentage)
+        {
             if (DefaultOwner == null) { throw new InvalidOperationException("Default owner must be set before calling this method."); }
             SetPercentage(DefaultOwner, newProgressPercentage);
         }
@@ -92,23 +105,32 @@ namespace Medo.Windows.Forms {
         /// <exception cref="System.ArgumentNullException">Owner cannot be null.</exception>
         /// <exception cref="System.NotImplementedException">Operation is only supported on Windows 7 and above.</exception>
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
-        public static void SetPercentage(IWin32Window owner, int newProgressPercentage) {
+        public static void SetPercentage(IWin32Window owner, int newProgressPercentage)
+        {
             if (owner == null) { throw new ArgumentNullException("owner", "Owner cannot be null."); }
             if (TaskbarProgress.IsRunningOnMono) { return; } //Mono has troubles with accessing COM.
-            if (System.Environment.OSVersion.Version.Build < 7000) {
-                if (DoNotThrowNotImplementedException) {
+            if (System.Environment.OSVersion.Version.Build < 7000)
+            {
+                if (DoNotThrowNotImplementedException)
+                {
                     return;
-                } else {
+                }
+                else
+                {
                     throw new NotImplementedException("Operation is only supported on Windows 7 and above.");
                 }
             }
             Init();
-            try {
-                if (_taskbarList != null) {
+            try
+            {
+                if (_taskbarList != null)
+                {
                     var res = _taskbarList.SetProgressValue(owner.Handle, (ulong)newProgressPercentage, 100);
                     if (res != NativeMethods.S_OK) { throw new Win32Exception(string.Format(CultureInfo.InvariantCulture, "Native error {0:x8}.", res)); }
                 }
-            } catch (NotImplementedException) {
+            }
+            catch (NotImplementedException)
+            {
                 if (DoNotThrowNotImplementedException == false) { throw; }
             }
         }
@@ -116,15 +138,21 @@ namespace Medo.Windows.Forms {
 
 
         private static NativeMethods.ITaskbarList3 _taskbarList;
-        private static void Init() {
-            lock (_syncRoot) {
-                try {
-                    if (_taskbarList == null) {
+        private static void Init()
+        {
+            lock (_syncRoot)
+            {
+                try
+                {
+                    if (_taskbarList == null)
+                    {
                         _taskbarList = (NativeMethods.ITaskbarList3)new NativeMethods.CTaskbarList();
                         var res = _taskbarList.HrInit();
                         if (res != NativeMethods.S_OK) { throw new Win32Exception(string.Format(CultureInfo.InvariantCulture, "Native error {0:x8}.", res)); }
                     }
-                } catch (NotImplementedException) {
+                }
+                catch (NotImplementedException)
+                {
                     _taskbarList = null;
                     if (DoNotThrowNotImplementedException == false) { throw; }
                 }
@@ -132,7 +160,8 @@ namespace Medo.Windows.Forms {
         }
 
 
-        private static class NativeMethods {
+        private static class NativeMethods
+        {
 
             internal const Int32 S_OK = 0x00000000;
 
@@ -144,7 +173,8 @@ namespace Medo.Windows.Forms {
             [ComImportAttribute()]
             [GuidAttribute("ea1afb91-9e28-4b86-90e9-9e9f8a5eefaf")]
             [InterfaceTypeAttribute(ComInterfaceType.InterfaceIsIUnknown)]
-            internal interface ITaskbarList3 {
+            internal interface ITaskbarList3
+            {
                 Int32 HrInit();
                 Int32 AddTab(IntPtr hwnd);
                 Int32 DeleteTab(IntPtr hwnd);
@@ -164,8 +194,10 @@ namespace Medo.Windows.Forms {
         }
 
 
-        private static bool IsRunningOnMono {
-            get {
+        private static bool IsRunningOnMono
+        {
+            get
+            {
                 return (Type.GetType("Mono.Runtime") != null);
             }
         }
@@ -178,7 +210,8 @@ namespace Medo.Windows.Forms {
     /// Flags that control the current state of the progress button. Specify only one of the following flags; all states are mutually exclusive of all others.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1027:MarkEnumsWithFlags", Justification = "These values are not flags. Only one can be set at any given time.")]
-    public enum TaskbarProgressState {
+    public enum TaskbarProgressState
+    {
         /// <summary>
         /// Stops displaying progress and returns the button to its normal state. Call this method with this flag to dismiss the progress bar when the operation is complete or cancelled.
         /// </summary>

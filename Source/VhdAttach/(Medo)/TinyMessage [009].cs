@@ -28,13 +28,15 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace Medo.Net {
+namespace Medo.Net
+{
 
     /// <summary>
     /// Sending and receiving UDP messages.
     /// Supports TinyMessage with Dictionary&lt;String,String&gt; as data.
     /// </summary>
-    public class TinyMessage : IDisposable {
+    public class TinyMessage : IDisposable
+    {
 
         /// <summary>
         /// Default port for TinyMessage protocol.
@@ -46,7 +48,8 @@ namespace Medo.Net {
         /// Creates new instance.
         /// </summary>
         public TinyMessage()
-            : this(new IPEndPoint(IPAddress.Any, TinyMessage.DefaultPort)) {
+            : this(new IPEndPoint(IPAddress.Any, TinyMessage.DefaultPort))
+        {
         }
 
         /// <summary>
@@ -54,7 +57,8 @@ namespace Medo.Net {
         /// </summary>
         /// <param name="localEndPoint">Local end point where messages should be received at.</param>
         /// <exception cref="System.ArgumentNullException">Local IP end point is null.</exception>
-        public TinyMessage(IPEndPoint localEndPoint) {
+        public TinyMessage(IPEndPoint localEndPoint)
+        {
             if (localEndPoint == null) { throw new ArgumentNullException("localEndPoint", "Local IP end point is null."); }
             this.LocalEndPoint = localEndPoint;
         }
@@ -68,8 +72,10 @@ namespace Medo.Net {
         /// <summary>
         /// Starts listener on background thread.
         /// </summary>
-        public void ListenAsync() {
-            lock (this.ListenSyncRoot) {
+        public void ListenAsync()
+        {
+            lock (this.ListenSyncRoot)
+            {
                 if (this.ListenThread != null) { throw new InvalidOperationException("Already listening."); }
 
                 this.ListenCancelEvent = new ManualResetEvent(false);
@@ -81,8 +87,10 @@ namespace Medo.Net {
         /// <summary>
         /// Stops listener on background thread.
         /// </summary>
-        public void CloseAsync() {
-            lock (this.ListenSyncRoot) {
+        public void CloseAsync()
+        {
+            lock (this.ListenSyncRoot)
+            {
                 if (this.ListenThread == null) { return; }
 
                 this.ListenCancelEvent.Set();
@@ -98,7 +106,8 @@ namespace Medo.Net {
         /// <summary>
         /// Gets whether TinyMessage is in listening state.
         /// </summary>
-        public Boolean IsListening {
+        public Boolean IsListening
+        {
             get { return (this.ListenThread != null) && (this.ListenThread.IsAlive); }
         }
 
@@ -117,8 +126,10 @@ namespace Medo.Net {
 
         private bool IsCanceled { get { return ListenCancelEvent.WaitOne(0, false); } }
 
-        private void Run() {
-            try {
+        private void Run()
+        {
+            try
+            {
                 this.ListenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
                 this.ListenSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 this.ListenSocket.Bind(this.LocalEndPoint);
@@ -126,37 +137,54 @@ namespace Medo.Net {
                 var buffer = new byte[16384];
                 EndPoint remoteEP;
                 int inCount;
-                while (!this.IsCanceled) {
-                    try {
+                while (!this.IsCanceled)
+                {
+                    try
+                    {
                         remoteEP = new IPEndPoint(IPAddress.Any, 0);
                         inCount = this.ListenSocket.ReceiveFrom(buffer, ref remoteEP);
-                    } catch (SocketException ex) {
-                        if (ex.SocketErrorCode == SocketError.Interrupted) {
+                    }
+                    catch (SocketException ex)
+                    {
+                        if (ex.SocketErrorCode == SocketError.Interrupted)
+                        {
                             return;
-                        } else {
+                        }
+                        else
+                        {
                             throw;
                         }
                     }
 
-                    if (TinyPacketReceived != null) {
+                    if (TinyPacketReceived != null)
+                    {
                         var newBuffer = new byte[inCount];
                         Buffer.BlockCopy(buffer, 0, newBuffer, 0, inCount);
                         Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage [{0} <- {1}]", TinyPacket.ParseHeaderOnly(newBuffer, 0, inCount), remoteEP));
                         var invokeArgs = new object[] { this, new TinyPacketEventArgs(newBuffer, 0, inCount, remoteEP as IPEndPoint) };
-                        foreach (Delegate iDelegate in TinyPacketReceived.GetInvocationList()) {
+                        foreach (Delegate iDelegate in TinyPacketReceived.GetInvocationList())
+                        {
                             ISynchronizeInvoke syncer = iDelegate.Target as ISynchronizeInvoke;
-                            if (syncer == null) {
+                            if (syncer == null)
+                            {
                                 iDelegate.DynamicInvoke(invokeArgs);
-                            } else {
+                            }
+                            else
+                            {
                                 syncer.BeginInvoke(iDelegate, invokeArgs);
                             }
                         }
                     }
                 }
 
-            } catch (ThreadAbortException) {
-            } finally {
-                if (this.ListenSocket != null) {
+            }
+            catch (ThreadAbortException)
+            {
+            }
+            finally
+            {
+                if (this.ListenSocket != null)
+                {
                     ((IDisposable)this.ListenSocket).Dispose();
                     this.ListenSocket = null;
                 }
@@ -173,7 +201,8 @@ namespace Medo.Net {
         /// <param name="packet">Packet to send.</param>
         /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
-        public static void Send(TinyPacket packet, IPAddress address) {
+        public static void Send(TinyPacket packet, IPAddress address)
+        {
             Send(packet, new IPEndPoint(address, TinyMessage.DefaultPort));
         }
 
@@ -184,7 +213,8 @@ namespace Medo.Net {
         /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
         /// <param name="port">Port of destination for packet.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
-        public static void Send(TinyPacket packet, IPAddress address, Int32 port) {
+        public static void Send(TinyPacket packet, IPAddress address, Int32 port)
+        {
             Send(packet, new IPEndPoint(address, port));
         }
 
@@ -194,11 +224,14 @@ namespace Medo.Net {
         /// <param name="packet">Packet to send.</param>
         /// <param name="remoteEndPoint">Address of destination for packet. It can be broadcast address.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
-        public static void Send(TinyPacket packet, IPEndPoint remoteEndPoint) {
+        public static void Send(TinyPacket packet, IPEndPoint remoteEndPoint)
+        {
             if (packet == null) { throw new ArgumentNullException("packet", "Packet is null."); }
             if (remoteEndPoint == null) { throw new ArgumentNullException("remoteEndPoint", "Remote IP end point is null."); }
-            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)) {
-                if (remoteEndPoint.Address == IPAddress.Broadcast) {
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            {
+                if (remoteEndPoint.Address == IPAddress.Broadcast)
+                {
                     socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
                 }
                 if (IsRunningOnMono == false) { socket.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.NoChecksum, false); }
@@ -215,7 +248,8 @@ namespace Medo.Net {
         /// <param name="packet">Packet to send.</param>
         /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
-        public static TinyPacket SendAndReceive(TinyPacket packet, IPAddress address) {
+        public static TinyPacket SendAndReceive(TinyPacket packet, IPAddress address)
+        {
             return SendAndReceive(packet, new IPEndPoint(address, TinyMessage.DefaultPort), 250);
         }
 
@@ -228,7 +262,8 @@ namespace Medo.Net {
         /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
         /// <param name="port">Port of destination for packet.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
-        public static TinyPacket SendAndReceive(TinyPacket packet, IPAddress address, Int32 port) {
+        public static TinyPacket SendAndReceive(TinyPacket packet, IPAddress address, Int32 port)
+        {
             return SendAndReceive(packet, new IPEndPoint(address, port), 250);
         }
 
@@ -240,12 +275,15 @@ namespace Medo.Net {
         /// <param name="remoteEndPoint">Address of destination for packet. It can be broadcast address.</param>
         /// <param name="receiveTimeout">Number of milliseconds to wait for receive operation to be done. If number is zero, infinite timeout will be used.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
-        public static TinyPacket SendAndReceive(TinyPacket packet, IPEndPoint remoteEndPoint, Int32 receiveTimeout) {
+        public static TinyPacket SendAndReceive(TinyPacket packet, IPEndPoint remoteEndPoint, Int32 receiveTimeout)
+        {
             if (packet == null) { throw new ArgumentNullException("packet", "Packet is null."); }
             if (remoteEndPoint == null) { throw new ArgumentNullException("remoteEndPoint", "Remote IP end point is null."); }
-            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)) {
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            {
                 socket.ReceiveTimeout = receiveTimeout;
-                if (remoteEndPoint.Address == IPAddress.Broadcast) {
+                if (remoteEndPoint.Address == IPAddress.Broadcast)
+                {
                     socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
                 }
                 if (IsRunningOnMono == false) { socket.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.NoChecksum, false); }
@@ -255,12 +293,15 @@ namespace Medo.Net {
 
                 EndPoint remoteEndPointIn = (EndPoint)(new IPEndPoint(IPAddress.Any, 0));
                 var bytesIn = new byte[65536];
-                try {
+                try
+                {
                     int len = socket.ReceiveFrom(bytesIn, ref remoteEndPointIn);
                     var packetIn = Medo.Net.TinyPacket.Parse(bytesIn, 0, len);
                     Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage [{0} <- {1}]", packetIn, remoteEndPointIn));
                     return packetIn;
-                } catch (SocketException) {
+                }
+                catch (SocketException)
+                {
                     return null;
                 }
             }
@@ -272,7 +313,8 @@ namespace Medo.Net {
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
-        public void Dispose() {
+        public void Dispose()
+        {
             this.Dispose(true);
             System.GC.SuppressFinalize(this);
         }
@@ -281,8 +323,10 @@ namespace Medo.Net {
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
-        protected virtual void Dispose(bool disposing) {
-            if (disposing) {
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
                 this.CloseAsync();
             }
         }
@@ -300,7 +344,8 @@ namespace Medo.Net {
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
     [DebuggerDisplay(@"{Product + "":"" + Operation}")]
-    public class TinyPacket : IDisposable, IEnumerable<KeyValuePair<String, String>> {
+    public class TinyPacket : IDisposable, IEnumerable<KeyValuePair<String, String>>
+    {
 
         /// <summary>
         /// Creates new instance
@@ -309,7 +354,8 @@ namespace Medo.Net {
         /// <param name="operation">Message type.</param>
         /// <exception cref="System.ArgumentNullException">Product is null or empty. -or- Operation is null or empty.</exception>
         /// <exception cref="System.ArgumentException">Product contains space character. -or- Operation contains space character.</exception>
-        public TinyPacket(String product, String operation) {
+        public TinyPacket(String product, String operation)
+        {
             if (string.IsNullOrEmpty(product)) { throw new ArgumentNullException("product", "Product is null or empty."); }
             if (product.Contains(" ")) { throw new ArgumentException("Product contains space character.", "product"); }
             if (string.IsNullOrEmpty(operation)) { throw new ArgumentNullException("operation", "Operation is null or empty."); }
@@ -328,7 +374,8 @@ namespace Medo.Net {
         /// <param name="items">Data to be encoded in JSON.</param>
         /// <exception cref="System.ArgumentNullException">Product is null or empty. -or- Operation is null or empty.</exception>
         /// <exception cref="System.ArgumentException">Product contains space character. -or- Operation contains space character.</exception>
-        internal TinyPacket(String product, String operation, IDictionary<String, String> items) {
+        internal TinyPacket(String product, String operation, IDictionary<String, String> items)
+        {
             if (string.IsNullOrEmpty(product)) { throw new ArgumentNullException("product", "Product is null or empty."); }
             if (product.Contains(" ")) { throw new ArgumentException("Product contains space character.", "product"); }
             if (string.IsNullOrEmpty(operation)) { throw new ArgumentNullException("operation", "Operation is null or empty."); }
@@ -358,19 +405,28 @@ namespace Medo.Net {
         /// </summary>
         /// <param name="key">Key.</param>
         /// <exception cref="System.NotSupportedException">Data is read-only.</exception>
-        public String this[String key] {
-            get {
-                if (this.Items.ContainsKey(key)) {
+        public String this[String key]
+        {
+            get
+            {
+                if (this.Items.ContainsKey(key))
+                {
                     return this.Items[key];
-                } else {
+                }
+                else
+                {
                     return null;
                 }
             }
-            set {
+            set
+            {
                 if (this.IsReadOnly) { throw new NotSupportedException("Data is read-only."); }
-                if (this.Items.ContainsKey(key)) {
+                if (this.Items.ContainsKey(key))
+                {
                     this.Items[key] = value;
-                } else {
+                }
+                else
+                {
                     this.Items.Add(key, value);
                 }
             }
@@ -382,8 +438,10 @@ namespace Medo.Net {
         /// Converts message to it's representation in bytes.
         /// </summary>
         /// <exception cref="System.InvalidOperationException">Packet length exceeds 65507 bytes.</exception>
-        public Byte[] GetBytes() {
-            using (var stream = new MemoryStream()) {
+        public Byte[] GetBytes()
+        {
+            using (var stream = new MemoryStream())
+            {
                 byte[] protocolBytes = TextEncoding.GetBytes("Tiny");
                 stream.Write(protocolBytes, 0, protocolBytes.Length);
                 stream.Write(new byte[] { 0x20 }, 0, 1);
@@ -397,26 +455,33 @@ namespace Medo.Net {
                 stream.Write(new byte[] { 0x20 }, 0, 1);
 
                 var addComma = false;
-                if (this.Items != null) {
+                if (this.Items != null)
+                {
                     stream.Write(new byte[] { 0x7B }, 0, 1); //{
-                    foreach (var item in this.Items) {
+                    foreach (var item in this.Items)
+                    {
                         if (addComma) { stream.Write(new byte[] { 0x2C }, 0, 1); } //,
                         byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
                         stream.Write(new byte[] { 0x22 }, 0, 1); //"
                         stream.Write(keyBytes, 0, keyBytes.Length);
                         stream.Write(new byte[] { 0x22, 0x3A }, 0, 2); //":
-                        if (item.Value != null) {
+                        if (item.Value != null)
+                        {
                             byte[] valueBytes = TextEncoding.GetBytes(JsonEncode(item.Value));
                             stream.Write(new byte[] { 0x22 }, 0, 1); //"
                             stream.Write(valueBytes, 0, valueBytes.Length);
                             stream.Write(new byte[] { 0x22 }, 0, 1); //"
-                        } else {
+                        }
+                        else
+                        {
                             stream.Write(new byte[] { 0x6E, 0x75, 0x6C, 0x6C }, 0, 4); //null
                         }
                         addComma = true;
                     }
                     stream.Write(new byte[] { 0x7D }, 0, 1); //}
-                } else {
+                }
+                else
+                {
                     stream.Write(new byte[] { 0x6E, 0x75, 0x6C, 0x6C }, 0, 4); //null
                 }
 
@@ -426,10 +491,13 @@ namespace Medo.Net {
             }
         }
 
-        private static string JsonEncode(string value) {
+        private static string JsonEncode(string value)
+        {
             var sb = new StringBuilder();
-            foreach (char ch in value) {
-                switch (ch) {
+            foreach (char ch in value)
+            {
+                switch (ch)
+                {
                     case '\"': sb.Append("\\\""); break;
                     case '\\': sb.Append("\\\\"); break;
                     case '/': sb.Append(@"\/"); break;
@@ -439,9 +507,12 @@ namespace Medo.Net {
                     case '\r': sb.Append(@"\r"); break;
                     case '\t': sb.Append(@"\t"); break;
                     default:
-                        if (char.IsControl(ch)) {
+                        if (char.IsControl(ch))
+                        {
                             sb.Append("\\u" + ((int)ch).ToString("x4", CultureInfo.InvariantCulture));
-                        } else {
+                        }
+                        else
+                        {
                             sb.Append(ch);
                         }
                         break;
@@ -456,7 +527,8 @@ namespace Medo.Net {
         /// <param name="buffer">Byte array.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
-        public static TinyPacket Parse(Byte[] buffer) {
+        public static TinyPacket Parse(Byte[] buffer)
+        {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
 
             return Parse(buffer, 0, buffer.Length);
@@ -471,13 +543,15 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
         /// <exception cref="System.FormatException">Cannot parse packet.</exception>
-        public static TinyPacket ParseHeaderOnly(Byte[] buffer, Int32 offset, Int32 count) {
+        public static TinyPacket ParseHeaderOnly(Byte[] buffer, Int32 offset, Int32 count)
+        {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
             if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
             if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
 
-            using (var stream = new MemoryStream(buffer, offset, count)) {
+            using (var stream = new MemoryStream(buffer, offset, count))
+            {
                 string protocol = ReadToSpaceOrEnd(stream);
                 if (string.Equals(protocol, "Tiny", StringComparison.Ordinal) == false) { throw new System.FormatException("Cannot parse packet."); }
 
@@ -499,13 +573,15 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
         /// <exception cref="System.FormatException">Cannot parse packet.</exception>
-        public static TinyPacket Parse(Byte[] buffer, Int32 offset, Int32 count) {
+        public static TinyPacket Parse(Byte[] buffer, Int32 offset, Int32 count)
+        {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
             if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
             if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
 
-            using (var stream = new MemoryStream(buffer, offset, count)) {
+            using (var stream = new MemoryStream(buffer, offset, count))
+            {
                 string protocol = ReadToSpaceOrEnd(stream);
                 if (string.Equals(protocol, "Tiny", StringComparison.Ordinal) == false) { throw new System.FormatException("Cannot parse packet."); }
 
@@ -517,22 +593,34 @@ namespace Medo.Net {
                 var data = new Dictionary<string, string>();
 
                 var jsonBytes = new byte[stream.Length - stream.Position];
-                if (jsonBytes.Length > 0) {
+                if (jsonBytes.Length > 0)
+                {
                     stream.Read(jsonBytes, 0, jsonBytes.Length);
                     var jsonText = new Queue<char>(TextEncoding.GetString(jsonBytes));
-                    while (true) { //remove whitespace and determine content kind
+                    while (true)
+                    { //remove whitespace and determine content kind
                         var ch = jsonText.Peek();
-                        if (ch == ' ') {
+                        if (ch == ' ')
+                        {
                             jsonText.Dequeue();
-                        } else if (ch == '{') {
+                        }
+                        else if (ch == '{')
+                        {
                             ParseJsonObject(jsonText, data);
                             break;
-                        } else {
-                            if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'n')) {
-                                if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'u')) {
-                                    if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'l')) {
-                                        if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'l')) {
-                                            while ((jsonText.Count > 0) && (jsonText.Peek() == ' ')) {
+                        }
+                        else
+                        {
+                            if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'n'))
+                            {
+                                if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'u'))
+                                {
+                                    if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'l'))
+                                    {
+                                        if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'l'))
+                                        {
+                                            while ((jsonText.Count > 0) && (jsonText.Peek() == ' '))
+                                            {
                                                 jsonText.Dequeue();
                                             }
                                             if (jsonText.Count == 0) { break; }
@@ -549,63 +637,86 @@ namespace Medo.Net {
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Cyclomatic complexity is actually lower than code analysis shows.")]
-        private static JsonState ParseJsonObject(Queue<char> jsonText, Dictionary<string, string> data) {
+        private static JsonState ParseJsonObject(Queue<char> jsonText, Dictionary<string, string> data)
+        {
             var state = JsonState.Default;
             var sbName = new StringBuilder();
             var sbValue = new StringBuilder();
-            while (jsonText.Count > 0) {
+            while (jsonText.Count > 0)
+            {
                 var ch = jsonText.Dequeue();
-                switch (state) {
-                    case JsonState.Default: {
-                            switch (ch) {
+                switch (state)
+                {
+                    case JsonState.Default:
+                        {
+                            switch (ch)
+                            {
                                 case '{': state = JsonState.LookingForNameStart; break;
                                 default: throw new System.FormatException("Cannot find item start.");
                             }
-                        } break;
+                        }
+                        break;
 
-                    case JsonState.LookingForNameStart: {
-                            switch (ch) {
+                    case JsonState.LookingForNameStart:
+                        {
+                            switch (ch)
+                            {
                                 case ' ': break;
                                 case '}': state = JsonState.DeadEnd; break; //empty object
                                 case '\"': state = JsonState.LookingForNameEnd; break;
                                 default: throw new System.FormatException("Cannot find key name start.");
                             }
-                        } break;
+                        }
+                        break;
 
-                    case JsonState.LookingForNameEnd: {
-                            switch (ch) {
+                    case JsonState.LookingForNameEnd:
+                        {
+                            switch (ch)
+                            {
                                 case '\\': sbName.Append(Descape(jsonText)); break;
                                 case '\"': state = JsonState.LookingForPairSeparator; break;
                                 default: sbName.Append(ch); break;
                             }
-                        } break;
+                        }
+                        break;
 
-                    case JsonState.LookingForPairSeparator: {
-                            switch (ch) {
+                    case JsonState.LookingForPairSeparator:
+                        {
+                            switch (ch)
+                            {
                                 case ' ': break;
                                 case ':': state = JsonState.LookingForValueStart; break;
                                 default: throw new System.FormatException("Cannot find name/value separator.");
                             }
-                        } break;
+                        }
+                        break;
 
-                    case JsonState.LookingForValueStart: {
-                            switch (ch) {
+                    case JsonState.LookingForValueStart:
+                        {
+                            switch (ch)
+                            {
                                 case ' ': break;
                                 case '\"': state = JsonState.LookingForValueEnd; break;
                                 case 'n': state = JsonState.LookingForNullChar2; break;
                                 default: throw new System.FormatException("Cannot find key value start.");
                             }
-                        } break;
+                        }
+                        break;
 
-                    case JsonState.LookingForValueEnd: {
-                            switch (ch) {
+                    case JsonState.LookingForValueEnd:
+                        {
+                            switch (ch)
+                            {
                                 case '\\': sbValue.Append(Descape(jsonText)); break;
                                 case '\"':
                                     var name = sbName.ToString();
                                     var value = sbValue.ToString();
-                                    if (data.ContainsKey(name)) {
+                                    if (data.ContainsKey(name))
+                                    {
                                         data[name] = value;
-                                    } else {
+                                    }
+                                    else
+                                    {
                                         data.Add(name, value);
                                     }
                                     sbName.Length = 0;
@@ -614,29 +725,41 @@ namespace Medo.Net {
                                     break;
                                 default: sbValue.Append(ch); break;
                             }
-                        } break;
+                        }
+                        break;
 
-                    case JsonState.LookingForNullChar2: {
-                            switch (ch) {
+                    case JsonState.LookingForNullChar2:
+                        {
+                            switch (ch)
+                            {
                                 case 'u': state = JsonState.LookingForNullChar3; break;
                                 default: throw new System.FormatException("Cannot find null.");
                             }
-                        } break;
+                        }
+                        break;
 
-                    case JsonState.LookingForNullChar3: {
-                            switch (ch) {
+                    case JsonState.LookingForNullChar3:
+                        {
+                            switch (ch)
+                            {
                                 case 'l': state = JsonState.LookingForNullChar4; break;
                                 default: throw new System.FormatException("Cannot find null.");
                             }
-                        } break;
+                        }
+                        break;
 
-                    case JsonState.LookingForNullChar4: {
-                            switch (ch) {
+                    case JsonState.LookingForNullChar4:
+                        {
+                            switch (ch)
+                            {
                                 case 'l':
                                     var name = sbName.ToString();
-                                    if (data.ContainsKey(name)) {
+                                    if (data.ContainsKey(name))
+                                    {
                                         data[name] = null;
-                                    } else {
+                                    }
+                                    else
+                                    {
                                         data.Add(name, null);
                                     }
                                     sbName.Length = 0;
@@ -645,23 +768,30 @@ namespace Medo.Net {
                                     break;
                                 default: throw new System.FormatException("Cannot find null.");
                             }
-                        } break;
+                        }
+                        break;
 
-                    case JsonState.LookingForObjectEnd: {
-                            switch (ch) {
+                    case JsonState.LookingForObjectEnd:
+                        {
+                            switch (ch)
+                            {
                                 case ' ': break;
                                 case ',': state = JsonState.LookingForNameStart; break;
                                 case '}': state = JsonState.DeadEnd; break;
                                 default: throw new System.FormatException("Cannot find item start.");
                             }
-                        } break;
+                        }
+                        break;
 
-                    case JsonState.DeadEnd: {
-                            switch (ch) {
+                    case JsonState.DeadEnd:
+                        {
+                            switch (ch)
+                            {
                                 case ' ': break;
                                 default: throw new System.FormatException("Unexpected data.");
                             }
-                        } break;
+                        }
+                        break;
 
                     default: throw new System.FormatException("Unexpected state.");
 
@@ -670,9 +800,11 @@ namespace Medo.Net {
             return state;
         }
 
-        private static string Descape(Queue<char> jsonText) {
+        private static string Descape(Queue<char> jsonText)
+        {
             var ch = jsonText.Dequeue();
-            switch (ch) {
+            switch (ch)
+            {
                 case '\"': return "\"";
                 case '\\': return "\\";
                 case '/': return "/";
@@ -689,13 +821,18 @@ namespace Medo.Net {
             }
         }
 
-        private static string ReadToSpaceOrEnd(MemoryStream stream) {
+        private static string ReadToSpaceOrEnd(MemoryStream stream)
+        {
             var bytes = new List<byte>(); ;
-            while (stream.Position < stream.Length) {
+            while (stream.Position < stream.Length)
+            {
                 var oneByte = (byte)stream.ReadByte();
-                if (oneByte == 0x20) {
+                if (oneByte == 0x20)
+                {
                     break;
-                } else {
+                }
+                else
+                {
                     bytes.Add(oneByte);
                 }
             }
@@ -706,14 +843,16 @@ namespace Medo.Net {
         /// Determines whether the specified object is equal to the current object.
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
-        public override Boolean Equals(Object obj) {
+        public override Boolean Equals(Object obj)
+        {
             return base.Equals(obj);
         }
 
         /// <summary>
         /// Serves as a hash function for a particular type.
         /// </summary>
-        public override Int32 GetHashCode() {
+        public override Int32 GetHashCode()
+        {
             return (this.Product).GetHashCode() ^ this.Operation.GetHashCode();
         }
 
@@ -723,7 +862,8 @@ namespace Medo.Net {
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
-        public void Dispose() {
+        public void Dispose()
+        {
             this.Dispose(true);
             System.GC.SuppressFinalize(this);
         }
@@ -732,8 +872,10 @@ namespace Medo.Net {
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
-        protected virtual void Dispose(bool disposing) {
-            if (disposing) {
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
                 this.Product = null;
                 this.Operation = null;
                 this.Items.Clear();
@@ -747,21 +889,24 @@ namespace Medo.Net {
         /// <summary>
         /// Returns an enumerator.
         /// </summary>
-        public IEnumerator<KeyValuePair<String, String>> GetEnumerator() {
+        public IEnumerator<KeyValuePair<String, String>> GetEnumerator()
+        {
             return this.Items.GetEnumerator();
         }
 
         /// <summary>
         /// Returns an enumerator.
         /// </summary>
-        IEnumerator IEnumerable.GetEnumerator() {
+        IEnumerator IEnumerable.GetEnumerator()
+        {
             return this.GetEnumerator();
         }
 
         #endregion
 
 
-        private enum JsonState {
+        private enum JsonState
+        {
             Default,
             LookingForObjectStart,
             LookingForNameStart,
@@ -784,7 +929,8 @@ namespace Medo.Net {
     /// <summary>
     /// Event arguments for TinyPacketReceived message.
     /// </summary>
-    public class TinyPacketEventArgs : EventArgs {
+    public class TinyPacketEventArgs : EventArgs
+    {
 
         private readonly byte[] Buffer;
         private readonly int Offset;
@@ -799,7 +945,8 @@ namespace Medo.Net {
         /// <param name="remoteEndPoint">Remote end point.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
-        public TinyPacketEventArgs(Byte[] buffer, Int32 offset, Int32 count, IPEndPoint remoteEndPoint) {
+        public TinyPacketEventArgs(Byte[] buffer, Int32 offset, Int32 count, IPEndPoint remoteEndPoint)
+        {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
             if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
@@ -821,7 +968,8 @@ namespace Medo.Net {
         /// </summary>
         /// <exception cref="System.FormatException">Cannot parse packet.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method might throw exception.")]
-        public TinyPacket GetPacket() {
+        public TinyPacket GetPacket()
+        {
             return TinyPacket.Parse(this.Buffer, this.Offset, this.Count);
         }
 
@@ -830,7 +978,8 @@ namespace Medo.Net {
         /// </summary>
         /// <exception cref="System.FormatException">Cannot parse packet.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is appropriate here.")]
-        public TinyPacket GetPacketWithoutData() {
+        public TinyPacket GetPacketWithoutData()
+        {
             return TinyPacket.ParseHeaderOnly(this.Buffer, this.Offset, this.Count);
         }
 
