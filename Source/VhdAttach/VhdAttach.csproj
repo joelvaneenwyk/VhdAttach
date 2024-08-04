@@ -1,27 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-<TargetFramework>net8.0-windows</TargetFramework>
-<Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-<OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <OutputType>WinExe</OutputType>
     <ApplicationIcon>Properties\App.ico</ApplicationIcon>
     <ApplicationManifest>Properties\App.manifest</ApplicationManifest>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Properties\App.snk</AssemblyOriginatorKeyFile>
-<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
-<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-<UseWindowsForms>true</UseWindowsForms>
-<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <OutputPath>..\..\Binaries\</OutputPath>
-<Platforms>x64</Platforms>
-</PropertyGroup>
+    <Platforms>x64</Platforms>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="%28Medo%29\AboutBox [014].cs" />
     <Compile Include="%28Medo%29\Args [002].cs" />
@@ -85,20 +77,20 @@
     <Compile Include="Utility.cs" />
     <Compile Include="VirtualHardDiskImage\DynamicDiskHeader.cs" />
     <Compile Include="VirtualHardDiskImage\HardDiskFooter.cs" />
-<None Update="Properties\App.manifest">
+    <None Update="Properties\App.manifest">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties\App.ico" />
   </ItemGroup>
-<PropertyGroup />
+  <PropertyGroup />
 
   <ItemGroup>
-<PackageReference Include="System.Management" Version="8.0.0" />
-<PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
 
-</ItemGroup>
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Core.System.ServiceProcess\System.Configuration.Install\System.Configuration.Install.csproj" />

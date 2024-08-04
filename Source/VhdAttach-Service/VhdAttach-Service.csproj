@@ -65,12 +65,10 @@
   </ItemGroup>
   <PropertyGroup />
   <ItemGroup>
-    <PackageReference Include="Core.System.Configuration.Install" Version="1.1.0" />
-    <PackageReference Include="Core.System.ServiceProcess" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="9.0.0-preview.6.24327.7" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Management" Version="9.0.0-preview.6.24327.7" />
-    <PackageReference Include="System.ServiceProcess.ServiceController" Version="9.0.0-preview.6.24327.7" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.System.ServiceProcess\System.Configuration.Install\System.Configuration.Install.csproj" />
