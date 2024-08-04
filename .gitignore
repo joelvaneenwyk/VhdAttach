@@ -31,3 +31,5 @@ Temporary/**
 *.vspscc
 *.vssscc
 *.zip
+
+*.upgrade.json
