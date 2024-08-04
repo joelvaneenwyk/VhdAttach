@@ -7,6 +7,8 @@ automatic disk attachment during system startup.
 
 ## Shortcut Keys
 
+<!-- markdownlint-disable MD033 -->
+
 - <kbd>F5</kbd>                      Refresh.
 - <kbd>F6</kbd>                      Attach.
 - <kbd>Ctrl</kbd>+<kbd>A</kbd>        Select all.
