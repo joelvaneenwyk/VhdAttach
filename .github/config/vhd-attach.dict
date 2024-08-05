@@ -87,6 +87,7 @@ signtool
 SIGNTOOL
 SYSTEMMODAL
 TASKMODAL
+testsettings
 TIMESTAMPURL
 TYPEMASK
 UNCOMMITED
@@ -96,6 +97,11 @@ uxml
 verifystore
 vhdattach
 VHDX
+vsconfig
+vshost
+vsmdi
+vspscc
+vssscc
 WINRAR
 WTSSESSION
 xamlx

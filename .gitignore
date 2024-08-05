@@ -36,5 +36,8 @@ Temporary/**
 
 *.upgrade.json
 *.csproj.DotSettings
+*.sln.DotSettings.user
 
 .build/
+
+/.vsconfig
