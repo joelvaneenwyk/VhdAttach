@@ -1,8 +1,8 @@
-#define AppName        GetStringFileInfo('..\Binaries\VhdAttach.exe', 'ProductName')
-#define AppVersion     GetStringFileInfo('..\Binaries\VhdAttach.exe', 'ProductVersion')
-#define AppFileVersion GetStringFileInfo('..\Binaries\VhdAttach.exe', 'FileVersion')
-#define AppCompany     GetStringFileInfo('..\Binaries\VhdAttach.exe', 'CompanyName')
-#define AppCopyright   GetStringFileInfo('..\Binaries\VhdAttach.exe', 'LegalCopyright')
+#define AppName        GetStringFileInfo('..\Binaries\Release\x64\net8.0-windows\VhdAttach.exe', 'ProductName')
+#define AppVersion     GetStringFileInfo('..\Binaries\Release\x64\net8.0-windows\VhdAttach.exe', 'ProductVersion')
+#define AppFileVersion GetStringFileInfo('..\Binaries\Release\x64\net8.0-windows\VhdAttach.exe', 'FileVersion')
+#define AppCompany     GetStringFileInfo('..\Binaries\Release\x64\net8.0-windows\VhdAttach.exe', 'CompanyName')
+#define AppCopyright   GetStringFileInfo('..\Binaries\Release\x64\net8.0-windows\VhdAttach.exe', 'LegalCopyright')
 #define AppBase        LowerCase(StringChange(AppName, ' ', ''))
 #define AppSetupFile   AppBase + StringChange(AppVersion, '.', '')
 
@@ -53,10 +53,10 @@ BeveledLabel=medo64.com
 
 
 [Files]
-Source: "VhdAttach.exe";         DestDir: "{app}";                            Flags: ignoreversion;
-Source: "VhdAttach.pdb";         DestDir: "{app}";                            Flags: ignoreversion;
-Source: "VhdAttachService.exe";  DestDir: "{app}";                            Flags: ignoreversion;
-Source: "VhdAttachService.pdb";  DestDir: "{app}";                            Flags: ignoreversion;
+Source: "Release\x64\net8.0-windows\VhdAttach.exe";         DestDir: "{app}";                            Flags: ignoreversion;
+; Source: "Release\x64\net8.0-windows\VhdAttach.pdb";         DestDir: "{app}";                            Flags: ignoreversion;
+Source: "Release\x64\net8.0-windows\VhdAttachService.exe";  DestDir: "{app}";                            Flags: ignoreversion;
+; Source: "Release\x64\net8.0-windows\VhdAttachService.pdb";  DestDir: "{app}";                            Flags: ignoreversion;
 Source: "..\README.md";          DestDir: "{app}";  DestName: "ReadMe.txt";   Flags: overwritereadonly uninsremovereadonly;  Attribs: readonly;
 Source: "..\LICENSE.md";         DestDir: "{app}";  DestName: "License.txt";  Flags: overwritereadonly uninsremovereadonly;  Attribs: readonly;
 
@@ -104,7 +104,7 @@ Root: HKCR;  Subkey: "Windows.VhdFile\shell\VhdAttach-Open";                    
 Root: HKCR;  Subkey: "Windows.VhdFile\shell\VhdAttach-Open";                    ValueType: string;  ValueName: "Icon";              ValueData: """{app}\VhdAttach.exe""";                           Tasks: context_open context_vhd_open;
 Root: HKCR;  Subkey: "Windows.VhdFile\shell\VhdAttach-Open";                    ValueType: string;  ValueName: "MultiSelectModel";  ValueData: "Document";                                          Tasks: context_open context_vhd_open;
 Root: HKCR;  Subkey: "Windows.VhdFile\shell\VhdAttach-Open\command";            ValueType: string;  ValueName: "";                  ValueData: """{app}\VhdAttach.exe"" ""%1""";                    Tasks: context_open context_vhd_open;
-                                                                     
+
 Root: HKCR;  Subkey: "VhdAttachFile\shell\Attach";                              ValueType: none;    Flags: deletekey;
 Root: HKCR;  Subkey: "Windows.VhdFile\shell\VhdAttach-Attach";                  ValueType: none;    Flags: deletekey uninsdeletekey;
 Root: HKCR;  Subkey: "Windows.VhdFile\shell\VhdAttach-Attach";                  ValueType: string;  ValueName: "";                  ValueData: "Attach";                                            Tasks: context_attach context_vhd_attach;
