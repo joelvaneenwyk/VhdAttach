@@ -36,3 +36,5 @@ Temporary/**
 
 *.upgrade.json
 *.csproj.DotSettings
+
+.build/

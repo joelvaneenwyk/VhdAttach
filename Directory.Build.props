@@ -24,7 +24,7 @@
     <!-- Set Folder Variables -->
     <PropertyGroup>
         <WorkspaceFolder>$(MSBuildThisFileDirectory.TrimEnd('\/'))</WorkspaceFolder>
-        <OutNoSlash>$(WorkspaceFolder)/bin/$(Configuration)/$(Platform)$(TargetArchitecture)</OutNoSlash>
+        <OutNoSlash>$(WorkspaceFolder)/Binaries/$(Configuration)/$(Platform)$(TargetArchitecture)</OutNoSlash>
         <IntNoSlash>$(WorkspaceFolder)/.build/$(MSBuildProjectName)/$(Configuration)/$(Platform)$(TargetArchitecture)</IntNoSlash>
     </PropertyGroup>
 

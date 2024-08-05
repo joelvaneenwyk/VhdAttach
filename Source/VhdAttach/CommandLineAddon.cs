@@ -28,7 +28,7 @@ namespace VhdAttach
     {
         /// <summary>
         /// Change the drive letter of an attached VHD.
-        /// <summary>
+        /// </summary>
         public int ChangeDriveLetter(string[] args)
         {
 

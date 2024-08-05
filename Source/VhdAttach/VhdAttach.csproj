@@ -1,110 +1,109 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <OutputType>WinExe</OutputType>
-    <ApplicationIcon>Properties\App.ico</ApplicationIcon>
-    <ApplicationManifest>Properties\App.manifest</ApplicationManifest>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Properties\App.snk</AssemblyOriginatorKeyFile>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <OutputPath>..\..\Binaries\</OutputPath>
-    <Platforms>x64</Platforms>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="%28Medo%29\AboutBox [014].cs" />
-    <Compile Include="%28Medo%29\Args [002].cs" />
-    <Compile Include="%28Medo%29\BinaryPrefixExtensions [002x].cs" />
-    <Compile Include="%28Medo%29\EntryAssembly [003].cs" />
-    <Compile Include="%28Medo%29\ErrorReport [020].cs" />
-    <Compile Include="%28Medo%29\MessageBox [007].cs" />
-    <Compile Include="%28Medo%29\NamedPipe [003].cs" />
-    <Compile Include="%28Medo%29\NumberDeclination [001].cs" />
-    <Compile Include="%28Medo%29\RecentFiles [005].cs" />
-    <Compile Include="%28Medo%29\Settings [012].cs" />
-    <Compile Include="%28Medo%29\State [015].cs" />
-    <Compile Include="%28Medo%29\StringAdder [002].cs" />
-    <Compile Include="%28Medo%29\TaskbarProgress [003].cs" />
-    <Compile Include="%28Medo%29\TinyMessage [009].cs" />
-    <Compile Include="%28Medo%29\UnhandledCatch [008].cs" />
-    <Compile Include="%28Medo%29\Upgrade [005].cs" />
-    <Compile Include="%28Medo%29\VirtualDisk [010].cs" />
-    <Compile Include="..\VhdAttach-Service\FileWithOptions.cs">
-      <Link>FileWithOptions.cs</Link>
-    </Compile>
-    <Compile Include="..\VhdAttach-Service\ServiceSettings.cs">
-      <Link>ServiceSettings.cs</Link>
-    </Compile>
-    <Compile Include="..\VhdAttach-Service\Volume.cs">
-      <Link>Volume.cs</Link>
-    </Compile>
-    <Compile Include="App.cs" />
-    <Compile Include="AttachForm.cs" />
-    <Compile Include="AttachForm.Designer.cs" />
-    <Compile Include="ChangeDriveLetterForm.cs" />
-    <Compile Include="ChangeDriveLetterForm.Designer.cs" />
-    <Compile Include="CommandLineAddon.cs" />
-    <Compile Include="CreateFixedDiskForm.cs" />
-    <Compile Include="CreateFixedDiskForm.Designer.cs" />
-    <Compile Include="DetachDriveForm.cs" />
-    <Compile Include="DetachDriveForm.Designer.cs" />
-    <Compile Include="DetachForm.cs" />
-    <Compile Include="DetachForm.Designer.cs" />
-    <Compile Include="FileWithOptionsCollection.cs" />
-    <Compile Include="Helper.cs" />
-    <Compile Include="ListViewVhdItem.cs" />
-    <Compile Include="MainForm.cs" />
-    <Compile Include="MainForm.designer.cs" />
-    <Compile Include="Messages.cs" />
-    <Compile Include="NewDiskForm.cs" />
-    <Compile Include="NewDiskForm.Designer.cs" />
-    <Compile Include="PathFromDevice.cs" />
-    <Compile Include="PipeClient.cs" />
-    <Compile Include="PipeResponse.cs" />
-    <Compile Include="Properties\Resources.Designer.cs" />
-    <Compile Include="Properties\SolutionInfo.cs" />
-    <Compile Include="ReFS.cs" />
-    <Compile Include="RemoveIntegrityStreamForm.cs" />
-    <Compile Include="RemoveIntegrityStreamForm.Designer.cs" />
-    <Compile Include="ServiceWaitForm.cs" />
-    <Compile Include="ServiceWaitForm.Designer.cs" />
-    <Compile Include="Settings.cs" />
-    <Compile Include="SettingsForm.cs" />
-    <Compile Include="SettingsForm.designer.cs" />
-    <Compile Include="Utility.cs" />
-    <Compile Include="VirtualHardDiskImage\DynamicDiskHeader.cs" />
-    <Compile Include="VirtualHardDiskImage\HardDiskFooter.cs" />
-    <None Update="Properties\App.manifest">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Properties\App.ico" />
-  </ItemGroup>
-  <PropertyGroup>
-    <Nullable>enable</Nullable>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <AnalysisLevel>latest-recommended</AnalysisLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DebugType>embedded</DebugType>
-    <WarningLevel>9999</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DebugType>embedded</DebugType>
-    <WarningLevel>9999</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Include="..\..\LICENSE.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Management" Version="8.0.0" />
-    <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+        <OutputType>WinExe</OutputType>
+        <ApplicationIcon>Properties\App.ico</ApplicationIcon>
+        <ApplicationManifest>Properties\App.manifest</ApplicationManifest>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>Properties\App.snk</AssemblyOriginatorKeyFile>
+        <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <UseWindowsForms>true</UseWindowsForms>
+        <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+        <Platforms>x64</Platforms>
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Include="%28Medo%29\AboutBox [014].cs" />
+        <Compile Include="%28Medo%29\Args [002].cs" />
+        <Compile Include="%28Medo%29\BinaryPrefixExtensions [002x].cs" />
+        <Compile Include="%28Medo%29\EntryAssembly [003].cs" />
+        <Compile Include="%28Medo%29\ErrorReport [020].cs" />
+        <Compile Include="%28Medo%29\MessageBox [007].cs" />
+        <Compile Include="%28Medo%29\NamedPipe [003].cs" />
+        <Compile Include="%28Medo%29\NumberDeclination [001].cs" />
+        <Compile Include="%28Medo%29\RecentFiles [005].cs" />
+        <Compile Include="%28Medo%29\Settings [012].cs" />
+        <Compile Include="%28Medo%29\State [015].cs" />
+        <Compile Include="%28Medo%29\StringAdder [002].cs" />
+        <Compile Include="%28Medo%29\TaskbarProgress [003].cs" />
+        <Compile Include="%28Medo%29\TinyMessage [009].cs" />
+        <Compile Include="%28Medo%29\UnhandledCatch [008].cs" />
+        <Compile Include="%28Medo%29\Upgrade [005].cs" />
+        <Compile Include="%28Medo%29\VirtualDisk [010].cs" />
+        <Compile Include="..\VhdAttach-Service\FileWithOptions.cs">
+            <Link>FileWithOptions.cs</Link>
+        </Compile>
+        <Compile Include="..\VhdAttach-Service\ServiceSettings.cs">
+            <Link>ServiceSettings.cs</Link>
+        </Compile>
+        <Compile Include="..\VhdAttach-Service\Volume.cs">
+            <Link>Volume.cs</Link>
+        </Compile>
+        <Compile Include="App.cs" />
+        <Compile Include="AttachForm.cs" />
+        <Compile Include="AttachForm.Designer.cs" />
+        <Compile Include="ChangeDriveLetterForm.cs" />
+        <Compile Include="ChangeDriveLetterForm.Designer.cs" />
+        <Compile Include="CommandLineAddon.cs" />
+        <Compile Include="CreateFixedDiskForm.cs" />
+        <Compile Include="CreateFixedDiskForm.Designer.cs" />
+        <Compile Include="DetachDriveForm.cs" />
+        <Compile Include="DetachDriveForm.Designer.cs" />
+        <Compile Include="DetachForm.cs" />
+        <Compile Include="DetachForm.Designer.cs" />
+        <Compile Include="FileWithOptionsCollection.cs" />
+        <Compile Include="Helper.cs" />
+        <Compile Include="ListViewVhdItem.cs" />
+        <Compile Include="MainForm.cs" />
+        <Compile Include="MainForm.designer.cs" />
+        <Compile Include="Messages.cs" />
+        <Compile Include="NewDiskForm.cs" />
+        <Compile Include="NewDiskForm.Designer.cs" />
+        <Compile Include="PathFromDevice.cs" />
+        <Compile Include="PipeClient.cs" />
+        <Compile Include="PipeResponse.cs" />
+        <Compile Include="Properties\Resources.Designer.cs" />
+        <Compile Include="Properties\SolutionInfo.cs" />
+        <Compile Include="ReFS.cs" />
+        <Compile Include="RemoveIntegrityStreamForm.cs" />
+        <Compile Include="RemoveIntegrityStreamForm.Designer.cs" />
+        <Compile Include="ServiceWaitForm.cs" />
+        <Compile Include="ServiceWaitForm.Designer.cs" />
+        <Compile Include="Settings.cs" />
+        <Compile Include="SettingsForm.cs" />
+        <Compile Include="SettingsForm.designer.cs" />
+        <Compile Include="Utility.cs" />
+        <Compile Include="VirtualHardDiskImage\DynamicDiskHeader.cs" />
+        <Compile Include="VirtualHardDiskImage\HardDiskFooter.cs" />
+        <None Update="Properties\App.manifest">
+            <SubType>Designer</SubType>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="Properties\App.ico" />
+    </ItemGroup>
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+        <AnalysisLevel>latest-recommended</AnalysisLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <DebugType>embedded</DebugType>
+        <WarningLevel>9999</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <DebugType>embedded</DebugType>
+        <WarningLevel>9999</WarningLevel>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="..\..\LICENSE.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="System.Management" Version="8.0.0" />
+        <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
+    </ItemGroup>
 </Project>

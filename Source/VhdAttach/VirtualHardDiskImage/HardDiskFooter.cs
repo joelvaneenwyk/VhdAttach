@@ -39,7 +39,7 @@ namespace VirtualHardDiskImage
         /// <summary>
         /// Create new instance from existing footer bytes.
         /// </summary>
-        /// <param name="Bytes">Footer bytes.</param>
+        /// <param name="bytes">Footer bytes.</param>
         public HardDiskFooter(byte[] bytes)
         {
             if (bytes == null) { throw new ArgumentNullException("bytes", "Argument bytes cannot be null."); }
@@ -50,7 +50,7 @@ namespace VirtualHardDiskImage
 
 
         /// <summary>
-        /// Cookies are used to uniquely identify the original creator of the hard disk image. 
+        /// Cookies are used to uniquely identify the original creator of the hard disk image.
         /// The values are case-sensitive. Microsoft uses the “conectix” string to identify this file as a hard disk image created by Microsoft Virtual Server, Virtual PC, and predecessor products. The cookie is stored as an eight-character ASCII string with the “c” in the first byte, the “o” in the second byte, and so on.
         /// </summary>
         public String Cookie
@@ -72,7 +72,7 @@ namespace VirtualHardDiskImage
         /// <summary>
         /// This is a bit field used to indicate specific feature support. The following table displays the list of features. Any fields not listed are reserved.
         /// Feature  Value:
-        ///     No features enabled  (0x00000000): The hard disk image has no special features enabled in it. 
+        ///     No features enabled  (0x00000000): The hard disk image has no special features enabled in it.
         ///     Temporary (0x00000001): This bit is set if the current disk is a temporary disk. A temporary disk designation indicates to an application that this disk is a candidate for deletion on shutdown.
         ///     Reserved  (0x00000002): This bit must always be set to 1.  All other bits are also reserved and should be set to 0.
         /// </summary>
@@ -91,7 +91,7 @@ namespace VirtualHardDiskImage
         }
 
         /// <summary>
-        /// This field is divided into a major/minor version and matches the version of the specification used in creating the file. The most-significant two bytes are for the  major version. The least-significant two bytes are the minor version. This must match the file format specification. For the current specification, this field must  be initialized to 0x00010000. The major version will be incremented only when the file format is modified in such a way that it is no longer compatible with older versions of the file format. 
+        /// This field is divided into a major/minor version and matches the version of the specification used in creating the file. The most-significant two bytes are for the  major version. The least-significant two bytes are the minor version. This must match the file format specification. For the current specification, this field must  be initialized to 0x00010000. The major version will be incremented only when the file format is modified in such a way that it is no longer compatible with older versions of the file format.
         /// </summary>
         public Version FileFormatVersion
         {
@@ -166,7 +166,7 @@ namespace VirtualHardDiskImage
         }
 
         /// <summary>
-        /// This field holds the major/minor version of the application that created the hard disk image. Virtual Server 2004 sets this value to 0x00010000 and Virtual PC 2004 sets this to 0x00050000. 
+        /// This field holds the major/minor version of the application that created the hard disk image. Virtual Server 2004 sets this value to 0x00010000 and Virtual PC 2004 sets this to 0x00050000.
         /// </summary>
         public Version CreatorVersion
         {
@@ -188,7 +188,7 @@ namespace VirtualHardDiskImage
         }
 
         /// <summary>
-        /// This field stores the type of host operating system this disk image is created on. 
+        /// This field stores the type of host operating system this disk image is created on.
         ///     Windows  0x5769326B (Wi2k)
         ///     Macintosh  0x4D616320 (Mac )
         /// </summary>
@@ -360,7 +360,7 @@ namespace VirtualHardDiskImage
         }
 
         /// <summary>
-        /// This field holds a one-byte flag that describes whether the system is in saved state. If the hard disk is in the saved state the value is set to 1. Operations such as compaction and expansion cannot be performed on a hard disk in a saved state. 
+        /// This field holds a one-byte flag that describes whether the system is in saved state. If the hard disk is in the saved state the value is set to 1. Operations such as compaction and expansion cannot be performed on a hard disk in a saved state.
         /// </summary>
         public Boolean SavedState
         {
