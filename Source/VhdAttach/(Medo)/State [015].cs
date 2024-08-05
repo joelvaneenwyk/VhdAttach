@@ -19,17 +19,12 @@
 //2010-10-31: Added option to skip registry writes (NoRegistryWrites).
 
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using System.Globalization;
-using System.IO;
 using System.Reflection;
 using System.Security;
 using System.Text;
-using System.Windows.Forms;
 using Microsoft.Win32;
 
 namespace Medo.Windows.Forms

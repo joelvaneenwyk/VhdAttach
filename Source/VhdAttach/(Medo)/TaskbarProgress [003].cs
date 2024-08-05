@@ -4,12 +4,10 @@
 //2011-08-24: Added workaround for Seamless Citrix Application.
 
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 namespace Medo.Windows.Forms
 {

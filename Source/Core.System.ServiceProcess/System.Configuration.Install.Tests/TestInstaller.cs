@@ -1,6 +1,5 @@
-﻿using System.Collections;
+using System.Collections;
 using System.ComponentModel;
-using System.IO;
 
 namespace System.Configuration.Install.Tests
 {

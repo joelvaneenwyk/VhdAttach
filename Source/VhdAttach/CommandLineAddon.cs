@@ -10,11 +10,7 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using Medo.IO;
 using VhdAttachCommon;
 using Timer = System.Timers.Timer;

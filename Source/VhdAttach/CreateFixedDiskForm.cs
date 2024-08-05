@@ -1,9 +1,4 @@
-using System;
 using System.ComponentModel;
-using System.Drawing;
-using System.IO;
-using System.Threading;
-using System.Windows.Forms;
 using Medo.IO;
 using Medo.Reflection;
 using Medo.Windows.Forms;

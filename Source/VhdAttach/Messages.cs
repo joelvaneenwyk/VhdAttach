@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-using MessageBox = Medo.MessageBox;
+﻿using MessageBox = Medo.MessageBox;
 
 namespace VhdAttach
 {

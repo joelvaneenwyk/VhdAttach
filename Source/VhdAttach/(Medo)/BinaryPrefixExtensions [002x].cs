@@ -1,10 +1,9 @@
-﻿//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
+//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
 
 //2008-03-29: Initial version.
 //2008-11-15: All methods now accept long instead of double (to be in sync with IO classes).
 
 
-using System;
 using System.Globalization;
 
 namespace Medo.Extensions

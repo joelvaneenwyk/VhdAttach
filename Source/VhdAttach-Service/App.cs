@@ -1,9 +1,6 @@
-﻿using System;
 using System.Configuration.Install;
 using System.Reflection;
 using System.ServiceProcess;
-using System.Threading;
-using System.Windows.Forms;
 using Medo.Application;
 using Medo.Diagnostics;
 

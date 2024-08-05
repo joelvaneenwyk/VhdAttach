@@ -12,11 +12,8 @@
 //2010-11-22: Changed default exception mode to CatchException.
 
 
-using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using System.Windows.Forms;
 
 namespace Medo.Application
 {

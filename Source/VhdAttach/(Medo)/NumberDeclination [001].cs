@@ -1,11 +1,10 @@
-﻿//Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
+//Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
 
 //2008-08-09: Initial version.
 //2008-11-21: Added GetText method.
 //            Added IDisposable.
 
 
-using System;
 using System.Globalization;
 
 namespace Medo.Localization.Croatia

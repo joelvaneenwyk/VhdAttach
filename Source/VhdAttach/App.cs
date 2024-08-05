@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using System.Threading;
-using System.Windows.Forms;
 using Medo.Application;
 using Medo.Windows.Forms;
 using MessageBox = Medo.MessageBox;

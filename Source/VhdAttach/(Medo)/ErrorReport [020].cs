@@ -30,21 +30,15 @@
 //2008-01-07: First version.
 
 
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using System.Globalization;
-using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Security;
 using System.Text;
-using System.Threading;
-using System.Windows.Forms;
 
 namespace Medo.Diagnostics
 {

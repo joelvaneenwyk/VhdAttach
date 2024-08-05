@@ -4,8 +4,6 @@
 //2012-11-24: Validating arguments.
 
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 

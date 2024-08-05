@@ -17,14 +17,10 @@
 //2012-12-22: Added VHDX creation.
 
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Security.Permissions;
 using System.Text;
-using System.Threading;
 
 namespace Medo.IO
 {

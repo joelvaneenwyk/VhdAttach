@@ -1,10 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using System.Drawing;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using Medo.Reflection;
 
 namespace VhdAttachService

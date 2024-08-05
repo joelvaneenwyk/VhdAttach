@@ -1,5 +1,3 @@
-using System.Runtime.Serialization;
-
 namespace System.Configuration.Install
 {
     /// <summary>The exception that is thrown when an error occurs during the commit, rollback, or uninstall phase of an installation.</summary>

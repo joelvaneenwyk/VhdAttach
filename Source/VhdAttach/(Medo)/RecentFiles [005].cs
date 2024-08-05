@@ -7,10 +7,7 @@
 //2012-08-20: Fixed crash when HideFileExt cannot be found in registry.
 
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Reflection;
 using System.Security;
 using Microsoft.Win32;

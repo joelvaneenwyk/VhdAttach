@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Threading;
 using Medo.IO;
 using Medo.Net;
 

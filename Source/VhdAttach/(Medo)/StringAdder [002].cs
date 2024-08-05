@@ -4,10 +4,8 @@
 //2008-04-11: Cleaned code to match FxCop 1.36 beta 2 (SpecifyIFormatProvider, SpecifyStringComparison).
 
 
-using System;
 using System.Globalization;
 using System.Text;
-using System.Threading;
 
 namespace Medo.Text
 {
