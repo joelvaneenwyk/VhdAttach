@@ -54,38 +54,20 @@ namespace System.ServiceProcess.Design
 		/// <returns>A string representing the password in the service account form. The default is an empty string ("").</returns>
         public string Password
         {
-            get
-            {
-                return passwordEdit.Text;
-            }
-            set
-            {
-                passwordEdit.Text = value;
-            }
+            get => passwordEdit.Text;
+            set => passwordEdit.Text = value;
         }
 
         /// <summary>Gets the dialog result for the service account form.</summary>
         /// <returns>A <see cref="T:System.ServiceProcess.Design.ServiceInstallerDialogResult" /> indicating the user response to the dialog box. The default is <see langword="OK" />.</returns>
-        public ServiceInstallerDialogResult Result
-        {
-            get
-            {
-                return result;
-            }
-        }
+        public ServiceInstallerDialogResult Result => result;
 
         /// <summary>Gets or sets the user name for the service account form.</summary>
 		/// <returns>A string representing the user name in the service account form. The default is an empty string ("").</returns>
         public string Username
         {
-            get
-            {
-                return usernameEdit.Text;
-            }
-            set
-            {
-                usernameEdit.Text = value;
-            }
+            get => usernameEdit.Text;
+            set => usernameEdit.Text = value;
         }
 
         /// <summary>Begins running a standard application message loop and displays the service account form.</summary>

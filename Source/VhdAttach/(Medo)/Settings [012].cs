@@ -46,7 +46,7 @@ namespace Medo.Configuration
     public static class Settings
     {
 
-        private static readonly object _syncRoot = new object(); //used for every access
+        private static readonly object _syncRoot = new(); //used for every access
 
 
         private static string _subkeyPath;
@@ -463,8 +463,7 @@ namespace Medo.Configuration
                         }
                         else
                         {
-                            int intValue;
-                            if (int.TryParse(valueCL, NumberStyles.Integer, CultureInfo.InvariantCulture, out intValue))
+                            if (int.TryParse(valueCL, NumberStyles.Integer, CultureInfo.InvariantCulture, out int intValue))
                             {
                                 retValue = intValue != 0;
                             }
@@ -482,8 +481,7 @@ namespace Medo.Configuration
                         string valueAC = AppConfig[currKey];
                         if (valueAC != null)
                         {
-                            int intValue;
-                            if (int.TryParse(valueAC, NumberStyles.Integer, CultureInfo.InvariantCulture, out intValue))
+                            if (int.TryParse(valueAC, NumberStyles.Integer, CultureInfo.InvariantCulture, out int intValue))
                             {
                                 retValue = intValue != 0;
                             }
@@ -514,8 +512,7 @@ namespace Medo.Configuration
                                             goto Done;
                                         case RegistryValueKind.String:
                                             string strValue = valueRM as string;
-                                            int intValue;
-                                            if (int.TryParse(strValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out intValue))
+                                            if (int.TryParse(strValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out int intValue))
                                             {
                                                 retValue = intValue != 0;
                                             }
@@ -550,8 +547,7 @@ namespace Medo.Configuration
                                             goto Done;
                                         case RegistryValueKind.String:
                                             string strValue = valueCU as string;
-                                            int intValue;
-                                            if (int.TryParse(strValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out intValue))
+                                            if (int.TryParse(strValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out int intValue))
                                             {
                                                 retValue = intValue != 0;
                                             }
@@ -571,8 +567,7 @@ namespace Medo.Configuration
                     if ((Defaults != null) && (Defaults.ContainsKey(currKey)))
                     {
                         string strValue = Defaults[currKey];
-                        int intValue;
-                        if (int.TryParse(strValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out intValue))
+                        if (int.TryParse(strValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out int intValue))
                         {
                             retValue = intValue != 0;
                         }
@@ -803,8 +798,8 @@ namespace Medo.Configuration
         private static class Cache
         {
 
-            private static Dictionary<string, string> _cache = new Dictionary<string, string>();
-            private static readonly object _cacheSyncRoot = new object();
+            private static Dictionary<string, string> _cache = new();
+            private static readonly object _cacheSyncRoot = new();
 
 
             internal static void Clear()
@@ -936,7 +931,7 @@ namespace Medo.Configuration
             /// <param name="count">Number of items.</param>
             public Args(string[] array, int offset, int count)
             {
-                InitializeFromArray(array, offset, count, new[] { "/", "--", "-" }, new[] { ':', '=' });
+                InitializeFromArray(array, offset, count, ["/", "--", "-"], [':', '=']);
             }
 
 
@@ -994,7 +989,7 @@ namespace Medo.Configuration
                     }
                     else
                     {
-                        currList = new List<string>();
+                        currList = [];
                         _items.Add(key, currList);
                     }
                     currList.Add(value);
@@ -1063,7 +1058,7 @@ namespace Medo.Configuration
 
 
 
-        private static Dictionary<string, string> Defaults = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private static Dictionary<string, string> Defaults = new(StringComparer.OrdinalIgnoreCase);
         /// <summary>
         /// Sets defaults to be used as last priority.
         /// </summary>
@@ -1096,22 +1091,13 @@ namespace Medo.Configuration
         }
 
 
-        private static bool IsRunningOnMono
-        {
-            get
-            {
-                return (Type.GetType("Mono.Runtime") != null);
-            }
-        }
+        private static bool IsRunningOnMono => (Type.GetType("Mono.Runtime") != null);
 
 
         private static class Resources
         {
 
-            internal static string ExceptionKeyCannotBeNull
-            {
-                get { return "Key cannot be null."; }
-            }
+            internal static string ExceptionKeyCannotBeNull => "Key cannot be null.";
         }
 
     }

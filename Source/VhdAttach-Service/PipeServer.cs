@@ -11,7 +11,7 @@ namespace VhdAttachService
     internal static class PipeServer
     {
 
-        public static NamedPipe Pipe = new NamedPipe("JosipMedved-VhdAttach-Commands");
+        public static NamedPipe Pipe = new("JosipMedved-VhdAttach-Commands");
 
         public static void Start()
         {
@@ -298,48 +298,38 @@ namespace VhdAttachService
 
             FileInfo vhdFile = null;
 
-            VdsServiceLoader loaderClass = new VdsServiceLoader();
+            VdsServiceLoader loaderClass = new();
             IVdsServiceLoader loader = (IVdsServiceLoader)loaderClass;
 
-            IVdsService service;
-            loader.LoadService(null, out service);
+            loader.LoadService(null, out IVdsService service);
 
             service.WaitForServiceReady();
 
-            IEnumVdsObject providerEnum;
-            service.QueryProviders(VDS_QUERY_PROVIDER_FLAG.VDS_QUERY_VIRTUALDISK_PROVIDERS, out providerEnum);
+            service.QueryProviders(VDS_QUERY_PROVIDER_FLAG.VDS_QUERY_VIRTUALDISK_PROVIDERS, out IEnumVdsObject providerEnum);
 
             while (true)
             {
-                uint fetchedProvider;
-                object unknownProvider;
-                providerEnum.Next(1, out unknownProvider, out fetchedProvider);
+                providerEnum.Next(1, out object unknownProvider, out uint fetchedProvider);
 
                 if (fetchedProvider == 0) break;
                 IVdsVdProvider provider = (IVdsVdProvider)unknownProvider;
                 Console.WriteLine("Got VD Provider");
 
-                IEnumVdsObject diskEnum;
-                provider.QueryVDisks(out diskEnum);
+                provider.QueryVDisks(out IEnumVdsObject diskEnum);
 
                 while (true)
                 {
-                    uint fetchedDisk;
-                    object unknownDisk;
-                    diskEnum.Next(1, out unknownDisk, out fetchedDisk);
+                    diskEnum.Next(1, out object unknownDisk, out uint fetchedDisk);
                     if (fetchedDisk == 0) break;
                     IVdsVDisk vDisk = (IVdsVDisk)unknownDisk;
 
-                    VDS_VDISK_PROPERTIES vdiskProperties;
-                    vDisk.GetProperties(out vdiskProperties);
+                    vDisk.GetProperties(out VDS_VDISK_PROPERTIES vdiskProperties);
 
                     try
                     {
-                        IVdsDisk disk;
-                        provider.GetDiskFromVDisk(vDisk, out disk);
+                        provider.GetDiskFromVDisk(vDisk, out IVdsDisk disk);
 
-                        VDS_DISK_PROP diskProperties;
-                        disk.GetProperties(out diskProperties);
+                        disk.GetProperties(out VDS_DISK_PROP diskProperties);
 
                         if (diskProperties.pwszName.Equals(device, StringComparison.OrdinalIgnoreCase))
                         {
@@ -391,17 +381,14 @@ namespace VhdAttachService
 
             public class FileSafeHandle : SafeHandle
             {
-                private static IntPtr minusOne = new IntPtr(-1);
+                private static IntPtr minusOne = new(-1);
 
 
                 public FileSafeHandle()
                     : base(minusOne, true) { }
 
 
-                public override bool IsInvalid
-                {
-                    get { return (IsClosed) || (handle == minusOne); }
-                }
+                public override bool IsInvalid => (IsClosed) || (handle == minusOne);
 
                 protected override bool ReleaseHandle()
                 {

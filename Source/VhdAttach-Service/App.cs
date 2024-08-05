@@ -11,7 +11,7 @@ namespace VhdAttachService
     {
 
         [STAThread]
-        static void Main()
+        private static void Main()
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
@@ -32,14 +32,14 @@ namespace VhdAttachService
 
                 try
                 {
-                    using (ServiceController sc = new ServiceController(AppService.Instance.ServiceName))
+                    using (ServiceController sc = new(AppService.Instance.ServiceName))
                     {
                         if (sc.Status != ServiceControllerStatus.Stopped) { sc.Stop(); }
                     }
                 }
                 catch (Exception) { }
 
-                ManagedInstallerClass.InstallHelper(new[] { Assembly.GetExecutingAssembly().Location });
+                ManagedInstallerClass.InstallHelper([Assembly.GetExecutingAssembly().Location]);
                 Environment.Exit(0);
 
             }
@@ -48,7 +48,7 @@ namespace VhdAttachService
 
                 try
                 {
-                    using (ServiceController sc = new ServiceController(AppService.Instance.ServiceName))
+                    using (ServiceController sc = new(AppService.Instance.ServiceName))
                     {
                         if (sc.Status != ServiceControllerStatus.Stopped) { sc.Stop(); }
                     }
@@ -56,7 +56,7 @@ namespace VhdAttachService
                 catch (Exception) { }
                 try
                 {
-                    ManagedInstallerClass.InstallHelper(new[] { "/u", Assembly.GetExecutingAssembly().Location });
+                    ManagedInstallerClass.InstallHelper(["/u", Assembly.GetExecutingAssembly().Location]);
                     Environment.Exit(0);
                 }
                 catch (InstallException)
@@ -97,14 +97,14 @@ namespace VhdAttachService
                 }
                 else
                 {
-                    ServiceBase.Run(new ServiceBase[] { AppService.Instance });
+                    ServiceBase.Run([AppService.Instance]);
                 }
 
             }
         }
 
 
-        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             ErrorReport.SaveToTemp(e.ExceptionObject as Exception);
             AppService.Instance.ExitCode = 1064; //ERROR_EXCEPTION_IN_SERVICE

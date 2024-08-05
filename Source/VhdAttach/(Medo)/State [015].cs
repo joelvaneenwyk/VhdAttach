@@ -84,7 +84,7 @@ namespace Medo.Windows.Forms
                 }
                 return _subkeyPath;
             }
-            set { _subkeyPath = value; }
+            set => _subkeyPath = value;
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Medo.Windows.Forms
             form.FormClosed += form_FormClosed;
         }
 
-        private static Dictionary<Form, Control[]> formSetup = new Dictionary<Form, Control[]>();
+        private static Dictionary<Form, Control[]> formSetup = new();
 
         private static void form_Load(object sender, EventArgs e)
         {
@@ -408,7 +408,7 @@ namespace Medo.Windows.Forms
                     MethodInfo methodMoveSplitterTo = gridViewObject.GetType().GetMethod("MoveSplitterTo", methodMoveSplitterToFlags);
                     if (methodMoveSplitterTo != null)
                     {
-                        methodMoveSplitterTo.Invoke(gridViewObject, methodMoveSplitterToFlags, null, new object[] { labelWidth }, CultureInfo.CurrentCulture);
+                        methodMoveSplitterTo.Invoke(gridViewObject, methodMoveSplitterToFlags, null, [labelWidth], CultureInfo.CurrentCulture);
                     }
                 }
             }
@@ -586,7 +586,7 @@ namespace Medo.Windows.Forms
 
             internal static string GetControlPath(Control control)
             {
-                StringBuilder sbPath = new StringBuilder();
+                StringBuilder sbPath = new();
 
                 Control currControl = control;
                 while (true)
@@ -616,14 +616,7 @@ namespace Medo.Windows.Forms
                 return sbPath.ToString();
             }
 
-            private static bool IsRunningOnMono
-            {
-                get
-                {
-                    return (Type.GetType("Mono.Runtime") != null);
-                }
-            }
-
+            private static bool IsRunningOnMono => (Type.GetType("Mono.Runtime") != null);
         }
 
     }

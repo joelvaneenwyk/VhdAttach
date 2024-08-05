@@ -42,7 +42,7 @@ namespace Medo.Application
         /// <param name="count">Number of items.</param>
         public Args(string[] array, int offset, int count)
         {
-            InitializeFromArray(array, offset, count, new[] { "/", "--", "-" }, new[] { ':', '=' });
+            InitializeFromArray(array, offset, count, ["/", "--", "-"], [':', '=']);
         }
 
         /// <summary>
@@ -53,8 +53,8 @@ namespace Medo.Application
         public Args(string line, bool removeFirstMember)
         {
             Helper.State state = Helper.State.Default;
-            List<string> list = new List<string>();
-            StringBuilder sb = new StringBuilder();
+            List<string> list = [];
+            StringBuilder sb = new();
 
             if (line != null)
             {
@@ -112,11 +112,11 @@ namespace Medo.Application
 
             if (removeFirstMember)
             {
-                InitializeFromArray(list.ToArray(), 1, list.Count - 1, new[] { "/", "--", "-" }, new[] { ':', '=' });
+                InitializeFromArray(list.ToArray(), 1, list.Count - 1, ["/", "--", "-"], [':', '=']);
             }
             else
             {
-                InitializeFromArray(list.ToArray(), 0, list.Count, new[] { "/", "--", "-" }, new[] { ':', '=' });
+                InitializeFromArray(list.ToArray(), 0, list.Count, ["/", "--", "-"], [':', '=']);
             }
         }
 
@@ -175,7 +175,7 @@ namespace Medo.Application
                 }
                 else
                 {
-                    currList = new List<string>();
+                    currList = [];
                     _items.Add(key, currList);
                 }
                 currList.Add(value);
@@ -205,7 +205,7 @@ namespace Medo.Application
         /// </summary>
         public string[] GetKeys()
         {
-            List<string> list = new List<string>();
+            List<string> list = [];
             Dictionary<string, List<string>>.Enumerator iEnum = _items.GetEnumerator();
             while (iEnum.MoveNext())
             {
@@ -234,7 +234,7 @@ namespace Medo.Application
                 return _items[key].ToArray();
             }
 
-            return new string[] { };
+            return [];
         }
 
         /// <summary>
@@ -295,14 +295,12 @@ namespace Medo.Application
             {
                 if (value.Length == 0) { return true; }
 
-                int valueInt;
-                if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out valueInt))
+                if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int valueInt))
                 {
                     return valueInt != 0;
                 }
 
-                bool valueBool;
-                if (bool.TryParse(value, out valueBool))
+                if (bool.TryParse(value, out bool valueBool))
                 {
                     return valueBool;
                 }
@@ -323,8 +321,7 @@ namespace Medo.Application
             string value = GetValue(key);
             if (value != null)
             {
-                int valueInt;
-                if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out valueInt))
+                if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int valueInt))
                 {
                     return valueInt;
                 }
@@ -344,8 +341,7 @@ namespace Medo.Application
             string value = GetValue(key);
             if (value != null)
             {
-                double valueX;
-                if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out valueX))
+                if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double valueX))
                 {
                     return valueX;
                 }

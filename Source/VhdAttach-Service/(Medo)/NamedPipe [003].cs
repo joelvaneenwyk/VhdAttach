@@ -36,7 +36,7 @@ namespace Medo.IO
         /// <summary>
         /// Gets full pipe name (e.g. \\.\pipe\example).
         /// </summary>
-        public string FullPipeName { get { return @"\\.\pipe\" + PipeName; } }
+        public string FullPipeName => @"\\.\pipe\" + PipeName;
 
         private NativeMethods.FileSafeHandle SafeHandle;
 
@@ -183,11 +183,11 @@ namespace Medo.IO
             if (SafeHandle == null) { throw new InvalidOperationException("Pipe is not open."); }
 
             var available = BytesToRead;
-            if (available == 0) { return new byte[] { }; }
+            if (available == 0) { return []; }
 
             byte[] buffer = new byte[available];
             uint read = 0;
-            NativeOverlapped overlapped = new NativeOverlapped();
+            NativeOverlapped overlapped = new();
             if (!NativeMethods.ReadFile(SafeHandle, buffer, (uint)buffer.Length, ref read, ref overlapped))
             {
                 throw new IOException("Cannot read from named pipe.", new Win32Exception());
@@ -281,7 +281,7 @@ namespace Medo.IO
 
             public class FileSafeHandle : SafeHandle
             {
-                private static IntPtr minusOne = new IntPtr(INVALID_HANDLE_VALUE);
+                private static IntPtr minusOne = new(INVALID_HANDLE_VALUE);
 
 
                 public FileSafeHandle()

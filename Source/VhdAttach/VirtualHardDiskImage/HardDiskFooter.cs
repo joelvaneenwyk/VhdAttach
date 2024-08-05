@@ -54,10 +54,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public String Cookie
         {
-            get
-            {
-                return ASCIIEncoding.ASCII.GetString(Bytes, 0, 8);
-            }
+            get => ASCIIEncoding.ASCII.GetString(Bytes, 0, 8);
             set
             {
                 if (value == null) { throw new ArgumentNullException("value", "Value cannot be null."); }
@@ -77,10 +74,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public VhdFeature Features
         {
-            get
-            {
-                return (VhdFeature)GetInt32(Bytes, 8);
-            }
+            get => (VhdFeature)GetInt32(Bytes, 8);
             set
             {
                 var buffer = GetBytes((int)value);
@@ -115,10 +109,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public UInt64 DataOffset
         {
-            get
-            {
-                return GetUInt64(Bytes, 16);
-            }
+            get => GetUInt64(Bytes, 16);
             set
             {
                 var buffer = GetBytes(value);
@@ -132,10 +123,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public DateTime TimeStamp
         {
-            get
-            {
-                return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(GetUInt32(Bytes, 24));
-            }
+            get => new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(GetUInt32(Bytes, 24));
             set
             {
                 var origin = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -152,10 +140,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public VhdCreatorApplication CreatorApplication
         {
-            get
-            {
-                return (VhdCreatorApplication)GetInt32(Bytes, 28);
-            }
+            get => (VhdCreatorApplication)GetInt32(Bytes, 28);
             set
             {
                 var buffer = GetBytes((int)value);
@@ -193,10 +178,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public VhdCreatorHostOs CreatorHostOs
         {
-            get
-            {
-                return (VhdCreatorHostOs)GetInt32(Bytes, 36);
-            }
+            get => (VhdCreatorHostOs)GetInt32(Bytes, 36);
             set
             {
                 var buffer = GetBytes((int)value);
@@ -210,10 +192,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public UInt64 OriginalSize
         {
-            get
-            {
-                return GetUInt64(Bytes, 40);
-            }
+            get => GetUInt64(Bytes, 40);
             set
             {
                 var buffer = GetBytes(value);
@@ -227,10 +206,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public UInt64 CurrentSize
         {
-            get
-            {
-                return GetUInt64(Bytes, 48);
-            }
+            get => GetUInt64(Bytes, 48);
             set
             {
                 var buffer = GetBytes(value);
@@ -244,10 +220,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public UInt16 DiskGeometryCylinders
         {
-            get
-            {
-                return GetUInt16(Bytes, 56);
-            }
+            get => GetUInt16(Bytes, 56);
             set
             {
                 var buffer = GetBytes(value);
@@ -261,10 +234,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public Byte DiskGeometryHeads
         {
-            get
-            {
-                return Bytes[58];
-            }
+            get => Bytes[58];
             set
             {
                 Bytes[58] = value;
@@ -277,10 +247,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public Byte DiskGeometrySectors
         {
-            get
-            {
-                return Bytes[59];
-            }
+            get => Bytes[59];
             set
             {
                 Bytes[59] = value;
@@ -293,10 +260,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public VhdDiskType DiskType
         {
-            get
-            {
-                return (VhdDiskType)GetInt32(Bytes, 60);
-            }
+            get => (VhdDiskType)GetInt32(Bytes, 60);
             set
             {
                 var buffer = GetBytes((int)value);
@@ -363,10 +327,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public Boolean SavedState
         {
-            get
-            {
-                return (Bytes[84] == 1);
-            }
+            get => (Bytes[84] == 1);
             set
             {
                 Bytes[84] = (value) ? (Byte)1 : (Byte)0;
@@ -484,7 +445,7 @@ namespace VirtualHardDiskImage
             var bytes = BitConverter.GetBytes(value);
             if (BitConverter.IsLittleEndian)
             {
-                return new[] { bytes[1], bytes[0] };
+                return [bytes[1], bytes[0]];
             }
 
             return bytes;
@@ -495,7 +456,7 @@ namespace VirtualHardDiskImage
             var bytes = BitConverter.GetBytes(value);
             if (BitConverter.IsLittleEndian)
             {
-                return new[] { bytes[3], bytes[2], bytes[1], bytes[0] };
+                return [bytes[3], bytes[2], bytes[1], bytes[0]];
             }
 
             return bytes;
@@ -506,7 +467,7 @@ namespace VirtualHardDiskImage
             var bytes = BitConverter.GetBytes(value);
             if (BitConverter.IsLittleEndian)
             {
-                return new[] { bytes[3], bytes[2], bytes[1], bytes[0] };
+                return [bytes[3], bytes[2], bytes[1], bytes[0]];
             }
 
             return bytes;
@@ -517,7 +478,7 @@ namespace VirtualHardDiskImage
             var bytes = BitConverter.GetBytes(value);
             if (BitConverter.IsLittleEndian)
             {
-                return new[] { bytes[7], bytes[6], bytes[5], bytes[4], bytes[3], bytes[2], bytes[1], bytes[0] };
+                return [bytes[7], bytes[6], bytes[5], bytes[4], bytes[3], bytes[2], bytes[1], bytes[0]];
             }
 
             return bytes;
@@ -528,7 +489,7 @@ namespace VirtualHardDiskImage
         {
             if (BitConverter.IsLittleEndian)
             {
-                return BitConverter.ToUInt16(new[] { bytes[offset + 1], bytes[offset + 0] }, 0);
+                return BitConverter.ToUInt16([bytes[offset + 1], bytes[offset + 0]], 0);
             }
 
             return BitConverter.ToUInt16(bytes, offset);
@@ -538,7 +499,8 @@ namespace VirtualHardDiskImage
         {
             if (BitConverter.IsLittleEndian)
             {
-                return BitConverter.ToInt32(new[] { bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0] }, 0);
+                return BitConverter.ToInt32([bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0]
+                ], 0);
             }
 
             return BitConverter.ToInt32(bytes, offset);
@@ -548,7 +510,8 @@ namespace VirtualHardDiskImage
         {
             if (BitConverter.IsLittleEndian)
             {
-                return BitConverter.ToUInt32(new[] { bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0] }, 0);
+                return BitConverter.ToUInt32([bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0]
+                ], 0);
             }
 
             return BitConverter.ToUInt32(bytes, offset);
@@ -558,7 +521,8 @@ namespace VirtualHardDiskImage
         {
             if (BitConverter.IsLittleEndian)
             {
-                return BitConverter.ToUInt64(new[] { bytes[offset + 7], bytes[offset + 6], bytes[offset + 5], bytes[offset + 4], bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0] }, 0);
+                return BitConverter.ToUInt64([bytes[offset + 7], bytes[offset + 6], bytes[offset + 5], bytes[offset + 4], bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0]
+                ], 0);
             }
 
             return BitConverter.ToUInt64(bytes, offset);

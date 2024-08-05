@@ -53,7 +53,7 @@ namespace VhdAttach
 
                     if (doChangeLetter)
                     {
-                        CommandLineAddon cla = new CommandLineAddon();
+                        CommandLineAddon cla = new();
                         int res = cla.ChangeDriveLetter(argfiles);
                         Environment.Exit(res);
                         return;
@@ -62,7 +62,7 @@ namespace VhdAttach
                     var files = new List<FileInfo>();
                     foreach (var iFile in argfiles)
                     {
-                        files.Add(new FileInfo(iFile.TrimEnd(new[] { '\"' })));
+                        files.Add(new FileInfo(iFile.TrimEnd(['\"'])));
                     }
 
                     if (files.Count == 0)
@@ -126,13 +126,6 @@ namespace VhdAttach
 
         }
 
-        private static bool IsRunningOnMono
-        {
-            get
-            {
-                return (Type.GetType("Mono.Runtime") != null);
-            }
-        }
-
+        private static bool IsRunningOnMono => (Type.GetType("Mono.Runtime") != null);
     }
 }

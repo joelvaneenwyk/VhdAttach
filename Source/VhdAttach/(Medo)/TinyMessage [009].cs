@@ -38,7 +38,7 @@ namespace Medo.Net
         /// <summary>
         /// Default port for TinyMessage protocol.
         /// </summary>
-        public static Int32 DefaultPort { get { return 5104; } }
+        public static Int32 DefaultPort => 5104;
 
 
         /// <summary>
@@ -103,10 +103,7 @@ namespace Medo.Net
         /// <summary>
         /// Gets whether TinyMessage is in listening state.
         /// </summary>
-        public Boolean IsListening
-        {
-            get { return (ListenThread != null) && (ListenThread.IsAlive); }
-        }
+        public Boolean IsListening => (ListenThread != null) && (ListenThread.IsAlive);
 
         /// <summary>
         /// Raises event when packet arrives.
@@ -118,10 +115,10 @@ namespace Medo.Net
 
         private Thread ListenThread;
         private ManualResetEvent ListenCancelEvent;
-        private readonly object ListenSyncRoot = new object();
+        private readonly object ListenSyncRoot = new();
         private Socket ListenSocket;
 
-        private bool IsCanceled { get { return ListenCancelEvent.WaitOne(0, false); } }
+        private bool IsCanceled => ListenCancelEvent.WaitOne(0, false);
 
         private void Run()
         {
@@ -225,7 +222,7 @@ namespace Medo.Net
         {
             if (packet == null) { throw new ArgumentNullException("packet", "Packet is null."); }
             if (remoteEndPoint == null) { throw new ArgumentNullException("remoteEndPoint", "Remote IP end point is null."); }
-            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            using (Socket socket = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
                 if (remoteEndPoint.Address == IPAddress.Broadcast)
                 {
@@ -276,7 +273,7 @@ namespace Medo.Net
         {
             if (packet == null) { throw new ArgumentNullException("packet", "Packet is null."); }
             if (remoteEndPoint == null) { throw new ArgumentNullException("remoteEndPoint", "Remote IP end point is null."); }
-            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            using (Socket socket = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
                 socket.ReceiveTimeout = receiveTimeout;
                 if (remoteEndPoint.Address == IPAddress.Broadcast)
@@ -330,8 +327,7 @@ namespace Medo.Net
 
         #endregion
 
-        private static Boolean IsRunningOnMono { get { return (Type.GetType("Mono.Runtime") != null); } }
-
+        private static Boolean IsRunningOnMono => (Type.GetType("Mono.Runtime") != null);
     }
 
 
@@ -427,7 +423,7 @@ namespace Medo.Net
             }
         }
 
-        private static readonly UTF8Encoding TextEncoding = new UTF8Encoding(false);
+        private static readonly UTF8Encoding TextEncoding = new(false);
 
         /// <summary>
         /// Converts message to it's representation in bytes.
@@ -439,45 +435,45 @@ namespace Medo.Net
             {
                 byte[] protocolBytes = TextEncoding.GetBytes("Tiny");
                 stream.Write(protocolBytes, 0, protocolBytes.Length);
-                stream.Write(new byte[] { 0x20 }, 0, 1);
+                stream.Write([0x20], 0, 1);
 
                 byte[] productBytes = TextEncoding.GetBytes(Product);
                 stream.Write(productBytes, 0, productBytes.Length);
-                stream.Write(new byte[] { 0x20 }, 0, 1);
+                stream.Write([0x20], 0, 1);
 
                 byte[] operationBytes = TextEncoding.GetBytes(Operation);
                 stream.Write(operationBytes, 0, operationBytes.Length);
-                stream.Write(new byte[] { 0x20 }, 0, 1);
+                stream.Write([0x20], 0, 1);
 
                 var addComma = false;
                 if (Items != null)
                 {
-                    stream.Write(new byte[] { 0x7B }, 0, 1); //{
+                    stream.Write([0x7B], 0, 1); //{
                     foreach (var item in Items)
                     {
-                        if (addComma) { stream.Write(new byte[] { 0x2C }, 0, 1); } //,
+                        if (addComma) { stream.Write([0x2C], 0, 1); } //,
                         byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
-                        stream.Write(new byte[] { 0x22 }, 0, 1); //"
+                        stream.Write([0x22], 0, 1); //"
                         stream.Write(keyBytes, 0, keyBytes.Length);
-                        stream.Write(new byte[] { 0x22, 0x3A }, 0, 2); //":
+                        stream.Write([0x22, 0x3A], 0, 2); //":
                         if (item.Value != null)
                         {
                             byte[] valueBytes = TextEncoding.GetBytes(JsonEncode(item.Value));
-                            stream.Write(new byte[] { 0x22 }, 0, 1); //"
+                            stream.Write([0x22], 0, 1); //"
                             stream.Write(valueBytes, 0, valueBytes.Length);
-                            stream.Write(new byte[] { 0x22 }, 0, 1); //"
+                            stream.Write([0x22], 0, 1); //"
                         }
                         else
                         {
-                            stream.Write(new byte[] { 0x6E, 0x75, 0x6C, 0x6C }, 0, 4); //null
+                            stream.Write([0x6E, 0x75, 0x6C, 0x6C], 0, 4); //null
                         }
                         addComma = true;
                     }
-                    stream.Write(new byte[] { 0x7D }, 0, 1); //}
+                    stream.Write([0x7D], 0, 1); //}
                 }
                 else
                 {
-                    stream.Write(new byte[] { 0x6E, 0x75, 0x6C, 0x6C }, 0, 4); //null
+                    stream.Write([0x6E, 0x75, 0x6C, 0x6C], 0, 4); //null
                 }
 
                 if (stream.Position > 65507) { throw new InvalidOperationException("Packet length exceeds 65507 bytes."); }

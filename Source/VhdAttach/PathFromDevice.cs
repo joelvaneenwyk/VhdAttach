@@ -11,8 +11,7 @@ namespace VhdAttach
 
         public static string[] GetPath(string device)
         {
-            int driveNumber;
-            if (device.StartsWith(@"\\.\PHYSICALDRIVE", StringComparison.InvariantCulture) && int.TryParse(device.Substring(17), NumberStyles.Integer, CultureInfo.InvariantCulture, out driveNumber))
+            if (device.StartsWith(@"\\.\PHYSICALDRIVE", StringComparison.InvariantCulture) && int.TryParse(device.Substring(17), NumberStyles.Integer, CultureInfo.InvariantCulture, out int driveNumber))
             {
                 return GetLettersFromPhysicalDrive(driveNumber);
             }
@@ -39,8 +38,7 @@ namespace VhdAttach
                 {
                     var device = GetSubsubstring((string)iReturn["Antecedent"], "Win32_DiskPartition.DeviceID", "Disk #", ",");
                     var letter = GetSubsubstring((string)iReturn["Dependent"], "Win32_LogicalDisk.DeviceID", "", "");
-                    int diskNumber;
-                    if (int.TryParse(device, NumberStyles.Integer, CultureInfo.InvariantCulture, out diskNumber))
+                    if (int.TryParse(device, NumberStyles.Integer, CultureInfo.InvariantCulture, out int diskNumber))
                     {
                         if (driveNumber == diskNumber)
                         {
@@ -98,12 +96,11 @@ namespace VhdAttach
                     Debug.WriteLine(sb + " is at " + dosDevice);
                     if (dosPath.StartsWith(@"\Device\CdRom", StringComparison.OrdinalIgnoreCase))
                     {
-                        int cdromNumber = 0;
-                        if (int.TryParse(dosPath.Substring(13), NumberStyles.Integer, CultureInfo.InvariantCulture, out cdromNumber))
+                        if (int.TryParse(dosPath.Substring(13), NumberStyles.Integer, CultureInfo.InvariantCulture, out int cdromNumber))
                         {
                             if (cdromNumber == driveNumber)
                             {
-                                return new[] { dosDevice + @"\" };
+                                return [dosDevice + @"\"];
                             }
                         }
                     }

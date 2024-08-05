@@ -8,7 +8,7 @@ namespace System.Configuration.Install.Tests.System.Configuration.Install
         [TestMethod]
         public void Should_Parse_Command_Parameters()
         {
-            var installContext = new InstallContext("/var/log/log.log", new[] { "-LogToConsole=true" });
+            var installContext = new InstallContext("/var/log/log.log", ["-LogToConsole=true"]);
             Assert.AreEqual("/var/log/log.log", installContext.Parameters["logFile"]);
             Assert.AreEqual("true", installContext.Parameters["LogToConsole"]);
         }
@@ -16,7 +16,7 @@ namespace System.Configuration.Install.Tests.System.Configuration.Install
         [TestMethod]
         public void Should_Return_Parameter_True_For_Parameters()
         {
-            var installContext = new InstallContext("/var/log/log.log", new[] { "/whatever", "/i", "-debug" });
+            var installContext = new InstallContext("/var/log/log.log", ["/whatever", "/i", "-debug"]);
 
             Assert.IsTrue(installContext.IsParameterTrue("debug"));
             Assert.IsTrue(installContext.IsParameterTrue("Debug"));

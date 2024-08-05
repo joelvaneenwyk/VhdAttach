@@ -14,13 +14,13 @@ namespace VhdAttachService
 
         public AppServiceInstaller()
         {
-            ServiceProcessInstaller serviceProcessInstaller = new ServiceProcessInstaller();
+            ServiceProcessInstaller serviceProcessInstaller = new();
             serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
             serviceProcessInstaller.Username = null;
             serviceProcessInstaller.Password = null;
             Installers.Add(serviceProcessInstaller);
 
-            ServiceInstaller serviceInstaller = new ServiceInstaller();
+            ServiceInstaller serviceInstaller = new();
             serviceInstaller.ServiceName = AppService.Instance.ServiceName;
             serviceInstaller.DisplayName = CallingAssembly.Product;
             serviceInstaller.Description = CallingAssembly.Description;
@@ -33,7 +33,7 @@ namespace VhdAttachService
         {
             Debug.WriteLine("OnCommitted : Begin.");
             base.OnCommitted(savedState);
-            using (ServiceController sc = new ServiceController(AppService.Instance.ServiceName))
+            using (ServiceController sc = new(AppService.Instance.ServiceName))
             {
                 Debug.WriteLine("OnCommitted : Service starting...");
                 sc.Start();
@@ -45,7 +45,7 @@ namespace VhdAttachService
         protected override void OnBeforeUninstall(IDictionary savedState)
         {
             Debug.WriteLine("OnBeforeUninstall : Begin.");
-            using (ServiceController sc = new ServiceController(AppService.Instance.ServiceName))
+            using (ServiceController sc = new(AppService.Instance.ServiceName))
             {
                 if (sc.Status != ServiceControllerStatus.Stopped)
                 {

@@ -110,11 +110,8 @@ namespace System.ServiceProcess
         /// </devdoc>
         private static bool AccountHasRight(IntPtr policyHandle, byte[] accountSid, string rightName)
         {
-            IntPtr pRights = 0;
-            int rightsCount = 0;
-
             // This function gives us back a pointer to the start of an array of LSA_UNICODE_STRING structs (in pRights).
-            int status = NativeMethods.LsaEnumerateAccountRights(policyHandle, accountSid, out pRights, out rightsCount);
+            int status = NativeMethods.LsaEnumerateAccountRights(policyHandle, accountSid, out IntPtr pRights, out int rightsCount);
 
             if (status == NativeMethods.STATUS_OBJECT_NAME_NOT_FOUND)
             {
@@ -135,11 +132,11 @@ namespace System.ServiceProcess
                 for (int i = 0; i < rightsCount; i++)
                 {
                     // Get this element in the array they gave us
-                    NativeMethods.LSA_UNICODE_STRING_withPointer uStr = new NativeMethods.LSA_UNICODE_STRING_withPointer();
+                    NativeMethods.LSA_UNICODE_STRING_withPointer uStr = new();
                     Marshal.PtrToStructure(pCurRights, uStr); // copy the buffer portion to an array & create a string from that
                     char[] rightChars = new char[uStr.length / sizeof(char)];
                     Marshal.Copy(uStr.pwstr, rightChars, 0, rightChars.Length);
-                    string right = new string(rightChars, 0, rightChars.Length);
+                    string right = new(rightChars, 0, rightChars.Length);
                     // see if this is the one we're looking for
                     if (string.Compare(right, rightName, StringComparison.Ordinal) == 0)
                     {
@@ -170,9 +167,9 @@ namespace System.ServiceProcess
         {
             //Lookup SID
             byte[] newSid = new byte[256];
-            int[] sidLen = { newSid.Length };
+            int[] sidLen = [newSid.Length];
             char[] domName = new char[1024];
-            int[] domNameLen = { domName.Length };
+            int[] domNameLen = [domName.Length];
             int[] peUse = new int[1];
             bool success;
 
@@ -180,7 +177,7 @@ namespace System.ServiceProcess
             if (accountName.Substring(0, 2) == ".\\")
             {
                 // Replace the "." with the local computer name.
-                StringBuilder compName = new StringBuilder(NativeMethods.MAX_COMPUTERNAME_LENGTH + 1);
+                StringBuilder compName = new(NativeMethods.MAX_COMPUTERNAME_LENGTH + 1);
                 int nameLen = NativeMethods.MAX_COMPUTERNAME_LENGTH + 1;
                 success = NativeMethods.GetComputerName(compName, ref nameLen);
                 if (!success)
@@ -235,7 +232,7 @@ namespace System.ServiceProcess
                         if (canPrompt)
                         {
 #if !NETSTANDARD
-                            using (ServiceInstallerDialog dlg = new ServiceInstallerDialog())
+                            using (ServiceInstallerDialog dlg = new())
                             {
                                 if (username != null)
                                     dlg.Username = username;
@@ -273,8 +270,10 @@ namespace System.ServiceProcess
         private static void GrantAccountRight(IntPtr policyHandle, byte[] accountSid, string rightName)
         {
             //Add Account Rights
-            NativeMethods.LSA_UNICODE_STRING accountRights = new NativeMethods.LSA_UNICODE_STRING();
-            accountRights.buffer = rightName;
+            NativeMethods.LSA_UNICODE_STRING accountRights = new()
+            {
+                buffer = rightName
+            };
             accountRights.length = (short)(accountRights.buffer.Length * sizeof(char));
             accountRights.maximumLength = accountRights.length;
             int result = NativeMethods.LsaAddAccountRights(policyHandle, accountSid, accountRights, 1);
@@ -351,14 +350,13 @@ namespace System.ServiceProcess
         {
             // PS 79669: This code was incorrectly using a hardcoded byte array of size 33 (which breaks on 64 bit).
             // Changed it to use actual structure. -- jonfisch
-            NativeMethods.LSA_OBJECT_ATTRIBUTES attribs = new NativeMethods.LSA_OBJECT_ATTRIBUTES();
+            NativeMethods.LSA_OBJECT_ATTRIBUTES attribs = new();
             GCHandle attribsHandle = GCHandle.Alloc(attribs, GCHandleType.Pinned);
             try
             {
-                IntPtr policyHandle;
                 int result = 0;
                 IntPtr attribsPointer = attribsHandle.AddrOfPinnedObject();
-                result = NativeMethods.LsaOpenPolicy(null, attribsPointer, NativeMethods.POLICY_CREATE_ACCOUNT | NativeMethods.POLICY_LOOKUP_NAMES, out policyHandle);
+                result = NativeMethods.LsaOpenPolicy(null, attribsPointer, NativeMethods.POLICY_CREATE_ACCOUNT | NativeMethods.POLICY_LOOKUP_NAMES, out IntPtr policyHandle);
                 if (result != 0)
                     throw new Win32Exception(SafeNativeMethods.LsaNtStatusToWinError(result));
 
@@ -372,8 +370,10 @@ namespace System.ServiceProcess
 
         private static void RemoveAccountRight(IntPtr policyHandle, byte[] accountSid, string rightName)
         {
-            NativeMethods.LSA_UNICODE_STRING accountRights = new NativeMethods.LSA_UNICODE_STRING();
-            accountRights.buffer = rightName;
+            NativeMethods.LSA_UNICODE_STRING accountRights = new()
+            {
+                buffer = rightName
+            };
             accountRights.length = (short)(accountRights.buffer.Length * sizeof(char));
             accountRights.maximumLength = accountRights.length;
             int result = NativeMethods.LsaRemoveAccountRights(policyHandle, accountSid, false, accountRights, 1);
@@ -391,7 +391,8 @@ namespace System.ServiceProcess
             try
             {
                 // remove the SeServiceLogonRight from the account if we added it.
-                if (((ServiceAccount)savedState["Account"]) == ServiceAccount.User && !((bool)savedState["hadServiceLogonRight"]))
+                if ((ServiceAccount)(savedState["Account"] ?? "") == ServiceAccount.User &&
+                    !(bool)savedState["hadServiceLogonRight"])
                 {
                     string username = (string)savedState["Username"];
                     IntPtr policyHandle = OpenSecurityPolicy();

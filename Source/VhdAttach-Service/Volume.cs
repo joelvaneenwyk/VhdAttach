@@ -17,15 +17,9 @@ namespace VhdAttachCommon
             VolumeName = volumeName;
         }
 
-        public string VolumeName { get; private set; }
+        public string VolumeName { get; private init; }
 
-        private string VolumeNameWithoutSlash
-        {
-            get
-            {
-                return RemoveLastBackslash(VolumeName);
-            }
-        }
+        private string VolumeNameWithoutSlash => RemoveLastBackslash(VolumeName);
 
         /// <summary>
         /// Returns drive letter with colon (:) and trailing backslash (\).
@@ -119,10 +113,7 @@ namespace VhdAttachCommon
         {
             if (_hasExtentInfo) { return; }
 
-            int diskNumber;
-            long startingOffset;
-            long extentLength;
-            if (GetExtentInfo(VolumeNameWithoutSlash, out diskNumber, out startingOffset, out extentLength))
+            if (GetExtentInfo(VolumeNameWithoutSlash, out int diskNumber, out long startingOffset, out long extentLength))
             {
                 _physicalDriveNumber = diskNumber;
                 _physicalDriveExtentOffset = startingOffset;
@@ -137,8 +128,10 @@ namespace VhdAttachCommon
             var volumeHandle = NativeMethods.CreateFile(volumeNameWithoutSlash, 0, NativeMethods.FILE_SHARE_READ | NativeMethods.FILE_SHARE_WRITE, IntPtr.Zero, NativeMethods.OPEN_EXISTING, 0, IntPtr.Zero);
             if (volumeHandle.IsInvalid == false)
             {
-                var de = new NativeMethods.VOLUME_DISK_EXTENTS();
-                de.NumberOfDiskExtents = 1;
+                var de = new NativeMethods.VOLUME_DISK_EXTENTS
+                {
+                    NumberOfDiskExtents = 1
+                };
                 int bytesReturned = 0;
                 if (NativeMethods.DeviceIoControl(volumeHandle, NativeMethods.IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, IntPtr.Zero, 0, ref de, Marshal.SizeOf(de), ref bytesReturned, IntPtr.Zero))
                 {
@@ -165,7 +158,7 @@ namespace VhdAttachCommon
             driveLetter = ParseDriveLetter(driveLetter);
             if (driveLetter == null) { throw new ArgumentOutOfRangeException("driveLetter", "Drive letter expected."); }
 
-            StringBuilder volumeName = new StringBuilder(50);
+            StringBuilder volumeName = new(50);
             if (NativeMethods.GetVolumeNameForVolumeMountPoint(driveLetter, volumeName, volumeName.Capacity))
             {
                 return new Volume(volumeName.ToString());
@@ -177,8 +170,7 @@ namespace VhdAttachCommon
 
         public static IList<Volume> GetVolumesOnPhysicalDrive(string physicalDrive)
         {
-            int driveNumber;
-            if ((physicalDrive != null) && physicalDrive.StartsWith(@"\\.\PHYSICALDRIVE", StringComparison.InvariantCultureIgnoreCase) && int.TryParse(physicalDrive.Substring(17), NumberStyles.Integer, CultureInfo.InvariantCulture, out driveNumber))
+            if ((physicalDrive != null) && physicalDrive.StartsWith(@"\\.\PHYSICALDRIVE", StringComparison.InvariantCultureIgnoreCase) && int.TryParse(physicalDrive.Substring(17), NumberStyles.Integer, CultureInfo.InvariantCulture, out int driveNumber))
             {
                 return GetVolumesOnPhysicalDrive(driveNumber);
             }
@@ -244,8 +236,7 @@ namespace VhdAttachCommon
                     Debug.WriteLine(sb + " is at " + dosDevice);
                     if (dosPath.StartsWith(@"\Device\CdRom", StringComparison.OrdinalIgnoreCase))
                     {
-                        int cdromNumber = 0;
-                        if (int.TryParse(dosPath.Substring(13), NumberStyles.Integer, CultureInfo.InvariantCulture, out cdromNumber))
+                        if (int.TryParse(dosPath.Substring(13), NumberStyles.Integer, CultureInfo.InvariantCulture, out int cdromNumber))
                         {
                             if (cdromNumber == driveNumber)
                             {

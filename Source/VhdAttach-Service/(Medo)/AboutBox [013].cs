@@ -31,7 +31,7 @@ namespace Medo.Windows.Forms
     public static class AboutBox
     {
 
-        private static readonly object _syncRoot = new object();
+        private static readonly object _syncRoot = new();
         private static int _titleHeight;
         private static PaintItem _paintImage;
         private static PaintItem _paintProduct;
@@ -111,7 +111,7 @@ namespace Medo.Windows.Forms
             Button buttonClose = null;
             Button buttonWebPage = null;
 
-            using (Form form = new Form())
+            using (Form form = new())
             {
                 try
                 {
@@ -338,7 +338,7 @@ namespace Medo.Windows.Forms
         }
 
 
-        static void buttonWebPage_Click(object sender, EventArgs e)
+        private static void buttonWebPage_Click(object sender, EventArgs e)
         {
             try
             {
@@ -348,7 +348,7 @@ namespace Medo.Windows.Forms
             catch (Win32Exception) { }
         }
 
-        static void buttonReadme_Click(object sender, EventArgs e)
+        private static void buttonReadme_Click(object sender, EventArgs e)
         {
             try
             {
@@ -436,10 +436,7 @@ namespace Medo.Windows.Forms
 
 
             private Image _image;
-            public Image Image
-            {
-                get { return _image; }
-            }
+            public Image Image => _image;
 
             private string _text;
             public string Text
@@ -522,25 +519,13 @@ namespace Medo.Windows.Forms
         private static class Resources
         {
 
-            internal static string Close
-            {
-                get { return GetInCurrentLanguage("Close", "Zatvori"); }
-            }
+            internal static string Close => GetInCurrentLanguage("Close", "Zatvori");
 
-            internal static string ReadMe
-            {
-                get { return GetInCurrentLanguage("Read me", "Pročitaj me"); }
-            }
+            internal static string ReadMe => GetInCurrentLanguage("Read me", "Pročitaj me");
 
-            internal static string WebPage
-            {
-                get { return GetInCurrentLanguage("Web page", "Web stranica"); }
-            }
+            internal static string WebPage => GetInCurrentLanguage("Web page", "Web stranica");
 
-            internal static string Caption
-            {
-                get { return GetInCurrentLanguage("About", "O programu"); }
-            }
+            internal static string Caption => GetInCurrentLanguage("About", "O programu");
 
 
             private static string GetInCurrentLanguage(string en_US, string hr_HR)
@@ -565,13 +550,7 @@ namespace Medo.Windows.Forms
         }
 
 
-        private static bool IsRunningOnMono
-        {
-            get
-            {
-                return (Type.GetType("Mono.Runtime") != null);
-            }
-        }
+        private static bool IsRunningOnMono => (Type.GetType("Mono.Runtime") != null);
 
 
         private static class NativeMethods
@@ -579,11 +558,11 @@ namespace Medo.Windows.Forms
 
             [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-            static extern internal IntPtr LoadIcon(IntPtr hInstance, string lpIconName);
+            internal static extern IntPtr LoadIcon(IntPtr hInstance, string lpIconName);
 
             [SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-            static extern internal IntPtr LoadLibrary(string lpFileName);
+            internal static extern IntPtr LoadLibrary(string lpFileName);
 
         }
 

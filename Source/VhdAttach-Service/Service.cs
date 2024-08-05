@@ -19,8 +19,10 @@ namespace VhdAttachService
             if (_thread != null) { return; }
 
             _cancelEvent = new ManualResetEvent(false);
-            _thread = new Thread(Run);
-            _thread.Name = "Service";
+            _thread = new Thread(Run)
+            {
+                Name = "Service"
+            };
             _thread.Start();
             Debug.WriteLine("Service thread started.");
         }

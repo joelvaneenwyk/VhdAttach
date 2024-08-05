@@ -140,8 +140,8 @@ namespace Medo.Text
         /// </summary>
         public string Separator
         {
-            get { return _separator; }
-            set { _separator = value; }
+            get => _separator;
+            set => _separator = value;
         }
 
         private StringBuilder _stringBuilder;
@@ -150,8 +150,8 @@ namespace Medo.Text
         /// </summary>
         public StringBuilder StringBuilder
         {
-            get { return _stringBuilder; }
-            private set { _stringBuilder = value; }
+            get => _stringBuilder;
+            private set => _stringBuilder = value;
         }
 
     }

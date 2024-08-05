@@ -17,16 +17,13 @@ namespace Medo.Reflection
     public static class EntryAssembly
     {
 
-        private readonly static Assembly Assembly = Assembly.GetEntryAssembly();
+        private static readonly Assembly Assembly = Assembly.GetEntryAssembly();
         //private readonly static AssemblyName AssemblyName = Assembly.GetName();
 
         /// <summary>
         /// Gets entry assembly's full name.
         /// </summary>
-        public static string FullName
-        {
-            get { return Assembly.GetEntryAssembly().GetName().FullName; }
-        }
+        public static string FullName => Assembly.GetEntryAssembly().GetName().FullName;
 
         /// <summary>
         /// Gets entry assembly's application name.

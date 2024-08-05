@@ -44,14 +44,13 @@ namespace VhdAttachService
             }
 
 
-            var wmiPhysicalDiskNumber = -1;
             foreach (var iReturn in wmiSearcher.Get())
             {
                 var disk = GetSubsubstring((string)iReturn["Antecedent"], "Win32_DiskPartition.DeviceID", "Disk #", ",");
                 var partition = GetSubsubstring((string)iReturn["Dependent"], "Win32_LogicalDisk.DeviceID", "", "");
                 if (iDirectory.Name.StartsWith(partition, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (int.TryParse(disk, NumberStyles.Integer, CultureInfo.InvariantCulture, out wmiPhysicalDiskNumber))
+                    if (int.TryParse(disk, NumberStyles.Integer, CultureInfo.InvariantCulture, out int wmiPhysicalDiskNumber))
                     {
                         return @"\\?\PHYSICALDRIVE" + wmiPhysicalDiskNumber.ToString(CultureInfo.InvariantCulture);
                     }
@@ -98,8 +97,7 @@ namespace VhdAttachService
                 Debug.WriteLine(sb + " is at " + dosDevice);
                 if (dosPath.StartsWith(@"\Device\CdRom", StringComparison.OrdinalIgnoreCase))
                 {
-                    int cdromNumber = 0;
-                    if (int.TryParse(dosPath.Substring(13), NumberStyles.Integer, CultureInfo.InvariantCulture, out cdromNumber))
+                    if (int.TryParse(dosPath.Substring(13), NumberStyles.Integer, CultureInfo.InvariantCulture, out int cdromNumber))
                     {
                         return @"\\?\CDROM" + cdromNumber.ToString(CultureInfo.InvariantCulture);
                     }

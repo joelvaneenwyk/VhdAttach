@@ -14,27 +14,15 @@ namespace System.ServiceProcess
         {
             if (loader == null)
             {
-                Res value = new Res();
+                Res value = new();
                 Interlocked.CompareExchange(ref loader, value, null);
             }
             return loader;
         }
 
-        private static CultureInfo Culture
-        {
-            get
-            {
-                return null;
-            }
-        }
+        private static CultureInfo Culture => null;
 
-        public static ResourceManager Resources
-        {
-            get
-            {
-                return GetLoader().resources;
-            }
-        }
+        public static ResourceManager Resources => GetLoader().resources;
 
         public static string GetString(string name, params object[] args)
         {

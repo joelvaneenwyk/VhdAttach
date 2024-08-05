@@ -72,7 +72,7 @@ namespace VhdAttach
             return Send("RegisterExtensionVhd", data);
         }
 
-        private static NamedPipe Pipe = new NamedPipe("JosipMedved-VhdAttach-Commands");
+        private static NamedPipe Pipe = new("JosipMedved-VhdAttach-Commands");
 
         private static PipeResponse Send(string operation, Dictionary<string, string> data, int timeout = 5000)
         {

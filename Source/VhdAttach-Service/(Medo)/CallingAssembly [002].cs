@@ -16,16 +16,13 @@ namespace Medo.Reflection
     public static class CallingAssembly
     {
 
-        private readonly static Assembly Assembly = Assembly.GetCallingAssembly();
-        private readonly static AssemblyName AssemblyName = Assembly.GetName();
+        private static readonly Assembly Assembly = Assembly.GetCallingAssembly();
+        private static readonly AssemblyName AssemblyName = Assembly.GetName();
 
         /// <summary>
         /// Gets entry assembly's full name.
         /// </summary>
-        public static string FullName
-        {
-            get { return AssemblyName.FullName; }
-        }
+        public static string FullName => AssemblyName.FullName;
 
         /// <summary>
         /// Gets entry assembly's application name.

@@ -26,7 +26,7 @@ namespace Medo
     public static class MessageBox
     {
 
-        private readonly static object _syncRoot = new object();
+        private static readonly object _syncRoot = new();
 
 
         #region With owner
@@ -154,13 +154,13 @@ namespace Medo
                 {
                     if (owner != null)
                     {
-                        using (CbtHook ch = new CbtHook(owner))
+                        using (CbtHook ch = new(owner))
                         {
                             return (DialogResult)NativeMethods.MessageBox(owner.Handle, text, caption, (uint)buttons | (uint)icon | (uint)defaultButton);
                         }
                     }
 
-                    using (CbtHook ch = new CbtHook(null))
+                    using (CbtHook ch = new(null))
                     {
                         return (DialogResult)NativeMethods.MessageBox(IntPtr.Zero, text, caption, (uint)buttons | (uint)icon | (uint)defaultButton);
                     }
@@ -571,43 +571,22 @@ namespace Medo
             }
 
 
-            internal static string OK
-            {
-                get { return GetInCurrentLanguage("OK", "U redu"); }
-            }
+            internal static string OK => GetInCurrentLanguage("OK", "U redu");
 
-            internal static string Cancel
-            {
-                get { return GetInCurrentLanguage("Cancel", "Odustani"); }
-            }
+            internal static string Cancel => GetInCurrentLanguage("Cancel", "Odustani");
 
-            internal static string Abort
-            {
-                get { return GetInCurrentLanguage("&Abort", "P&rekini"); }
-            }
+            internal static string Abort => GetInCurrentLanguage("&Abort", "P&rekini");
 
-            internal static string Retry
-            {
-                get { return GetInCurrentLanguage("&Retry", "&Ponovi"); }
-            }
+            internal static string Retry => GetInCurrentLanguage("&Retry", "&Ponovi");
 
-            internal static string Ignore
-            {
-                get { return GetInCurrentLanguage("&Ignore", "&Zanemari"); }
-            }
+            internal static string Ignore => GetInCurrentLanguage("&Ignore", "&Zanemari");
 
-            internal static string Yes
-            {
-                get { return GetInCurrentLanguage("&Yes", "&Da"); }
-            }
+            internal static string Yes => GetInCurrentLanguage("&Yes", "&Da");
 
-            internal static string No
-            {
-                get { return GetInCurrentLanguage("&No", "&Ne"); }
-            }
+            internal static string No => GetInCurrentLanguage("&No", "&Ne");
 
 
-            internal static string ExceptionCbtHookCannotBeRemoved { get { return "CBT Hook cannot be removed."; } }
+            internal static string ExceptionCbtHookCannotBeRemoved => "CBT Hook cannot be removed.";
 
 
             internal static bool IsTranslatable
@@ -686,8 +665,8 @@ namespace Medo
 
                         if (_owner != null)
                         {
-                            NativeMethods.RECT rectMessage = new NativeMethods.RECT();
-                            NativeMethods.RECT rectOwner = new NativeMethods.RECT();
+                            NativeMethods.RECT rectMessage = new();
+                            NativeMethods.RECT rectOwner = new();
                             if ((NativeMethods.GetWindowRect(wParam, ref rectMessage)) && (NativeMethods.GetWindowRect(_owner.Handle, ref rectOwner)))
                             {
                                 int widthMessage = rectMessage.right - rectMessage.left;
@@ -798,10 +777,7 @@ namespace Medo
                 }
 
 
-                public override bool IsInvalid
-                {
-                    get { return (IsClosed) || (handle == IntPtr.Zero); }
-                }
+                public override bool IsInvalid => (IsClosed) || (handle == IntPtr.Zero);
 
                 protected override bool ReleaseHandle()
                 {
@@ -863,14 +839,7 @@ namespace Medo
         #endregion
 
 
-        private static bool IsRunningOnMono
-        {
-            get
-            {
-                return (Type.GetType("Mono.Runtime") != null);
-            }
-        }
-
+        private static bool IsRunningOnMono => (Type.GetType("Mono.Runtime") != null);
     }
 
 }

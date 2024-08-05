@@ -259,14 +259,14 @@ namespace Medo.Services
             }
 
 
-            private readonly ProgressBar prgProgress = new ProgressBar { Height = (int)(SystemInformation.HorizontalScrollBarHeight * 1.5), Style = ProgressBarStyle.Marquee };
-            private readonly Label lblStatus = new Label { AutoSize = true, Text = Resources.StatusChecking };
-            private readonly Button btnCancel = new Button { AutoSize = true, DialogResult = DialogResult.Cancel, Padding = new Padding(3, 1, 3, 1), Text = Resources.Cancel };
-            private readonly Button btnUpgrade = new Button { AutoSize = true, Padding = new Padding(3, 1, 3, 1), Text = Resources.Upgrade, Visible = false };
-            private readonly Button btnDownload = new Button { AutoSize = true, Padding = new Padding(3, 1, 3, 1), Text = Resources.Download, Visible = false };
+            private readonly ProgressBar prgProgress = new() { Height = (int)(SystemInformation.HorizontalScrollBarHeight * 1.5), Style = ProgressBarStyle.Marquee };
+            private readonly Label lblStatus = new() { AutoSize = true, Text = Resources.StatusChecking };
+            private readonly Button btnCancel = new() { AutoSize = true, DialogResult = DialogResult.Cancel, Padding = new Padding(3, 1, 3, 1), Text = Resources.Cancel };
+            private readonly Button btnUpgrade = new() { AutoSize = true, Padding = new Padding(3, 1, 3, 1), Text = Resources.Upgrade, Visible = false };
+            private readonly Button btnDownload = new() { AutoSize = true, Padding = new Padding(3, 1, 3, 1), Text = Resources.Download, Visible = false };
 
-            private readonly BackgroundWorker bwCheck = new BackgroundWorker { WorkerSupportsCancellation = true };
-            private readonly BackgroundWorker bwDownload = new BackgroundWorker { WorkerSupportsCancellation = true, WorkerReportsProgress = true };
+            private readonly BackgroundWorker bwCheck = new() { WorkerSupportsCancellation = true };
+            private readonly BackgroundWorker bwDownload = new() { WorkerSupportsCancellation = true, WorkerReportsProgress = true };
 
             private UpgradeFile UpgradeFile;
 
@@ -448,20 +448,20 @@ namespace Medo.Services
         private static class Resources
         {
 
-            internal static string Caption { get { return GetInCurrentLanguage("Upgrade {0}", "{0} nadogradnja"); } }
-            internal static string Cancel { get { return GetInCurrentLanguage("Cancel", "Odustani"); } }
-            internal static string Close { get { return GetInCurrentLanguage("Close", "Zatvori"); } }
-            internal static string Upgrade { get { return GetInCurrentLanguage("Upgrade", "Nadogradi"); } }
-            internal static string Download { get { return GetInCurrentLanguage("Download", "Preuzmi"); } }
-            internal static string ErrorCannotCheck { get { return GetInCurrentLanguage("Cannot check for upgrade.", "Nije moguće provjeriti nadogradnju."); } }
-            internal static string ErrorCannotUpgrade { get { return GetInCurrentLanguage("Cannot upgrade.", "Nadogradnja nije moguća."); } }
-            internal static string ErrorCannotDownload { get { return GetInCurrentLanguage("Cannot download upgrade.", "Nije moguće preuzeti nadogradnju."); } }
-            internal static string StatusChecking { get { return GetInCurrentLanguage("Checking for upgrade...", "Provjera nadogradnje u tijeku..."); } }
-            internal static string StatusCancelling { get { return GetInCurrentLanguage("Cancelling...", "Odustajanje u tijeku..."); } }
-            internal static string StatusDownloading { get { return GetInCurrentLanguage("Download in progress...", "Preuzimanje u tijeku..."); } }
-            internal static string StatusUpgradeIsAvailable { get { return GetInCurrentLanguage("Upgrade is available.", "Nadogradnja je dostupna."); } }
-            internal static string StatusUpgradeIsNotAvailable { get { return GetInCurrentLanguage("Upgrade is not available.", "Nadogradnja nije dostupna."); } }
-            internal static string Filter { get { return GetInCurrentLanguage("Download|*{0}|All files|*.*", "Preuzimanje|*{0}|Sve datoteke|*.*"); } }
+            internal static string Caption => GetInCurrentLanguage("Upgrade {0}", "{0} nadogradnja");
+            internal static string Cancel => GetInCurrentLanguage("Cancel", "Odustani");
+            internal static string Close => GetInCurrentLanguage("Close", "Zatvori");
+            internal static string Upgrade => GetInCurrentLanguage("Upgrade", "Nadogradi");
+            internal static string Download => GetInCurrentLanguage("Download", "Preuzmi");
+            internal static string ErrorCannotCheck => GetInCurrentLanguage("Cannot check for upgrade.", "Nije moguće provjeriti nadogradnju.");
+            internal static string ErrorCannotUpgrade => GetInCurrentLanguage("Cannot upgrade.", "Nadogradnja nije moguća.");
+            internal static string ErrorCannotDownload => GetInCurrentLanguage("Cannot download upgrade.", "Nije moguće preuzeti nadogradnju.");
+            internal static string StatusChecking => GetInCurrentLanguage("Checking for upgrade...", "Provjera nadogradnje u tijeku...");
+            internal static string StatusCancelling => GetInCurrentLanguage("Cancelling...", "Odustajanje u tijeku...");
+            internal static string StatusDownloading => GetInCurrentLanguage("Download in progress...", "Preuzimanje u tijeku...");
+            internal static string StatusUpgradeIsAvailable => GetInCurrentLanguage("Upgrade is available.", "Nadogradnja je dostupna.");
+            internal static string StatusUpgradeIsNotAvailable => GetInCurrentLanguage("Upgrade is not available.", "Nadogradnja nije dostupna.");
+            internal static string Filter => GetInCurrentLanguage("Download|*{0}|All files|*.*", "Preuzimanje|*{0}|Sve datoteke|*.*");
 
 
             private static string GetInCurrentLanguage(string en_US, string hr_HR)
@@ -510,7 +510,7 @@ namespace Medo.Services
         /// <summary>
         /// Gets file name.
         /// </summary>
-        public string FileName { get { return Uri.Segments[Uri.Segments.Length - 1]; } }
+        public string FileName => Uri.Segments[Uri.Segments.Length - 1];
 
         /// <summary>
         /// Returns content stream.

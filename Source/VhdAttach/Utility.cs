@@ -9,11 +9,13 @@ namespace VhdAttach
 
         public static ProcessStartInfo GetProcessStartInfo(string exe, string arguments)
         {
-            var startInfo = new ProcessStartInfo();
-            startInfo.CreateNoWindow = Process.GetCurrentProcess().StartInfo.CreateNoWindow;
-            startInfo.FileName = exe;
-            startInfo.Arguments = arguments;
-            startInfo.WorkingDirectory = Environment.CurrentDirectory;
+            var startInfo = new ProcessStartInfo
+            {
+                CreateNoWindow = Process.GetCurrentProcess().StartInfo.CreateNoWindow,
+                FileName = exe,
+                Arguments = arguments,
+                WorkingDirectory = Environment.CurrentDirectory
+            };
             return startInfo;
         }
 

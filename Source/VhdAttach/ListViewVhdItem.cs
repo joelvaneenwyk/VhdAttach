@@ -66,7 +66,7 @@ namespace VhdAttach
         private bool _isReadOnly;
         public bool IsReadOnly
         {
-            get { return _isReadOnly; }
+            get => _isReadOnly;
             set
             {
                 _isReadOnly = value;
@@ -82,9 +82,11 @@ namespace VhdAttach
 
         public string GetSettingFileName()
         {
-            var fwo = new FileWithOptions(FileName);
-            fwo.ReadOnly = IsReadOnly;
-            fwo.NoDriveLetter = HasNoDriveLetter;
+            var fwo = new FileWithOptions(FileName)
+            {
+                ReadOnly = IsReadOnly,
+                NoDriveLetter = HasNoDriveLetter
+            };
             return fwo.ToString();
         }
 

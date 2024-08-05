@@ -50,8 +50,8 @@ namespace Medo.Diagnostics
     public static class ErrorReport
     {
 
-        private static readonly object _syncRoot = new object();
-        private static readonly StringBuilder _logBuffer = new StringBuilder(8000);
+        private static readonly object _syncRoot = new();
+        private static readonly StringBuilder _logBuffer = new(8000);
         private static readonly string _logSeparator = Environment.NewLine + new string('-', 72) + Environment.NewLine + Environment.NewLine;
         private static readonly string _logFileName;
 
@@ -1070,7 +1070,7 @@ namespace Medo.Diagnostics
         private static class Resources
         {
 
-            internal static string MeasurementText { get { return "mMiI"; } }
+            internal static string MeasurementText => "mMiI";
 
             internal static string GetInCurrentLanguage(string en_US, string hr_HR)
             {

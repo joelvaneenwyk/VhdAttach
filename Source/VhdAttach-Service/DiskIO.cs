@@ -19,8 +19,10 @@ namespace VhdAttachService
 
                 Int32 bytesOut = 0;
 
-                var cd = new NativeMethods.CREATE_DISK();
-                cd.PartitionStyle = NativeMethods.PARTITION_STYLE.PARTITION_STYLE_MBR;
+                var cd = new NativeMethods.CREATE_DISK
+                {
+                    PartitionStyle = NativeMethods.PARTITION_STYLE.PARTITION_STYLE_MBR
+                };
                 cd.Mbr.Signature = BitConverter.ToInt32(signature, 0);
                 if (NativeMethods.DeviceIoControl(handle, NativeMethods.IOCTL_DISK_CREATE_DISK, ref cd, Marshal.SizeOf(cd), IntPtr.Zero, 0, ref bytesOut, IntPtr.Zero) == false) { throw new Win32Exception(); }
 
@@ -29,9 +31,11 @@ namespace VhdAttachService
                 var pi = new NativeMethods.PARTITION_INFORMATION();
                 if (NativeMethods.DeviceIoControl(handle, NativeMethods.IOCTL_DISK_GET_PARTITION_INFO, IntPtr.Zero, 0, ref pi, Marshal.SizeOf(pi), ref bytesOut, IntPtr.Zero) == false) { throw new Win32Exception(); }
 
-                var dli = new NativeMethods.DRIVE_LAYOUT_INFORMATION_EX();
-                dli.PartitionStyle = NativeMethods.PARTITION_STYLE.PARTITION_STYLE_MBR;
-                dli.PartitionCount = 1;
+                var dli = new NativeMethods.DRIVE_LAYOUT_INFORMATION_EX
+                {
+                    PartitionStyle = NativeMethods.PARTITION_STYLE.PARTITION_STYLE_MBR,
+                    PartitionCount = 1
+                };
                 dli.Partition1.PartitionStyle = NativeMethods.PARTITION_STYLE.PARTITION_STYLE_MBR;
                 dli.Partition1.StartingOffset = 65536;
                 dli.Partition1.PartitionLength = pi.PartitionLength - dli.Partition1.StartingOffset;

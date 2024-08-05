@@ -16,12 +16,12 @@ namespace System.ServiceProcess
     internal static class SafeNativeMethods
     {
         [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
-        public extern static IntPtr OpenSCManager(string machineName, string databaseName, int access);
+        public static extern IntPtr OpenSCManager(string machineName, string databaseName, int access);
 
         [
             DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true),
         ]
-        public extern static bool CloseServiceHandle(IntPtr handle);
+        public static extern bool CloseServiceHandle(IntPtr handle);
 
         [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = false)]
         public static extern int LsaClose(IntPtr objectHandle);

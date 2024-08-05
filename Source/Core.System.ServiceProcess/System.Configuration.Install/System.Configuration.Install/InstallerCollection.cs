@@ -6,7 +6,7 @@ namespace System.Configuration.Install
     /// <summary>Contains a collection of installers to be run during an installation.</summary>
     public class InstallerCollection : CollectionBase
     {
-        private Installer _owner;
+        private readonly Installer _owner;
 
         /// <summary>Gets or sets an installer at the specified index.</summary>
         /// <returns>An <see cref="T:System.Configuration.Install.Installer" /> that represents the installer at the specified index.</returns>

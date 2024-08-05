@@ -6,7 +6,7 @@ namespace System.Diagnostics
     /// <summary>Allows you to install and configure an event log that your application reads from or writes to when running. </summary>
     public class EventLogInstaller : ComponentInstaller
     {
-        private readonly EventSourceCreationData _sourceData = new EventSourceCreationData(null, null);
+        private readonly EventSourceCreationData _sourceData = new(null, null);
 
         private UninstallAction _uninstallAction;
 

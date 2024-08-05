@@ -31,7 +31,7 @@ namespace Medo.IO
     public class VirtualDisk : IDisposable
     {
 
-        private NativeMethods.VirtualDiskSafeHandle _handle = new NativeMethods.VirtualDiskSafeHandle();
+        private NativeMethods.VirtualDiskSafeHandle _handle = new();
         private NativeOverlapped _createOverlap;
         private ManualResetEvent _createOverlapEvent;
 
@@ -57,11 +57,7 @@ namespace Medo.IO
         /// <summary>
         /// Gets whether connection to file is currently open.
         /// </summary>
-        public bool IsOpen
-        {
-
-            get { return !(_handle.IsClosed || _handle.IsInvalid); }
-        }
+        public bool IsOpen => !(_handle.IsClosed || _handle.IsInvalid);
 
         /// <summary>
         /// Opens connection to file.
@@ -98,8 +94,10 @@ namespace Medo.IO
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         private void Open(VirtualDiskAccessMask fileAccess, VirtualDiskType type)
         {
-            var parameters = new NativeMethods.OPEN_VIRTUAL_DISK_PARAMETERS();
-            parameters.Version = NativeMethods.OPEN_VIRTUAL_DISK_VERSION.OPEN_VIRTUAL_DISK_VERSION_1;
+            var parameters = new NativeMethods.OPEN_VIRTUAL_DISK_PARAMETERS
+            {
+                Version = NativeMethods.OPEN_VIRTUAL_DISK_VERSION.OPEN_VIRTUAL_DISK_VERSION_1
+            };
             parameters.Version1.RWDepth = NativeMethods.OPEN_VIRTUAL_DISK_RW_DEPTH_DEFAULT;
 
             var storageType = new NativeMethods.VIRTUAL_STORAGE_TYPE();
@@ -312,8 +310,10 @@ namespace Medo.IO
 
         private void Create(VirtualDiskType type, long size, VirtualDiskCreateOptions options, int blockSize, int sectorSize, bool createAsync)
         {
-            var parameters = new NativeMethods.CREATE_VIRTUAL_DISK_PARAMETERS();
-            parameters.Version = NativeMethods.CREATE_VIRTUAL_DISK_VERSION.CREATE_VIRTUAL_DISK_VERSION_1;
+            var parameters = new NativeMethods.CREATE_VIRTUAL_DISK_PARAMETERS
+            {
+                Version = NativeMethods.CREATE_VIRTUAL_DISK_VERSION.CREATE_VIRTUAL_DISK_VERSION_1
+            };
             if (blockSize == 0)
             {
                 //parameters.Version1.BlockSizeInBytes = NativeMethods.CREATE_VIRTUAL_DISK_PARAMETERS_DEFAULT_BLOCK_SIZE; //blocks if you set it
@@ -368,9 +368,11 @@ namespace Medo.IO
             if (createAsync)
             {
                 _createOverlapEvent = new ManualResetEvent(false);
-                _createOverlap = new NativeOverlapped();
-                _createOverlap.OffsetLow = 0;
-                _createOverlap.OffsetHigh = 0;
+                _createOverlap = new NativeOverlapped
+                {
+                    OffsetLow = 0,
+                    OffsetHigh = 0
+                };
 #pragma warning disable 0618
                 _createOverlap.EventHandle = _createOverlapEvent.Handle;
 #pragma warning restore 0618
@@ -483,8 +485,10 @@ namespace Medo.IO
         {
             if (DiskType == VirtualDiskType.Iso) { options |= VirtualDiskAttachOptions.ReadOnly; }
 
-            var parameters = new NativeMethods.ATTACH_VIRTUAL_DISK_PARAMETERS();
-            parameters.Version = NativeMethods.ATTACH_VIRTUAL_DISK_VERSION.ATTACH_VIRTUAL_DISK_VERSION_1;
+            var parameters = new NativeMethods.ATTACH_VIRTUAL_DISK_PARAMETERS
+            {
+                Version = NativeMethods.ATTACH_VIRTUAL_DISK_VERSION.ATTACH_VIRTUAL_DISK_VERSION_1
+            };
 
             int res = NativeMethods.AttachVirtualDisk(_handle, IntPtr.Zero, (NativeMethods.ATTACH_VIRTUAL_DISK_FLAG)options, 0, ref parameters, IntPtr.Zero);
             if (res == NativeMethods.ERROR_SUCCESS)
@@ -597,8 +601,10 @@ namespace Medo.IO
         /// <param name="sectorSize">Sector size of the VHD, in bytes.</param>
         public void GetSize(out long virtualSize, out long physicalSize, out int blockSize, out int sectorSize)
         {
-            var info = new NativeMethods.GET_VIRTUAL_DISK_INFO();
-            info.Version = NativeMethods.GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_SIZE;
+            var info = new NativeMethods.GET_VIRTUAL_DISK_INFO
+            {
+                Version = NativeMethods.GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_SIZE
+            };
 
             int size = Marshal.SizeOf(info);
             int sizeUsed = 0;
@@ -629,8 +635,10 @@ namespace Medo.IO
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method does not behave as field.")]
         public Guid GetIdentifier()
         {
-            var info = new NativeMethods.GET_VIRTUAL_DISK_INFO();
-            info.Version = NativeMethods.GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_IDENTIFIER;
+            var info = new NativeMethods.GET_VIRTUAL_DISK_INFO
+            {
+                Version = NativeMethods.GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_IDENTIFIER
+            };
 
             int size = Marshal.SizeOf(info);
             int sizeUsed = 0;
@@ -658,8 +666,10 @@ namespace Medo.IO
         /// <param name="vendorId">Vendor-unique identifier.</param>
         public void GetVirtualStorageType(out int deviceId, out Guid vendorId)
         {
-            var info = new NativeMethods.GET_VIRTUAL_DISK_INFO();
-            info.Version = NativeMethods.GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_VIRTUAL_STORAGE_TYPE;
+            var info = new NativeMethods.GET_VIRTUAL_DISK_INFO
+            {
+                Version = NativeMethods.GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_VIRTUAL_STORAGE_TYPE
+            };
 
             int size = Marshal.SizeOf(info);
             int sizeUsed = 0;
@@ -688,8 +698,10 @@ namespace Medo.IO
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method does not behave as field.")]
         public int GetProviderSubtype()
         {
-            var info = new NativeMethods.GET_VIRTUAL_DISK_INFO();
-            info.Version = NativeMethods.GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_PROVIDER_SUBTYPE;
+            var info = new NativeMethods.GET_VIRTUAL_DISK_INFO
+            {
+                Version = NativeMethods.GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_PROVIDER_SUBTYPE
+            };
 
             int size = Marshal.SizeOf(info);
             int sizeUsed = 0;
@@ -781,7 +793,7 @@ namespace Medo.IO
 
             /// <summary>
             /// </summary>
-            public static readonly Guid VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT = new Guid("EC984AEC-A0F9-47e9-901F-71415A66345B");
+            public static readonly Guid VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT = new("EC984AEC-A0F9-47e9-901F-71415A66345B");
 
             ///// <summary>
             ///// </summary>
@@ -1988,10 +2000,7 @@ namespace Medo.IO
                     : base(IntPtr.Zero, true) { }
 
 
-                public override bool IsInvalid
-                {
-                    get { return (IsClosed) || (handle == IntPtr.Zero); }
-                }
+                public override bool IsInvalid => (IsClosed) || (handle == IntPtr.Zero);
 
                 protected override bool ReleaseHandle()
                 {

@@ -19,7 +19,7 @@ namespace VhdAttach
         }
 
 
-        private static readonly NumberDeclination BytesSuffix = new NumberDeclination("byte", "bytes", "bytes");
+        private static readonly NumberDeclination BytesSuffix = new("byte", "bytes", "bytes");
         public string FileName { get; private set; }
 
         private void Form_Load(object sender, EventArgs e)
@@ -236,8 +236,7 @@ namespace VhdAttach
                 case Keys.Up:
                     {
                         e.Handled = true;
-                        decimal number;
-                        if (TryParseNumber(txtSize.Text, out number))
+                        if (TryParseNumber(txtSize.Text, out decimal number))
                         {
                             number = Math.Floor(number);
                             if (number < 99999999)
@@ -254,8 +253,7 @@ namespace VhdAttach
                 case Keys.Down:
                     {
                         e.Handled = true;
-                        decimal number;
-                        if (TryParseNumber(txtSize.Text, out number))
+                        if (TryParseNumber(txtSize.Text, out decimal number))
                         {
                             number = Math.Floor(number);
                             if (number > 0)
@@ -318,8 +316,7 @@ namespace VhdAttach
 
         private static long GetSizeInBytes(string text, string unit, bool use1000 = false)
         {
-            decimal value;
-            if (TryParseNumber(text, out value))
+            if (TryParseNumber(text, out decimal value))
             {
                 if (value > int.MaxValue) { return 0; }
                 var divider = use1000 ? 1000 : 1024;
@@ -341,8 +338,7 @@ namespace VhdAttach
 
         private static bool TryParseNumber(string text, out decimal value)
         {
-            decimal number;
-            if (decimal.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out number) || decimal.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out number))
+            if (decimal.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out decimal number) || decimal.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out number))
             {
                 value = number;
                 return true;

@@ -6,8 +6,8 @@ namespace VhdAttachService
     internal class AppService : ServiceBase
     {
 
-        private static AppService _instance = new AppService();
-        public static AppService Instance { get { return _instance; } }
+        private static AppService _instance = new();
+        public static AppService Instance => _instance;
 
 
         private AppService()

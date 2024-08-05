@@ -15,9 +15,11 @@ namespace VhdAttachService
             if (Thread != null) { return; }
 
             CancelEvent = new ManualResetEvent(false);
-            Thread = new Thread(Run);
-            Thread.Name = "Service status";
-            Thread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread = new Thread(Run)
+            {
+                Name = "Service status",
+                CurrentCulture = CultureInfo.InvariantCulture
+            };
             Thread.Start();
         }
 

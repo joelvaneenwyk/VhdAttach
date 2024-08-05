@@ -8,7 +8,7 @@ namespace System.Diagnostics
     {
         private string _categoryName = string.Empty;
 
-        private readonly CounterCreationDataCollection _counters = new CounterCreationDataCollection();
+        private readonly CounterCreationDataCollection _counters = new();
 
         private string _categoryHelp = string.Empty;
 

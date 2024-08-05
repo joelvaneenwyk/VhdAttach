@@ -26,13 +26,13 @@ namespace VhdAttach
 
         private string VhdFileName;
         private RecentFiles Recent;
-        private static readonly NumberDeclination CylinderSuffix = new NumberDeclination("cylinder", "cylinders", "cylinders");
-        private static readonly NumberDeclination HeadSuffix = new NumberDeclination("head", "heads", "heads");
-        private static readonly NumberDeclination SectorSuffix = new NumberDeclination("sector", "sectors", "sectors");
-        private static readonly ListViewGroup GroupFileSystem = new ListViewGroup("File system");
-        private static readonly ListViewGroup GroupDetails = new ListViewGroup("Details");
-        private static readonly ListViewGroup GroupInternals = new ListViewGroup("Internals");
-        private static readonly ListViewGroup GroupInternalsDynamic = new ListViewGroup("Internals (dynamic disk)");
+        private static readonly NumberDeclination CylinderSuffix = new("cylinder", "cylinders", "cylinders");
+        private static readonly NumberDeclination HeadSuffix = new("head", "heads", "heads");
+        private static readonly NumberDeclination SectorSuffix = new("sector", "sectors", "sectors");
+        private static readonly ListViewGroup GroupFileSystem = new("File system");
+        private static readonly ListViewGroup GroupDetails = new("Details");
+        private static readonly ListViewGroup GroupInternals = new("Internals");
+        private static readonly ListViewGroup GroupInternalsDynamic = new("Internals (dynamic disk)");
 
         public MainForm()
         {
@@ -225,20 +225,22 @@ namespace VhdAttach
                 {
                     var items = new List<ListViewItem>();
                     var fileInfo = new FileInfo(document.FileName);
-                    items.Add(new ListViewItem(new[] { "File path", fileInfo.Directory.FullName }) { Group = GroupFileSystem });
-                    items.Add(new ListViewItem(new[] { "File name", fileInfo.Name }) { Group = GroupFileSystem });
+                    items.Add(new ListViewItem(["File path", fileInfo.Directory.FullName]) { Group = GroupFileSystem });
+                    items.Add(new ListViewItem(["File name", fileInfo.Name]) { Group = GroupFileSystem });
 
                     try
                     {
                         var fi = new FileInfo(document.FileName);
-                        items.Add(new ListViewItem(new[] { "File size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(fi.Length, "B", "0"), fi.Length) }) { Group = GroupFileSystem });
+                        items.Add(new ListViewItem(["File size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(fi.Length, "B", "0"), fi.Length)
+                        ]) { Group = GroupFileSystem });
                     }
                     catch { }
 
                     try
                     {
                         var di = new DriveInfo(new FileInfo(document.FileName).Directory.Root.FullName);
-                        items.Add(new ListViewItem(new[] { "Free space on " + di.Name, string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(di.AvailableFreeSpace, "B", "0"), di.AvailableFreeSpace) }) { Group = GroupFileSystem });
+                        items.Add(new ListViewItem(["Free space on " + di.Name, string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(di.AvailableFreeSpace, "B", "0"), di.AvailableFreeSpace)
+                        ]) { Group = GroupFileSystem });
                     }
                     catch { }
 
@@ -262,47 +264,45 @@ namespace VhdAttach
                         catch { }
                         if (attachedDevice != null)
                         {
-                            items.Add(new ListViewItem(new[] { "Attached device", attachedDevice }) { Group = GroupFileSystem });
+                            items.Add(new ListViewItem(["Attached device", attachedDevice]) { Group = GroupFileSystem });
                         }
                         if (attachedPaths != null)
                         {
                             for (int i = 0; i < attachedPaths.Length; i++)
                             {
-                                items.Add(new ListViewItem(new[] { ((i == 0) ? "Attached path" : ""), attachedPaths[i] }) { Group = GroupFileSystem });
+                                items.Add(new ListViewItem([((i == 0) ? "Attached path" : ""), attachedPaths[i]]) { Group = GroupFileSystem });
                             }
                         }
 
                         try
                         {
-                            long virtualSize;
-                            long physicalSize;
-                            int blockSize;
-                            int sectorSize;
-                            document.GetSize(out virtualSize, out physicalSize, out blockSize, out sectorSize);
-                            items.Add(new ListViewItem(new[] { "Virtual size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(virtualSize, "B", "0"), virtualSize) }) { Group = GroupDetails });
+                            document.GetSize(out long virtualSize, out long physicalSize, out int blockSize, out int sectorSize);
+                            items.Add(new ListViewItem(["Virtual size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(virtualSize, "B", "0"), virtualSize)
+                            ]) { Group = GroupDetails });
                             if (fileInfo.Length != physicalSize)
                             {
-                                items.Add(new ListViewItem(new[] { "Physical size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(physicalSize, "B", "0"), physicalSize) }) { Group = GroupDetails });
+                                items.Add(new ListViewItem(["Physical size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(physicalSize, "B", "0"), physicalSize)
+                                ]) { Group = GroupDetails });
                             }
                             if (blockSize != 0)
                             {
-                                items.Add(new ListViewItem(new[] { "Block size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(blockSize, "B", "0"), blockSize) }) { Group = GroupDetails });
+                                items.Add(new ListViewItem(["Block size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(blockSize, "B", "0"), blockSize)
+                                ]) { Group = GroupDetails });
                             }
-                            items.Add(new ListViewItem(new[] { "Sector size", string.Format(CultureInfo.CurrentCulture, "{0} ({1} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(sectorSize, "B", "0"), sectorSize) }) { Group = GroupDetails });
+                            items.Add(new ListViewItem(["Sector size", string.Format(CultureInfo.CurrentCulture, "{0} ({1} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(sectorSize, "B", "0"), sectorSize)
+                            ]) { Group = GroupDetails });
                         }
                         catch { }
 
                         try
                         {
-                            items.Add(new ListViewItem(new[] { "Identifier", document.GetIdentifier().ToString() }) { Group = GroupDetails });
+                            items.Add(new ListViewItem(["Identifier", document.GetIdentifier().ToString()]) { Group = GroupDetails });
                         }
                         catch { }
 
                         try
                         {
-                            int deviceId;
-                            Guid vendorId;
-                            document.GetVirtualStorageType(out deviceId, out vendorId);
+                            document.GetVirtualStorageType(out int deviceId, out Guid vendorId);
                             string deviceText = string.Format(CultureInfo.InvariantCulture, "Unknown ({0})", deviceId);
                             switch (deviceId)
                             {
@@ -312,14 +312,15 @@ namespace VhdAttach
                             }
                             string vendorText = string.Format(CultureInfo.InvariantCulture, "Unknown ({0})", vendorId);
                             if (vendorId.Equals(new Guid("EC984AEC-A0F9-47e9-901F-71415A66345B"))) { vendorText = "Microsoft"; }
-                            items.Add(new ListViewItem(new[] { "Device ID", deviceText }) { Group = GroupDetails });
-                            items.Add(new ListViewItem(new[] { "Vendor ID", vendorText }) { Group = GroupDetails });
+                            items.Add(new ListViewItem(["Device ID", deviceText]) { Group = GroupDetails });
+                            items.Add(new ListViewItem(["Vendor ID", vendorText]) { Group = GroupDetails });
                         }
                         catch { }
 
                         try
                         {
-                            items.Add(new ListViewItem(new[] { "Provider subtype", string.Format(CultureInfo.CurrentCulture, "{0} (0x{0:x8})", document.GetProviderSubtype()) }) { Group = GroupDetails });
+                            items.Add(new ListViewItem(["Provider subtype", string.Format(CultureInfo.CurrentCulture, "{0} (0x{0:x8})", document.GetProviderSubtype())
+                            ]) { Group = GroupDetails });
                         }
                         catch { }
 
@@ -343,10 +344,11 @@ namespace VhdAttach
 
                                 if (footer.Cookie != "conectix")
                                 {
-                                    items.Add(new ListViewItem(new[] { "Cookie", footer.Cookie }) { Group = GroupInternals });
+                                    items.Add(new ListViewItem(["Cookie", footer.Cookie]) { Group = GroupInternals });
                                 }
 
-                                items.Add(new ListViewItem(new[] { "Creation time stamp", string.Format(CultureInfo.CurrentCulture, "{0}", footer.TimeStamp.ToLocalTime()) }) { Group = GroupInternals });
+                                items.Add(new ListViewItem(["Creation time stamp", string.Format(CultureInfo.CurrentCulture, "{0}", footer.TimeStamp.ToLocalTime())
+                                ]) { Group = GroupInternals });
 
                                 var creatorApplicationText = string.Format(CultureInfo.InvariantCulture, "Unknown (0x{0:x4})", (int)footer.CreatorApplication);
                                 switch (footer.CreatorApplication)
@@ -358,7 +360,8 @@ namespace VhdAttach
                                     case VhdCreatorApplication.MicrosoftWindows: creatorApplicationText = "Microsoft Windows"; break;
                                     case VhdCreatorApplication.OracleVirtualBox: creatorApplicationText = "Oracle VirtualBox"; break;
                                 }
-                                items.Add(new ListViewItem(new[] { "Creator application", string.Format(CultureInfo.InvariantCulture, "{0} {1}.{2}", creatorApplicationText, footer.CreatorVersion.Major, footer.CreatorVersion.Minor) }) { Group = GroupInternals });
+                                items.Add(new ListViewItem(["Creator application", string.Format(CultureInfo.InvariantCulture, "{0} {1}.{2}", creatorApplicationText, footer.CreatorVersion.Major, footer.CreatorVersion.Minor)
+                                ]) { Group = GroupInternals });
 
                                 var creatorHostOsText = string.Format(CultureInfo.InvariantCulture, "Unknown (0x{0:x4})", (int)footer.CreatorHostOs);
                                 switch (footer.CreatorHostOs)
@@ -366,9 +369,10 @@ namespace VhdAttach
                                     case VhdCreatorHostOs.Windows: creatorHostOsText = "Windows"; break;
                                     case VhdCreatorHostOs.Macintosh: creatorHostOsText = "Macintosh"; break;
                                 }
-                                items.Add(new ListViewItem(new[] { "Creator host OS", creatorHostOsText }) { Group = GroupInternals });
+                                items.Add(new ListViewItem(["Creator host OS", creatorHostOsText]) { Group = GroupInternals });
 
-                                items.Add(new ListViewItem(new[] { "Disk geometry", string.Format(CultureInfo.CurrentCulture, "{0}, {1}, {2}", CylinderSuffix.GetText(footer.DiskGeometryCylinders), HeadSuffix.GetText(footer.DiskGeometryHeads), SectorSuffix.GetText(footer.DiskGeometrySectors)) }) { Group = GroupInternals });
+                                items.Add(new ListViewItem(["Disk geometry", string.Format(CultureInfo.CurrentCulture, "{0}, {1}, {2}", CylinderSuffix.GetText(footer.DiskGeometryCylinders), HeadSuffix.GetText(footer.DiskGeometryHeads), SectorSuffix.GetText(footer.DiskGeometrySectors))
+                                ]) { Group = GroupInternals });
 
                                 var diskTypeText = string.Format(CultureInfo.CurrentCulture, "Unknown ({0}: 0x{0:x4})", (int)footer.DiskType);
                                 switch ((int)footer.DiskType)
@@ -381,7 +385,7 @@ namespace VhdAttach
                                     case 5: diskTypeText = "Reserved (deprecated: 0x0005)"; break;
                                     case 6: diskTypeText = "Reserved (deprecated: 0x0006)"; break;
                                 }
-                                items.Add(new ListViewItem(new[] { "Disk type", diskTypeText }) { Group = GroupInternals });
+                                items.Add(new ListViewItem(["Disk type", diskTypeText]) { Group = GroupInternals });
 
                                 if ((footer.DiskType == VhdDiskType.DynamicHardDisk) || (footer.DiskType == VhdDiskType.DifferencingHardDisk))
                                 {
@@ -390,17 +394,19 @@ namespace VhdAttach
 
                                     if (header.Cookie != "cxsparse")
                                     {
-                                        items.Add(new ListViewItem(new[] { "Cookie", header.Cookie }) { Group = GroupInternalsDynamic });
+                                        items.Add(new ListViewItem(["Cookie", header.Cookie]) { Group = GroupInternalsDynamic });
                                     }
 
                                     if (header.DataOffset != ulong.MaxValue)
                                     {
-                                        items.Add(new ListViewItem(new[] { "Data offset", header.DataOffset.ToString("#,##0") }) { Group = GroupInternalsDynamic });
+                                        items.Add(new ListViewItem(["Data offset", header.DataOffset.ToString("#,##0")]) { Group = GroupInternalsDynamic });
                                     }
 
-                                    items.Add(new ListViewItem(new[] { "Max table entries", header.MaxTableEntries.ToString("#,##0") }) { Group = GroupInternalsDynamic });
+                                    items.Add(new ListViewItem(["Max table entries", header.MaxTableEntries.ToString("#,##0")
+                                    ]) { Group = GroupInternalsDynamic });
 
-                                    items.Add(new ListViewItem(new[] { "Block size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(header.BlockSize, "B", "0"), header.BlockSize) }) { Group = GroupInternalsDynamic });
+                                    items.Add(new ListViewItem(["Block size", string.Format(CultureInfo.CurrentCulture, "{0} ({1:#,##0} bytes)", BinaryPrefixExtensions.ToBinaryPrefixString(header.BlockSize, "B", "0"), header.BlockSize)
+                                    ]) { Group = GroupInternalsDynamic });
 
                                 }
 
@@ -474,7 +480,7 @@ namespace VhdAttach
             }
         }
 
-        void recentItem_Click(object sender, EventArgs e)
+        private void recentItem_Click(object sender, EventArgs e)
         {
             var item = (ToolStripMenuItem)sender;
             var recentItem = (RecentFile)item.Tag;

@@ -37,13 +37,7 @@ namespace Medo.Localization.Croatia
         /// Gets number with appropriate suffix.
         /// </summary>
         /// <param name="value">Value</param>
-        public string this[int value]
-        {
-            get
-            {
-                return GetText(value);
-            }
-        }
+        public string this[int value] => GetText(value);
 
         /// <summary>
         /// Gets number with appropriate suffix.

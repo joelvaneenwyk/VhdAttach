@@ -33,8 +33,10 @@ namespace VhdAttachTest
         [TestMethod]
         public void Test_FileWithOptions_Write_01()
         {
-            var x = new FileWithOptions("Test.vhd");
-            x.ReadOnly = true;
+            var x = new FileWithOptions("Test.vhd")
+            {
+                ReadOnly = true
+            };
             Assert.AreEqual("Test.vhd", x.FileName);
             Assert.AreEqual(true, x.ReadOnly);
             Assert.AreEqual(false, x.NoDriveLetter);
@@ -44,9 +46,11 @@ namespace VhdAttachTest
         [TestMethod]
         public void Test_FileWithOptions_Write_02()
         {
-            var x = new FileWithOptions("Test.vhd");
-            x.ReadOnly = true;
-            x.NoDriveLetter = true;
+            var x = new FileWithOptions("Test.vhd")
+            {
+                ReadOnly = true,
+                NoDriveLetter = true
+            };
             Assert.AreEqual("Test.vhd", x.FileName);
             Assert.AreEqual(true, x.ReadOnly);
             Assert.AreEqual(true, x.NoDriveLetter);

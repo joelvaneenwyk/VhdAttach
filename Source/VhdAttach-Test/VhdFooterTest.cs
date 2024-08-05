@@ -16,7 +16,7 @@ namespace VhdAttachTest
         public void VhdFooter_Parse1()
         {
             byte[] bytes = GetBytesFromHex("63-6F-6E-65-63-74-69-78-00-00-00-02-00-01-00-00-FF-FF-FF-FF-FF-FF-FF-FF-15-DC-BD-20-77-69-6E-20-00-06-00-01-57-69-32-6B-00-00-00-00-C0-00-00-00-00-00-00-00-C0-00-00-00-18-61-10-3F-00-00-00-02-FF-FF-E5-66-3A-E3-A9-5E-DD-1D-A3-49-BD-6D-3C-D7-90-5A-B6-70-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00");
-            HardDiskFooter target = new HardDiskFooter(bytes);
+            HardDiskFooter target = new(bytes);
             Assert.AreEqual("conectix", target.Cookie);
             Assert.AreEqual(VhdFeature.Reserved, target.Features);
             Assert.AreEqual(new Version(1, 0), target.FileFormatVersion);
@@ -41,7 +41,7 @@ namespace VhdAttachTest
         public void VhdFooter_Parse2()
         {
             byte[] bytes = GetBytesFromHex("63-6F-6E-65-63-74-69-78-00-00-00-02-00-01-00-00-FF-FF-FF-FF-FF-FF-FF-FF-15-74-6E-C8-77-69-6E-20-00-06-00-01-57-69-32-6B-00-00-00-08-00-00-00-00-00-00-00-08-00-00-00-00-40-40-10-FF-00-00-00-02-FF-FF-E5-9D-48-A5-FD-A9-74-81-23-4D-B3-89-E9-41-D2-33-7E-F7-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00");
-            HardDiskFooter target = new HardDiskFooter(bytes);
+            HardDiskFooter target = new(bytes);
             Assert.AreEqual("conectix", target.Cookie);
             Assert.AreEqual(VhdFeature.Reserved, target.Features);
             Assert.AreEqual(new Version(1, 0), target.FileFormatVersion);
@@ -66,7 +66,7 @@ namespace VhdAttachTest
         public void VhdFooter_Parse3()
         {
             byte[] bytes = GetBytesFromHex("63-6F-6E-65-63-74-69-78-00-00-00-02-00-01-00-00-FF-FF-FF-FF-FF-FF-FF-FF-16-70-DF-D8-77-69-6E-20-00-06-00-01-57-69-32-6B-00-00-00-19-00-00-00-00-00-00-00-19-00-00-00-00-C8-C8-10-FF-00-00-00-02-FF-FF-E2-A5-BD-C1-AF-B7-E1-AE-AC-47-B7-F2-8B-C5-26-9F-0A-F2-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00");
-            HardDiskFooter target = new HardDiskFooter(bytes);
+            HardDiskFooter target = new(bytes);
             Assert.AreEqual("conectix", target.Cookie);
             Assert.AreEqual(VhdFeature.Reserved, target.Features);
             Assert.AreEqual(new Version(1, 0), target.FileFormatVersion);
@@ -91,7 +91,7 @@ namespace VhdAttachTest
         public void VhdFooter_Parse4()
         {
             byte[] bytes = GetBytesFromHex("63-6F-6E-65-63-74-69-78-00-00-00-02-00-01-00-00-00-00-00-00-00-00-02-00-16-7B-95-F6-76-62-6F-78-00-04-00-01-57-69-32-6B-00-00-00-05-00-00-00-00-00-00-00-05-00-00-00-00-A2-8A-10-3F-00-00-00-03-FF-FF-EE-A0-D1-AA-42-85-60-1B-FE-44-88-05-14-7A-D1-88-B5-10-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00");
-            HardDiskFooter target = new HardDiskFooter(bytes);
+            HardDiskFooter target = new(bytes);
             Assert.AreEqual("conectix", target.Cookie);
             Assert.AreEqual(VhdFeature.Reserved, target.Features);
             Assert.AreEqual(new Version(1, 0), target.FileFormatVersion);
@@ -116,7 +116,7 @@ namespace VhdAttachTest
         public void VhdFooter_Parse5()
         {
             byte[] bytes = GetBytesFromHex("63-6F-6E-65-63-74-69-78-00-00-00-02-00-01-00-00-00-00-00-00-00-00-02-00-14-DB-F4-2D-64-32-76-00-00-01-00-00-57-69-32-6B-00-00-00-25-43-3D-60-00-00-00-00-25-43-3D-60-00-FF-FF-10-FF-00-00-00-03-FF-FF-EA-E4-52-1F-CD-53-39-A4-E5-4B-92-F2-88-99-48-B7-BC-27-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00");
-            HardDiskFooter target = new HardDiskFooter(bytes);
+            HardDiskFooter target = new(bytes);
             Assert.AreEqual("conectix", target.Cookie);
             Assert.AreEqual(VhdFeature.Reserved, target.Features);
             Assert.AreEqual(new Version(1, 0), target.FileFormatVersion);
@@ -141,7 +141,7 @@ namespace VhdAttachTest
         public void VhdFooter_Parse6()
         {
             byte[] bytes = GetBytesFromHex("63-6F-6E-65-63-74-69-78-00-00-00-02-00-01-00-00-00-00-00-00-00-00-02-00-16-98-8B-19-77-69-6E-20-00-06-00-01-57-69-32-6B-00-00-00-EE-2F-8D-30-00-00-00-00-EE-2F-8D-30-00-FF-FF-10-FF-00-00-00-03-FF-FF-E8-44-7D-D8-77-50-FA-9B-A6-42-90-33-C3-97-96-A6-9A-E5-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00");
-            HardDiskFooter target = new HardDiskFooter(bytes);
+            HardDiskFooter target = new(bytes);
             Assert.AreEqual("conectix", target.Cookie);
             Assert.AreEqual(VhdFeature.Reserved, target.Features);
             Assert.AreEqual(new Version(1, 0), target.FileFormatVersion);
@@ -167,7 +167,7 @@ namespace VhdAttachTest
         public void VhdFooter_ParseInvalid1()
         {
             byte[] bytes = GetBytesFromHex("63-6F-6E-65-63-74-69-78-00-00-00-02-00-01-00-00-00-00-00-00-00-00-02-00-16-98-8B-19-77-69-6E-20-00-06-00-01-57-69-32-6B-00-00-00-EE-2F-8D-30-00-00-00-00-EE-2F-8D-30-00-FF-FF-10-FF-00-00-00-03-FF-FF-E8-44-7D-D8-77-50-FA-9B-A6-42-90-33-C3-97-96-A6-9A-E5-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-01");
-            HardDiskFooter target = new HardDiskFooter(bytes);
+            HardDiskFooter target = new(bytes);
             Assert.AreEqual("conectix", target.Cookie);
             Assert.AreEqual(VhdFeature.Reserved, target.Features);
             Assert.AreEqual(new Version(1, 0), target.FileFormatVersion);
@@ -192,7 +192,7 @@ namespace VhdAttachTest
         [TestMethod]
         public void VhdFooter_CreateEmpty()
         {
-            HardDiskFooter target = new HardDiskFooter();
+            HardDiskFooter target = new();
             Assert.AreEqual("conectix", target.Cookie);
             Assert.AreEqual(VhdFeature.NoFeaturesEnabled, target.Features);
             Assert.AreEqual(new Version(1, 0), target.FileFormatVersion);
@@ -214,15 +214,17 @@ namespace VhdAttachTest
         [TestMethod]
         public void VhdFooter_Create1()
         {
-            HardDiskFooter target = new HardDiskFooter();
-            target.Cookie = "conectix";
-            target.Features = VhdFeature.Reserved;
-            target.FileFormatVersion = new Version(1, 0);
-            target.DataOffset = 0xFFFFFFFFFFFFFFFF;
-            target.TimeStamp = new DateTime(2011, 8, 16, 5, 31, 12, DateTimeKind.Utc);
-            target.CreatorApplication = VhdCreatorApplication.MicrosoftWindows;
-            target.CreatorVersion = new Version(6, 1);
-            target.CreatorHostOs = VhdCreatorHostOs.Windows;
+            HardDiskFooter target = new()
+            {
+                Cookie = "conectix",
+                Features = VhdFeature.Reserved,
+                FileFormatVersion = new Version(1, 0),
+                DataOffset = 0xFFFFFFFFFFFFFFFF,
+                TimeStamp = new DateTime(2011, 8, 16, 5, 31, 12, DateTimeKind.Utc),
+                CreatorApplication = VhdCreatorApplication.MicrosoftWindows,
+                CreatorVersion = new Version(6, 1),
+                CreatorHostOs = VhdCreatorHostOs.Windows
+            };
             target.SetSize(3221225472);
             target.OriginalSize = target.CurrentSize;
             target.DiskType = VhdDiskType.FixedHardDisk;
@@ -238,15 +240,17 @@ namespace VhdAttachTest
         [TestMethod]
         public void VhdFooter_Create2()
         {
-            HardDiskFooter target = new HardDiskFooter();
-            target.Cookie = "conectix";
-            target.Features = VhdFeature.Reserved;
-            target.FileFormatVersion = new Version(1, 0);
-            target.DataOffset = 0xFFFFFFFFFFFFFFFF;
-            target.TimeStamp = new DateTime(2011, 5, 29, 2, 41, 12, DateTimeKind.Utc);
-            target.CreatorApplication = VhdCreatorApplication.MicrosoftWindows;
-            target.CreatorVersion = new Version(6, 1);
-            target.CreatorHostOs = VhdCreatorHostOs.Windows;
+            HardDiskFooter target = new()
+            {
+                Cookie = "conectix",
+                Features = VhdFeature.Reserved,
+                FileFormatVersion = new Version(1, 0),
+                DataOffset = 0xFFFFFFFFFFFFFFFF,
+                TimeStamp = new DateTime(2011, 5, 29, 2, 41, 12, DateTimeKind.Utc),
+                CreatorApplication = VhdCreatorApplication.MicrosoftWindows,
+                CreatorVersion = new Version(6, 1),
+                CreatorHostOs = VhdCreatorHostOs.Windows
+            };
             target.SetSize(34359738368);
             target.OriginalSize = target.CurrentSize;
             target.DiskType = VhdDiskType.FixedHardDisk;
@@ -262,15 +266,17 @@ namespace VhdAttachTest
         [TestMethod]
         public void VhdFooter_Create3()
         {
-            HardDiskFooter target = new HardDiskFooter();
-            target.Cookie = "conectix";
-            target.Features = VhdFeature.Reserved;
-            target.FileFormatVersion = new Version(1, 0);
-            target.DataOffset = 0xFFFFFFFFFFFFFFFF;
-            target.TimeStamp = new DateTime(2011, 12, 6, 14, 14, 48, DateTimeKind.Utc);
-            target.CreatorApplication = VhdCreatorApplication.MicrosoftWindows;
-            target.CreatorVersion = new Version(6, 1);
-            target.CreatorHostOs = VhdCreatorHostOs.Windows;
+            HardDiskFooter target = new()
+            {
+                Cookie = "conectix",
+                Features = VhdFeature.Reserved,
+                FileFormatVersion = new Version(1, 0),
+                DataOffset = 0xFFFFFFFFFFFFFFFF,
+                TimeStamp = new DateTime(2011, 12, 6, 14, 14, 48, DateTimeKind.Utc),
+                CreatorApplication = VhdCreatorApplication.MicrosoftWindows,
+                CreatorVersion = new Version(6, 1),
+                CreatorHostOs = VhdCreatorHostOs.Windows
+            };
             target.SetSize(107374182400);
             target.OriginalSize = target.CurrentSize;
             target.DiskType = VhdDiskType.FixedHardDisk;
@@ -286,15 +292,17 @@ namespace VhdAttachTest
         [TestMethod]
         public void VhdFooter_Create4()
         {
-            HardDiskFooter target = new HardDiskFooter();
-            target.Cookie = "conectix";
-            target.Features = VhdFeature.Reserved;
-            target.FileFormatVersion = new Version(1, 0);
-            target.DataOffset = 512;
-            target.TimeStamp = new DateTime(2011, 12, 14, 17, 14, 30, DateTimeKind.Utc);
-            target.CreatorApplication = VhdCreatorApplication.OracleVirtualBox;
-            target.CreatorVersion = new Version(4, 1);
-            target.CreatorHostOs = VhdCreatorHostOs.Windows;
+            HardDiskFooter target = new()
+            {
+                Cookie = "conectix",
+                Features = VhdFeature.Reserved,
+                FileFormatVersion = new Version(1, 0),
+                DataOffset = 512,
+                TimeStamp = new DateTime(2011, 12, 14, 17, 14, 30, DateTimeKind.Utc),
+                CreatorApplication = VhdCreatorApplication.OracleVirtualBox,
+                CreatorVersion = new Version(4, 1),
+                CreatorHostOs = VhdCreatorHostOs.Windows
+            };
             target.SetSize(21474836480);
             target.OriginalSize = target.CurrentSize;
             target.DiskType = VhdDiskType.DynamicHardDisk;
@@ -310,15 +318,17 @@ namespace VhdAttachTest
         [TestMethod]
         public void VhdFooter_Create5()
         {
-            HardDiskFooter target = new HardDiskFooter();
-            target.Cookie = "conectix";
-            target.Features = VhdFeature.Reserved;
-            target.FileFormatVersion = new Version(1, 0);
-            target.DataOffset = 512;
-            target.TimeStamp = new DateTime(2011, 2, 2, 10, 53, 33, DateTimeKind.Utc);
-            target.CreatorApplication = VhdCreatorApplication.MicrosoftSysinternalsDisk2Vhd;
-            target.CreatorVersion = new Version(1, 0);
-            target.CreatorHostOs = VhdCreatorHostOs.Windows;
+            HardDiskFooter target = new()
+            {
+                Cookie = "conectix",
+                Features = VhdFeature.Reserved,
+                FileFormatVersion = new Version(1, 0),
+                DataOffset = 512,
+                TimeStamp = new DateTime(2011, 2, 2, 10, 53, 33, DateTimeKind.Utc),
+                CreatorApplication = VhdCreatorApplication.MicrosoftSysinternalsDisk2Vhd,
+                CreatorVersion = new Version(1, 0),
+                CreatorHostOs = VhdCreatorHostOs.Windows
+            };
             target.SetSize(160041885696);
             target.OriginalSize = target.CurrentSize;
             target.DiskType = VhdDiskType.DynamicHardDisk;
@@ -334,15 +344,17 @@ namespace VhdAttachTest
         [TestMethod]
         public void VhdFooter_Create6()
         {
-            HardDiskFooter target = new HardDiskFooter();
-            target.Cookie = "conectix";
-            target.Features = VhdFeature.Reserved;
-            target.FileFormatVersion = new Version(1, 0);
-            target.DataOffset = 512;
-            target.TimeStamp = new DateTime(2012, 1, 5, 16, 23, 53, DateTimeKind.Utc);
-            target.CreatorApplication = VhdCreatorApplication.MicrosoftWindows;
-            target.CreatorVersion = new Version(6, 1);
-            target.CreatorHostOs = VhdCreatorHostOs.Windows;
+            HardDiskFooter target = new()
+            {
+                Cookie = "conectix",
+                Features = VhdFeature.Reserved,
+                FileFormatVersion = new Version(1, 0),
+                DataOffset = 512,
+                TimeStamp = new DateTime(2012, 1, 5, 16, 23, 53, DateTimeKind.Utc),
+                CreatorApplication = VhdCreatorApplication.MicrosoftWindows,
+                CreatorVersion = new Version(6, 1),
+                CreatorHostOs = VhdCreatorHostOs.Windows
+            };
             target.SetSize(1022999998464);
             target.OriginalSize = target.CurrentSize;
             target.DiskType = VhdDiskType.DynamicHardDisk;
@@ -359,7 +371,7 @@ namespace VhdAttachTest
         [TestMethod]
         public void VhdFooter_Checksum()
         {
-            HardDiskFooter target = new HardDiskFooter();
+            HardDiskFooter target = new();
             var firstChecksum = BitConverter.ToString(target.Checksum);
             target.BeginUpdate();
             target.UniqueId = Guid.NewGuid();

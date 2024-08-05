@@ -372,24 +372,24 @@ namespace System.ServiceProcess
         public delegate int ServiceControlCallbackEx(int control, int eventType, IntPtr eventData, IntPtr eventContext);
 
         [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
-        public extern static IntPtr OpenService(IntPtr databaseHandle, string serviceName, int access);
+        public static extern IntPtr OpenService(IntPtr databaseHandle, string serviceName, int access);
 
         [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
-        public extern static IntPtr RegisterServiceCtrlHandler(string serviceName, Delegate callback);
+        public static extern IntPtr RegisterServiceCtrlHandler(string serviceName, Delegate callback);
 
         [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
-        public extern static IntPtr RegisterServiceCtrlHandlerEx(string serviceName, Delegate callback, IntPtr userData);
+        public static extern IntPtr RegisterServiceCtrlHandlerEx(string serviceName, Delegate callback, IntPtr userData);
 
         [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
-        public extern static bool StartServiceCtrlDispatcher(IntPtr entry);
+        public static extern bool StartServiceCtrlDispatcher(IntPtr entry);
 
         [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
-        public extern static IntPtr CreateService(IntPtr databaseHandle, string serviceName, string displayName, int access, int serviceType,
+        public static extern IntPtr CreateService(IntPtr databaseHandle, string serviceName, string displayName, int access, int serviceType,
             int startType, int errorControl, string binaryPath, string loadOrderGroup, IntPtr pTagId, string dependencies,
             string servicesStartName, string password);
 
         [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = true)]
-        public extern static bool DeleteService(IntPtr serviceHandle);
+        public static extern bool DeleteService(IntPtr serviceHandle);
 
         [DllImport(ExternDll.Advapi32, CharSet = CharSet.Unicode, SetLastError = false)]
         public static extern int LsaOpenPolicy(LSA_UNICODE_STRING systemName, IntPtr pointerObjectAttributes,

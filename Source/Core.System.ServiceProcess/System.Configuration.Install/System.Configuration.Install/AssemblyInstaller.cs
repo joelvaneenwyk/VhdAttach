@@ -32,7 +32,7 @@ namespace System.Configuration.Install
             {
                 if (!string.IsNullOrEmpty(Path))
                 {
-                    Context = new InstallContext(null, new string[0]);
+                    Context = new InstallContext(null, []);
                     if (!_initialized)
                     {
                         InitializeFromAssembly();
@@ -108,8 +108,8 @@ namespace System.Configuration.Install
             var assemblyInstaller = new AssemblyInstaller();
             assemblyInstaller.UseNewContext = false;
             assemblyInstaller.Path = assemblyName;
-            assemblyInstaller.CommandLine = new string[0];
-            assemblyInstaller.Context = new InstallContext(null, new string[0]);
+            assemblyInstaller.CommandLine = [];
+            assemblyInstaller.Context = new InstallContext(null, []);
             assemblyInstaller.InitializeFromAssembly();
             if (assemblyInstaller.Installers.Count == 0)
             {
@@ -152,7 +152,7 @@ namespace System.Configuration.Install
                 {
                     try
                     {
-                        var value = (Installer)Activator.CreateInstance(array[i], BindingFlags.Instance | BindingFlags.Public | BindingFlags.CreateInstance, null, new object[0], null);
+                        var value = (Installer)Activator.CreateInstance(array[i], BindingFlags.Instance | BindingFlags.Public | BindingFlags.CreateInstance, null, [], null);
                         Installers.Add(value);
                     }
                     catch (Exception ex2)
@@ -267,10 +267,9 @@ namespace System.Configuration.Install
                 }
                 Context = installContext;
             }
-            Context.LogMessage(string.Format(CultureInfo.InvariantCulture, activity, new object[1]
-            {
+            Context.LogMessage(string.Format(CultureInfo.InvariantCulture, activity, [
                 Path
-            }));
+            ]));
             Context.LogMessage(Res.GetString("InstallLogParameters"));
             if (Context.Parameters.Count == 0)
             {

@@ -84,9 +84,7 @@ namespace VhdAttach
 
         internal static void UpdateToolstripImages(ImageList imageList, ToolStrip toolstrip)
         {
-            int size;
-            string set;
-            GetToolstripSizeAndSet(toolstrip, out size, out set);
+            GetToolstripSizeAndSet(toolstrip, out int size, out string set);
             toolstrip.ImageScalingSize = new Size(size, size);
 
             var resources = Resources.ResourceManager;
@@ -122,9 +120,7 @@ namespace VhdAttach
 
         internal static void UpdateToolstripImage(ToolStripItem item, string name)
         {
-            int size;
-            string set;
-            GetToolstripSizeAndSet(item.GetCurrentParent(), out size, out set);
+            GetToolstripSizeAndSet(item.GetCurrentParent(), out int size, out string set);
             UpdateToolstripImage(item, name, size, set);
         }
 

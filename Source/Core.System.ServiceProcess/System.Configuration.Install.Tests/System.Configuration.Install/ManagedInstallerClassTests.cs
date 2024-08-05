@@ -32,8 +32,9 @@ namespace System.Configuration.Install.Tests.System.Configuration.Install
         {
             StringBuilder log = new();
             InstallerLogHandler.Instance.OnLog += (source, message) => { log.AppendLine(message); };
-            Assert.ThrowsException<InvalidOperationException>(() => ManagedInstallerClass.InstallHelper(new[]
-                {"-ThrowException=True", "-AssemblyName",  Assembly.GetExecutingAssembly().GetName().Name}));
+            Assert.ThrowsException<InvalidOperationException>(() => ManagedInstallerClass.InstallHelper([
+                "-ThrowException=True", "-AssemblyName",  Assembly.GetExecutingAssembly().GetName().Name
+            ]));
             StringAssert.Contains(log.ToString(), "The ThrowException parameter is detected.");
         }
 
@@ -48,13 +49,13 @@ namespace System.Configuration.Install.Tests.System.Configuration.Install
 
         private static void InstallComponent()
         {
-            ManagedInstallerClass.InstallHelper(new[] { "-AssemblyName", Assembly.GetExecutingAssembly().GetName().Name });
+            ManagedInstallerClass.InstallHelper(["-AssemblyName", Assembly.GetExecutingAssembly().GetName().Name]);
         }
 
 
         private static void UnInstallComponent()
         {
-            ManagedInstallerClass.InstallHelper(new[] { "-u", "-AssemblyName", Assembly.GetExecutingAssembly().GetName().Name });
+            ManagedInstallerClass.InstallHelper(["-u", "-AssemblyName", Assembly.GetExecutingAssembly().GetName().Name]);
         }
     }
 }

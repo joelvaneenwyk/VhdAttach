@@ -24,7 +24,7 @@ namespace System.ServiceProcess
         private string serviceName = "";
         private string displayName = "";
         private string description = "";
-        private string[] servicesDependedOn = new string[0];
+        private string[] servicesDependedOn = [];
         private ServiceStartMode startType = ServiceStartMode.Manual;
         private bool delayedStartMode;
         private static bool environmentChecked;
@@ -54,10 +54,7 @@ namespace System.ServiceProcess
         ]
         public string DisplayName
         {
-            get
-            {
-                return displayName;
-            }
+            get => displayName;
             set
             {
                 if (value == null)
@@ -74,10 +71,7 @@ namespace System.ServiceProcess
         ]
         public string Description
         {
-            get
-            {
-                return description;
-            }
+            get => description;
             set
             {
                 if (value == null)
@@ -93,14 +87,11 @@ namespace System.ServiceProcess
         ]
         public string[] ServicesDependedOn
         {
-            get
-            {
-                return servicesDependedOn;
-            }
+            get => servicesDependedOn;
             set
             {
                 if (value == null)
-                    value = new string[0];
+                    value = [];
                 servicesDependedOn = value;
             }
         }
@@ -114,10 +105,7 @@ namespace System.ServiceProcess
         ]
         public string ServiceName
         {
-            get
-            {
-                return serviceName;
-            }
+            get => serviceName;
             set
             {
                 if (value == null)
@@ -161,10 +149,7 @@ namespace System.ServiceProcess
         ]
         public ServiceStartMode StartType
         {
-            get
-            {
-                return startType;
-            }
+            get => startType;
             set
             {
                 if (!Enum.IsDefined(typeof(ServiceStartMode), value))
@@ -194,14 +179,8 @@ namespace System.ServiceProcess
         ]
         public bool DelayedAutoStart
         {
-            get
-            {
-                return delayedStartMode;
-            }
-            set
-            {
-                delayedStartMode = value;
-            }
+            get => delayedStartMode;
+            set => delayedStartMode = value;
         }
 
         internal static void CheckEnvironment()
@@ -326,7 +305,7 @@ namespace System.ServiceProcess
                 string servicesDependedOn = null;
                 if (ServicesDependedOn.Length > 0)
                 {
-                    StringBuilder buff = new StringBuilder();
+                    StringBuilder buff = new();
                     for (int i = 0; i < ServicesDependedOn.Length; ++i)
                     {
                         // we have to build a list of the services' short names. But the user
@@ -335,7 +314,7 @@ namespace System.ServiceProcess
                         string tempServiceName = ServicesDependedOn[i];
                         try
                         {
-                            ServiceController svc = new ServiceController(tempServiceName, ".");
+                            ServiceController svc = new(tempServiceName, ".");
                             tempServiceName = svc.ServiceName;
                         }
                         catch
@@ -390,8 +369,10 @@ namespace System.ServiceProcess
 
                     if (Description.Length != 0)
                     {
-                        NativeMethods.SERVICE_DESCRIPTION serviceDesc = new NativeMethods.SERVICE_DESCRIPTION();
-                        serviceDesc.description = Marshal.StringToHGlobalUni(Description);
+                        NativeMethods.SERVICE_DESCRIPTION serviceDesc = new()
+                        {
+                                description = Marshal.StringToHGlobalUni(Description)
+                            };
                         bool success = NativeMethods.ChangeServiceConfig2(serviceHandle, NativeMethods.SERVICE_CONFIG_DESCRIPTION, ref serviceDesc);
                         Marshal.FreeHGlobal(serviceDesc.description);
                         if (!success)
@@ -402,8 +383,10 @@ namespace System.ServiceProcess
                     {
                         if (StartType == ServiceStartMode.Automatic)
                         {
-                            NativeMethods.SERVICE_DELAYED_AUTOSTART_INFO serviceDelayedInfo = new NativeMethods.SERVICE_DELAYED_AUTOSTART_INFO();
-                            serviceDelayedInfo.fDelayedAutostart = DelayedAutoStart;
+                            NativeMethods.SERVICE_DELAYED_AUTOSTART_INFO serviceDelayedInfo = new()
+                            {
+                                    fDelayedAutostart = DelayedAutoStart
+                                };
                             bool success = NativeMethods.ChangeServiceConfig2(serviceHandle, NativeMethods.SERVICE_CONFIG_DELAYED_AUTO_START_INFO, ref serviceDelayedInfo);
                             if (!success)
                                 throw new Win32Exception();
@@ -483,7 +466,7 @@ namespace System.ServiceProcess
             // Stop the service
             try
             {
-                using (ServiceController svc = new ServiceController(ServiceName))
+                using (ServiceController svc = new(ServiceName))
                 {
                     if (svc.Status != ServiceControllerStatus.Stopped)
                     {

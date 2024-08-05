@@ -30,7 +30,7 @@ namespace Medo.Application
         /// </summary>
         public static event EventHandler<ThreadExceptionEventArgs> ThreadException;
 
-        private static readonly object SyncRoot = new object();
+        private static readonly object SyncRoot = new();
 
         /// <summary>
         /// Initializes handlers for unhandled exception.
@@ -146,14 +146,7 @@ namespace Medo.Application
             }
         }
 
-        private static bool IsRunningOnMono
-        {
-            get
-            {
-                return (Type.GetType("Mono.Runtime") != null);
-            }
-        }
-
+        private static bool IsRunningOnMono => (Type.GetType("Mono.Runtime") != null);
     }
 
 }

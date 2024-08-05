@@ -39,10 +39,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public String Cookie
         {
-            get
-            {
-                return ASCIIEncoding.ASCII.GetString(Bytes, 0, 8);
-            }
+            get => ASCIIEncoding.ASCII.GetString(Bytes, 0, 8);
             set
             {
                 if (value == null) { throw new ArgumentNullException("value", "Value cannot be null."); }
@@ -58,10 +55,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public UInt64 DataOffset
         {
-            get
-            {
-                return GetUInt64(Bytes, 8);
-            }
+            get => GetUInt64(Bytes, 8);
             set
             {
                 var buffer = GetBytes(value);
@@ -75,10 +69,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public UInt64 TableOffset
         {
-            get
-            {
-                return GetUInt64(Bytes, 16);
-            }
+            get => GetUInt64(Bytes, 16);
             set
             {
                 var buffer = GetBytes(value);
@@ -114,10 +105,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public UInt32 MaxTableEntries
         {
-            get
-            {
-                return GetUInt32(Bytes, 28);
-            }
+            get => GetUInt32(Bytes, 28);
             set
             {
                 var buffer = GetBytes(value);
@@ -131,10 +119,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public UInt32 BlockSize
         {
-            get
-            {
-                return GetUInt32(Bytes, 32);
-            }
+            get => GetUInt32(Bytes, 32);
             set
             {
                 //throw new ArgumentException("Argument must be power of two.", "value"); }
@@ -201,10 +186,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public String ParentUnicodeName
         {
-            get
-            {
-                return UnicodeEncoding.Unicode.GetString(Bytes, 64, 512);
-            }
+            get => UnicodeEncoding.Unicode.GetString(Bytes, 64, 512);
             set
             {
                 if (value == null) { throw new ArgumentNullException("value", "Value cannot be null."); }
@@ -221,10 +203,7 @@ namespace VirtualHardDiskImage
         /// </summary>
         public DateTime ParentTimeStamp
         {
-            get
-            {
-                return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(GetUInt32(Bytes, 56));
-            }
+            get => new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(GetUInt32(Bytes, 56));
             set
             {
                 var origin = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -291,7 +270,7 @@ namespace VirtualHardDiskImage
             var bytes = BitConverter.GetBytes(value);
             if (BitConverter.IsLittleEndian)
             {
-                return new[] { bytes[7], bytes[6], bytes[5], bytes[4], bytes[3], bytes[2], bytes[1], bytes[0] };
+                return [bytes[7], bytes[6], bytes[5], bytes[4], bytes[3], bytes[2], bytes[1], bytes[0]];
             }
 
             return bytes;
@@ -301,7 +280,7 @@ namespace VirtualHardDiskImage
         {
             if (BitConverter.IsLittleEndian)
             {
-                return BitConverter.ToUInt16(new[] { bytes[offset + 1], bytes[offset + 0] }, 0);
+                return BitConverter.ToUInt16([bytes[offset + 1], bytes[offset + 0]], 0);
             }
 
             return BitConverter.ToUInt16(bytes, offset);
@@ -311,7 +290,8 @@ namespace VirtualHardDiskImage
         {
             if (BitConverter.IsLittleEndian)
             {
-                return BitConverter.ToUInt32(new[] { bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0] }, 0);
+                return BitConverter.ToUInt32([bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0]
+                ], 0);
             }
 
             return BitConverter.ToUInt32(bytes, offset);
@@ -321,7 +301,8 @@ namespace VirtualHardDiskImage
         {
             if (BitConverter.IsLittleEndian)
             {
-                return BitConverter.ToUInt64(new[] { bytes[offset + 7], bytes[offset + 6], bytes[offset + 5], bytes[offset + 4], bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0] }, 0);
+                return BitConverter.ToUInt64([bytes[offset + 7], bytes[offset + 6], bytes[offset + 5], bytes[offset + 4], bytes[offset + 3], bytes[offset + 2], bytes[offset + 1], bytes[offset + 0]
+                ], 0);
             }
 
             return BitConverter.ToUInt64(bytes, offset);

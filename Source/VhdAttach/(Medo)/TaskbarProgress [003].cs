@@ -18,7 +18,7 @@ namespace Medo.Windows.Forms
     public static class TaskbarProgress
     {
 
-        private static readonly object _syncRoot = new object();
+        private static readonly object _syncRoot = new();
 
 
         /// <summary>
@@ -189,14 +189,7 @@ namespace Medo.Windows.Forms
         }
 
 
-        private static bool IsRunningOnMono
-        {
-            get
-            {
-                return (Type.GetType("Mono.Runtime") != null);
-            }
-        }
-
+        private static bool IsRunningOnMono => (Type.GetType("Mono.Runtime") != null);
     }
 
 

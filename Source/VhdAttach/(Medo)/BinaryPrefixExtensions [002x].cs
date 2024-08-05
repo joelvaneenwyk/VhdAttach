@@ -16,9 +16,10 @@ namespace Medo.Extensions
     public static class BinaryPrefixExtensions
     {
 
-        private static readonly double[] prefixBigValues = { Math.Pow(2, 60), Math.Pow(2, 50), Math.Pow(2, 40), Math.Pow(2, 30), Math.Pow(2, 20), Math.Pow(2, 10) };
-        private static readonly string[] prefixBigTexts = { "exbi", "pebi", "tebi", "gibi", "mebi", "kibi" };
-        private static readonly string[] prefixBigSymbols = { "Ei", "Pi", "Ti", "Gi", "Mi", "Ki" };
+        private static readonly double[] prefixBigValues = [Math.Pow(2, 60), Math.Pow(2, 50), Math.Pow(2, 40), Math.Pow(2, 30), Math.Pow(2, 20), Math.Pow(2, 10)
+        ];
+        private static readonly string[] prefixBigTexts = ["exbi", "pebi", "tebi", "gibi", "mebi", "kibi"];
+        private static readonly string[] prefixBigSymbols = ["Ei", "Pi", "Ti", "Gi", "Mi", "Ki"];
 
 
         /// <summary>

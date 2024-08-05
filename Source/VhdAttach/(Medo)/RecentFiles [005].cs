@@ -107,10 +107,7 @@ namespace Medo.Configuration
         /// <summary>
         /// Gets number of file names.
         /// </summary>
-        public int Count
-        {
-            get { return _items.Count; }
-        }
+        public int Count => _items.Count;
 
         /// <summary>
         /// Group name.
@@ -118,16 +115,13 @@ namespace Medo.Configuration
         public string GroupName { get; private set; }
 
 
-        private List<RecentFile> _items = new List<RecentFile>();
+        private List<RecentFile> _items = new();
 
         /// <summary>
         /// Gets file name at given index.
         /// </summary>
         /// <param name="index">Index.</param>
-        public RecentFile this[int index]
-        {
-            get { return _items[index]; }
-        }
+        public RecentFile this[int index] => _items[index];
 
         /// <summary>
         /// Returns read-only collection of recent files.
@@ -276,14 +270,7 @@ namespace Medo.Configuration
         /// </summary>
         private string SubkeyPath { get; set; }
 
-        private static bool IsRunningOnMono
-        {
-            get
-            {
-                return (Type.GetType("Mono.Runtime") != null);
-            }
-        }
-
+        private static bool IsRunningOnMono => (Type.GetType("Mono.Runtime") != null);
     }
 
 
@@ -395,14 +382,7 @@ namespace Medo.Configuration
             }
         }
 
-        private static bool IsRunningOnMono
-        {
-            get
-            {
-                return (Type.GetType("Mono.Runtime") != null);
-            }
-        }
-
+        private static bool IsRunningOnMono => (Type.GetType("Mono.Runtime") != null);
 
         #endregion
 
