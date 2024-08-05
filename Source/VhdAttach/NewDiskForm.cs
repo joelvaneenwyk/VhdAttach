@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Medo.Extensions;
 using Medo.IO;
 using Medo.Localization.Croatia;

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Medo.Windows.Forms;
 using MessageBox = Medo.MessageBox;
 

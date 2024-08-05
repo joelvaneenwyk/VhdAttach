@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VirtualHardDiskImage;
 

@@ -1,4 +1,4 @@
-﻿namespace VhdAttach
+namespace VhdAttach
 {
     internal class PipeResponse
     {

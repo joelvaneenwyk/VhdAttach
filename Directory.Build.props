@@ -15,10 +15,10 @@
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-<TargetFramework>net8.0-windows</TargetFramework>
+        <TargetFramework>net8.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-</PropertyGroup>
+    </PropertyGroup>
 
 
     <!-- Set Folder Variables -->
@@ -30,12 +30,13 @@
 
     <!-- Set Base Variables -->
     <PropertyGroup>
-        <ProjectUrl>https://github.com/joelvaneenwyk/plex-service-wrapper</ProjectUrl>
+        <ProjectUrl>https://github.com/joelvaneenwyk/vhd-attach</ProjectUrl>
 
         <!-- SolutionDir is not defined when building projects explicitly -->
         <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(WorkspaceFolder)</SolutionDir>
         <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
-        <VSToolsPath Condition="'$(VSToolsPath)' == '' and Exists('$(MSBuildExtensionsPath32)/Microsoft/VisualStudio/v$(VisualStudioVersion)')">$(MSBuildExtensionsPath32)/Microsoft/VisualStudio/v$(VisualStudioVersion)
+        <VSToolsPath Condition="'$(VSToolsPath)' == '' and Exists('$(MSBuildExtensionsPath32)/Microsoft/VisualStudio/v$(VisualStudioVersion)')">
+            $(MSBuildExtensionsPath32)/Microsoft/VisualStudio/v$(VisualStudioVersion)
         </VSToolsPath>
     </PropertyGroup>
 
@@ -66,7 +67,8 @@
         <Deterministic>true</Deterministic>
         <UseCommonOutputDirectory>false</UseCommonOutputDirectory>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-<NoWarn>$(NoWarn);1591;CA1852;CA1416;CA1822;CA1305;CA1304;CA1309;CA1310;CA1507;CA1712;CA1806;CA1825;CA1834;CA1838;CA1845;CA1846;CA1847;CA1853;CA1854;CA1861;CA1863;CA1864;CA1865;CA1866;CA2022;CA2101;CA2201;CA2249;CA2251;CA2263;CA5364;CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8622;CS8625;CS8629;CS8630;CS8765;NETSDK1005;SYSLIB0003;SYSLIB0004;SYSLIB0014;WFAC010</NoWarn>
-<DebugType>embedded</DebugType>
+        <NoWarn>
+            $(NoWarn);1591;CA1852;CA1416;CA1822;CA1305;CA1304;CA1309;CA1310;CA1507;CA1712;CA1806;CA1825;CA1834;CA1838;CA1845;CA1846;CA1847;CA1853;CA1854;CA1861;CA1863;CA1864;CA1865;CA1866;CA2022;CA2101;CA2201;CA2249;CA2251;CA2263;CA5364;CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8622;CS8625;CS8629;CS8630;CS8765;NETSDK1005;SYSLIB0003;SYSLIB0004;SYSLIB0014;WFAC010</NoWarn>
+        <DebugType>embedded</DebugType>
     </PropertyGroup>
 </Project>

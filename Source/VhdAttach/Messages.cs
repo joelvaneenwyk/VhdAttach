@@ -1,4 +1,4 @@
-﻿using MessageBox = Medo.MessageBox;
+using MessageBox = Medo.MessageBox;
 
 namespace VhdAttach
 {

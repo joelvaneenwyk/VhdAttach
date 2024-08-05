@@ -1,4 +1,4 @@
-﻿//Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
+//Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
 
 //2008-01-02: New version.
 //2008-01-05: Top line now contains product name.

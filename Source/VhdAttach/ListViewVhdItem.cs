@@ -1,4 +1,4 @@
-﻿using VhdAttachCommon;
+using VhdAttachCommon;
 
 namespace VhdAttach
 {
