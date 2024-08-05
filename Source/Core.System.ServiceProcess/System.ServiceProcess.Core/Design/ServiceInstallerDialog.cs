@@ -96,7 +96,6 @@ namespace System.ServiceProcess.Design
 
         private void InitializeComponent()
         {
-            ComponentResourceManager resources = new ComponentResourceManager(typeof(ServiceInstallerDialog));
             okButton = new Button();
             passwordEdit = new TextBox();
             cancelButton = new Button();
@@ -110,81 +109,98 @@ namespace System.ServiceProcess.Design
             okCancelTableLayoutPanel.SuspendLayout();
             overarchingTableLayoutPanel.SuspendLayout();
             SuspendLayout();
-            //
+            // 
             // okButton
-            //
-            resources.ApplyResources(okButton, "okButton");
+            // 
             okButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             okButton.DialogResult = DialogResult.OK;
-            okButton.Margin = new Padding(0, 0, 3, 0);
-            okButton.MinimumSize = new Size(75, 23);
+            okButton.Location = new Point(0, 0);
+            okButton.Margin = new Padding(0, 0, 5, 0);
+            okButton.MinimumSize = new Size(125, 44);
             okButton.Name = "okButton";
-            okButton.Padding = new Padding(10, 0, 10, 0);
+            okButton.Padding = new Padding(17, 0, 17, 0);
+            okButton.Size = new Size(125, 44);
+            okButton.TabIndex = 0;
             okButton.Click += okButton_Click;
-            //
+            // 
             // passwordEdit
-            //
-            resources.ApplyResources(passwordEdit, "passwordEdit");
-            passwordEdit.Margin = new Padding(3, 3, 0, 3);
+            // 
+            passwordEdit.Location = new Point(177, 56);
+            passwordEdit.Margin = new Padding(5, 6, 0, 6);
             passwordEdit.Name = "passwordEdit";
-            //
+            passwordEdit.Size = new Size(154, 31);
+            passwordEdit.TabIndex = 5;
+            // 
             // cancelButton
-            //
-            resources.ApplyResources(cancelButton, "cancelButton");
+            // 
             cancelButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             cancelButton.DialogResult = DialogResult.Cancel;
-            cancelButton.Margin = new Padding(3, 0, 0, 0);
-            cancelButton.MinimumSize = new Size(75, 23);
+            cancelButton.Location = new Point(171, 0);
+            cancelButton.Margin = new Padding(5, 0, 0, 0);
+            cancelButton.MinimumSize = new Size(125, 44);
             cancelButton.Name = "cancelButton";
-            cancelButton.Padding = new Padding(10, 0, 10, 0);
+            cancelButton.Padding = new Padding(17, 0, 17, 0);
+            cancelButton.Size = new Size(125, 44);
+            cancelButton.TabIndex = 1;
             cancelButton.Click += cancelButton_Click;
-            //
+            // 
             // confirmPassword
-            //
-            resources.ApplyResources(confirmPassword, "confirmPassword");
-            confirmPassword.Margin = new Padding(3, 3, 0, 3);
+            // 
+            confirmPassword.Location = new Point(177, 112);
+            confirmPassword.Margin = new Padding(5, 6, 0, 6);
             confirmPassword.Name = "confirmPassword";
-            //
+            confirmPassword.Size = new Size(154, 31);
+            confirmPassword.TabIndex = 3;
+            // 
             // usernameEdit
-            //
-            resources.ApplyResources(usernameEdit, "usernameEdit");
-            usernameEdit.Margin = new Padding(3, 0, 0, 3);
+            // 
+            usernameEdit.Location = new Point(177, 0);
+            usernameEdit.Margin = new Padding(5, 0, 0, 6);
             usernameEdit.Name = "usernameEdit";
-            //
+            usernameEdit.Size = new Size(154, 31);
+            usernameEdit.TabIndex = 6;
+            // 
             // label1
-            //
-            resources.ApplyResources(label1, "label1");
-            label1.Margin = new Padding(0, 0, 3, 3);
+            // 
+            label1.Location = new Point(0, 0);
+            label1.Margin = new Padding(0, 0, 5, 6);
             label1.Name = "label1";
-            //
+            label1.Size = new Size(167, 44);
+            label1.TabIndex = 0;
+            // 
             // label2
-            //
-            resources.ApplyResources(label2, "label2");
-            label2.Margin = new Padding(0, 3, 3, 3);
+            // 
+            label2.Location = new Point(0, 56);
+            label2.Margin = new Padding(0, 6, 5, 6);
             label2.Name = "label2";
-            //
+            label2.Size = new Size(167, 44);
+            label2.TabIndex = 2;
+            // 
             // label3
-            //
-            resources.ApplyResources(label3, "label3");
-            label3.Margin = new Padding(0, 3, 3, 3);
+            // 
+            label3.Location = new Point(0, 112);
+            label3.Margin = new Padding(0, 6, 5, 6);
             label3.Name = "label3";
-            //
+            label3.Size = new Size(167, 44);
+            label3.TabIndex = 4;
+            // 
             // okCancelTableLayoutPanel
-            //
-            resources.ApplyResources(okCancelTableLayoutPanel, "okCancelTableLayoutPanel");
+            // 
             okCancelTableLayoutPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             overarchingTableLayoutPanel.SetColumnSpan(okCancelTableLayoutPanel, 2);
             okCancelTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             okCancelTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             okCancelTableLayoutPanel.Controls.Add(okButton, 0, 0);
             okCancelTableLayoutPanel.Controls.Add(cancelButton, 1, 0);
-            okCancelTableLayoutPanel.Margin = new Padding(0, 6, 0, 0);
+            okCancelTableLayoutPanel.Location = new Point(0, 174);
+            okCancelTableLayoutPanel.Margin = new Padding(0, 12, 0, 0);
             okCancelTableLayoutPanel.Name = "okCancelTableLayoutPanel";
             okCancelTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            //
+            okCancelTableLayoutPanel.Size = new Size(333, 192);
+            okCancelTableLayoutPanel.TabIndex = 1;
+            // 
             // overarchingTableLayoutPanel
-            //
-            resources.ApplyResources(overarchingTableLayoutPanel, "overarchingTableLayoutPanel");
+            // 
             overarchingTableLayoutPanel.ColumnStyles.Add(new ColumnStyle());
             overarchingTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             overarchingTableLayoutPanel.Controls.Add(label1, 0, 0);
@@ -194,22 +210,27 @@ namespace System.ServiceProcess.Design
             overarchingTableLayoutPanel.Controls.Add(label3, 0, 2);
             overarchingTableLayoutPanel.Controls.Add(passwordEdit, 1, 1);
             overarchingTableLayoutPanel.Controls.Add(usernameEdit, 1, 0);
+            overarchingTableLayoutPanel.Location = new Point(14, 15);
+            overarchingTableLayoutPanel.Margin = new Padding(5, 6, 5, 6);
             overarchingTableLayoutPanel.Name = "overarchingTableLayoutPanel";
             overarchingTableLayoutPanel.RowStyles.Add(new RowStyle());
             overarchingTableLayoutPanel.RowStyles.Add(new RowStyle());
             overarchingTableLayoutPanel.RowStyles.Add(new RowStyle());
             overarchingTableLayoutPanel.RowStyles.Add(new RowStyle());
-            //
+            overarchingTableLayoutPanel.Size = new Size(435, 439);
+            overarchingTableLayoutPanel.TabIndex = 0;
+            // 
             // ServiceInstallerDialog
-            //
+            // 
             AcceptButton = okButton;
-            resources.ApplyResources(this, "$this");
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            AutoScaleDimensions = new SizeF(6, 13);
             CancelButton = cancelButton;
+            ClientSize = new Size(463, 469);
             Controls.Add(overarchingTableLayoutPanel);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             HelpButton = true;
+            Margin = new Padding(5, 6, 5, 6);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ServiceInstallerDialog";
@@ -217,11 +238,9 @@ namespace System.ServiceProcess.Design
             ShowInTaskbar = false;
             HelpButtonClicked += ServiceInstallerDialog_HelpButtonClicked;
             okCancelTableLayoutPanel.ResumeLayout(false);
-            okCancelTableLayoutPanel.PerformLayout();
             overarchingTableLayoutPanel.ResumeLayout(false);
             overarchingTableLayoutPanel.PerformLayout();
             ResumeLayout(false);
-
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
