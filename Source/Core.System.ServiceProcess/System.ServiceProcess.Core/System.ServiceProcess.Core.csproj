@@ -28,7 +28,7 @@
         <None Include="..\LICENSE" Pack="true" PackagePath="$(PackageLicenseFile)" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
+        <PackageReference Include="System.ServiceProcess.ServiceController" Version="9.0.1" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference
