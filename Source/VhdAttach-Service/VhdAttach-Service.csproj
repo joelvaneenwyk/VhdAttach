@@ -68,7 +68,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
     <PackageReference Include="System.Management" Version="9.0.1" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+    <PackageReference Include="System.Text.Json" Version="9.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.System.ServiceProcess\System.Configuration.Install\System.Configuration.Install.csproj" />
