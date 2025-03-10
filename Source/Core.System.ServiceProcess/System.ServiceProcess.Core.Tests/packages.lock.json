@@ -64,8 +64,8 @@
       },
       "System.Diagnostics.EventLog": {
         "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "fdYxcRjQqTTacKId/2IECojlDSFvp7LP5N78+0z/xH7v/Tuw5ZAxu23Y6PTCRinqyu2ePx+Gn1098NC6jM6d+A=="
+        "resolved": "9.0.2",
+        "contentHash": "i+Fe6Fpst/onydFLBGilCr/Eh9OFdlaTU/c3alPp6IbLZXQJOgpIu3l4MOnmsN8fDYq5nAyHSqNIJesc74Yw3Q=="
       },
       "System.Reflection.Metadata": {
         "type": "Transitive",
@@ -74,10 +74,10 @@
       },
       "System.ServiceProcess.ServiceController": {
         "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "jtYVG3bpw2n/NvNnP2g/JLri0D4UtfusTvLeH6cZPNAEjJXJVGspS3wLgVvjNbm+wjaYkFgsXejMTocV1T5DIQ==",
+        "resolved": "9.0.2",
+        "contentHash": "c69iiGEZ4xUv8aZTFd45K4SM08L2NLepihJ5vAb7Ekzgtk2Y8bUwt+3PQVstUl020dXW16R8hpiq/RZuzFFVyw==",
         "dependencies": {
-          "System.Diagnostics.EventLog": "8.0.0"
+          "System.Diagnostics.EventLog": "9.0.2"
         }
       },
       "xunit.abstractions": {
@@ -130,7 +130,7 @@
         "type": "Project",
         "dependencies": {
           "Core.System.Configuration.Install": "[1.1.0, )",
-          "System.ServiceProcess.ServiceController": "[8.0.0, )"
+          "System.ServiceProcess.ServiceController": "[9.0.2, )"
         }
       }
     }
