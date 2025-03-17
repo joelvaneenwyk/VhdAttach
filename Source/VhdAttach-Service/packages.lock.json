@@ -24,11 +24,11 @@
       },
       "System.ServiceProcess.ServiceController": {
         "type": "Direct",
-        "requested": "[8.0.0, )",
-        "resolved": "8.0.0",
-        "contentHash": "jtYVG3bpw2n/NvNnP2g/JLri0D4UtfusTvLeH6cZPNAEjJXJVGspS3wLgVvjNbm+wjaYkFgsXejMTocV1T5DIQ==",
+        "requested": "[9.0.3, )",
+        "resolved": "9.0.3",
+        "contentHash": "moNbNXB7q4flS7bLjBTueu5MBZuxBHb08QTdVeDxJo55TgICdlaq4dvdmusB1D6VoUmq7/dT4uZDZ8KMZScHKg==",
         "dependencies": {
-          "System.Diagnostics.EventLog": "8.0.0"
+          "System.Diagnostics.EventLog": "9.0.3"
         }
       },
       "System.Text.Json": {
@@ -339,8 +339,8 @@
       },
       "System.Diagnostics.EventLog": {
         "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "fdYxcRjQqTTacKId/2IECojlDSFvp7LP5N78+0z/xH7v/Tuw5ZAxu23Y6PTCRinqyu2ePx+Gn1098NC6jM6d+A=="
+        "resolved": "9.0.3",
+        "contentHash": "0nDJBZ06DVdTG2vvCZ4XjazLVaFawdT0pnji23ISX8I8fEOlRJyzH2I0kWiAbCtFwry2Zir4qE4l/GStLATfFw=="
       },
       "System.Text.Encodings.Web": {
         "type": "Transitive",
@@ -357,7 +357,7 @@
         "type": "Project",
         "dependencies": {
           "Core.System.Configuration.Install": "[1.1.0, )",
-          "System.ServiceProcess.ServiceController": "[8.0.0, )"
+          "System.ServiceProcess.ServiceController": "[9.0.3, )"
         }
       }
     }
